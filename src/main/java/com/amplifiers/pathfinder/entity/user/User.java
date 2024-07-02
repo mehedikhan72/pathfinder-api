@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.user;
 
+import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.token.Token;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,6 +39,9 @@ public class User implements UserDetails {
 
   @OneToMany(mappedBy = "user")
   private List<Token> tokens;
+
+  @OneToMany(mappedBy = "user")
+  private List<Gig> gigs;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
