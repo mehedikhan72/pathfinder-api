@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @Builder
@@ -25,6 +27,7 @@ public class Gig {
     private Integer id;
     private String title;
     private String description;
+    private String category;
     private float price;
     private float rating;
     private Integer total_orders;
@@ -34,6 +37,15 @@ public class Gig {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "gig_tag",
+            joinColumns = @JoinColumn(name = "gig_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags;
 
     @CreatedDate
     @Column(

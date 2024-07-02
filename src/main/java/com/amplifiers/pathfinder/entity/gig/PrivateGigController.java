@@ -15,7 +15,6 @@ public class PrivateGigController {
     public ResponseEntity<?> createGig(
             @RequestBody GigCreateRequest request
     ) {
-        service.save(request);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok(service.createGig(request));
     }
 }
