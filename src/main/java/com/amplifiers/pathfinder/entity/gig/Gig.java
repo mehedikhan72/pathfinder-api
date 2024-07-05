@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.faq.FAQ;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,6 +47,9 @@ public class Gig {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<Tag> tags;
+
+    @OneToMany(mappedBy = "gig")
+    private Set<FAQ> faqs;
 
     @CreatedDate
     @Column(
