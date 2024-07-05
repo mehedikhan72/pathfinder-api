@@ -50,7 +50,7 @@ public class GigService {
                 .rating(0.0f)
                 .total_orders(0)
                 .accepted(false)
-                .user(user)
+                .seller(user)
                 .tags(tags)
                 .created_at(LocalDateTime.now())
                 .build();

@@ -12,12 +12,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FAQService {
-    private final FAQRepository repository;
+    private final FAQRepository faqRepository;
     private final GigRepository gigRepository;
 
     public FAQ createFAQ(FAQCreateRequest request, Integer gig_id) {
 
-    Gig gig = gigRepository.findById(gig_id)
+        Gig gig = gigRepository.findById(gig_id)
             .orElseThrow(() -> new IllegalArgumentException("Gig not found"));
 
         var faq = FAQ.builder()
@@ -25,10 +25,10 @@ public class FAQService {
                 .question(request.getQuestion())
                 .answer(request.getAnswer())
                 .build();
-        return repository.save(faq);
+        return faqRepository.save(faq);
     }
 
     public List<FAQ>findAllByGigId(Integer id) {
-        return repository.findAllByGigId(id);
+        return faqRepository.findAllByGigId(id);
     }
 }

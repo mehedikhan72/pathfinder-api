@@ -48,6 +48,6 @@ public class Enrollment {
     private float price;
     private Integer num_sessions;
     private Integer num_sessions_completed;
-    private Integer buyer_confirmed; // when buyer accepts the offer
-    private Integer paid;
+    private boolean buyer_confirmed; // when buyer accepts the offer
+    private boolean paid;
 }
