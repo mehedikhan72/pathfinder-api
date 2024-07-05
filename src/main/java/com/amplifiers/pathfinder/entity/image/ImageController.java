@@ -1,17 +1,18 @@
 package com.amplifiers.pathfinder.entity.image;
 
+import com.amplifiers.pathfinder.cloudstorage.CloudStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("/api/v1/public/images")
 @RequiredArgsConstructor
 public class ImageController {
     private final ImageService service;
+    private final CloudStorageService cloudService;
 
     @PostMapping("/save")
     public ResponseEntity<?> saveImage(@RequestParam("image") MultipartFile file){
@@ -24,8 +25,26 @@ public class ImageController {
     }
 
     @RequestMapping("/{filename}")
-    public ResponseEntity<?> findImage(@PathVariable("filename") String filename) {
-        return service.getImage(filename);
+    public ResponseEntity<?> serveImage(@PathVariable("filename") String filename) {
+        try {
+            Image image = service.getImage(filename);
+            System.out.println("Served image : "+image.getFilename());
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(CloudStorageService.getFile(image.getUrl()));
+        } catch (Exception E) {
+            E.printStackTrace();
+            return ResponseEntity.status(400).body(E.getMessage());
+        }
+    }
+
+    @RequestMapping("/delete-all")
+    public ResponseEntity<?> clearStoredImages() {
+        try {
+            service.clearStoredImages();
+            return ResponseEntity.ok("cleared");
+        } catch (Exception E) {
+            E.printStackTrace();
+            return ResponseEntity.status(400).body(E.getMessage());
+        }
     }
 
     @GetMapping("/all")
