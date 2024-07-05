@@ -22,7 +22,7 @@ public class ImageService {
     private final ImageRepository repository;
 
     private final Integer MAX_FILE_SIZE = 500 * 1024;
-    private final List<String> allowedExts = Arrays.asList(new String[]{"jpg", "jpeg", "gif", "png", "bmp", "wbmp"});
+    private final List<String> allowedExts = Arrays.asList("jpg", "jpeg", "gif", "png", "bmp", "wbmp");
 
     public byte[] compressImage(MultipartFile file) throws Exception {
         BufferedImage pngImg = ImageIO.read(file.getInputStream());
@@ -62,7 +62,7 @@ public class ImageService {
 //            System.out.println("Size after pass " + count + " : " +finalImageData.length);
         }
 
-        System.out.println(finalImageData.length / (float)file.getBytes().length);
+//        System.out.println(finalImageData.length / (float)file.getBytes().length);
 
         ImageIO.write(compressedImage, "jpg", new File("test.jpg"));
 

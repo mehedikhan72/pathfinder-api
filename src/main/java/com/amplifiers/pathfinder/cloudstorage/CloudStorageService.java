@@ -29,18 +29,14 @@ public class CloudStorageService {
                 .region(Region.of("eu-central-003")).build();
     }
 
-    public static String uploadFile(byte[] fileData, String keyName) {
-
+    public static void uploadFile(byte[] fileData, String keyName) {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).build();
-            PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileData));
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileData));
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(1);
         }
-
-        return "nothing";
     }
 
     public static byte[] getFile(String keyName){
