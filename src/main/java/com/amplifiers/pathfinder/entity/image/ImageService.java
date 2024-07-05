@@ -1,7 +1,6 @@
 package com.amplifiers.pathfinder.entity.image;
 
 import com.amplifiers.pathfinder.cloudstorage.CloudStorageService;
-import jakarta.activation.MimetypesFileTypeMap;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
@@ -13,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +22,7 @@ public class ImageService {
     private final ImageRepository repository;
 
     private final Integer MAX_FILE_SIZE = 500 * 1024;
+    private final List<String> allowedExts = Arrays.asList(new String[]{"jpg", "jpeg", "gif", "png", "bmp", "wbmp"});
 
     public byte[] compressImage(MultipartFile file) throws Exception {
         BufferedImage pngImg = ImageIO.read(file.getInputStream());
@@ -70,7 +71,6 @@ public class ImageService {
 
     private boolean isValidImageFile(MultipartFile file) {
         String ext = FilenameUtils.getExtension(file.getOriginalFilename()).toLowerCase();
-        String allowedExts[] = {"jpg", "jpeg", "gif", "png", "bmp", "wbmp"};
 
         for (String allowedExt : allowedExts) {
             if (allowedExt.equals(ext)) {
@@ -101,12 +101,10 @@ public class ImageService {
 
     public Image getImage(String filename) {
         filename = FilenameUtils.getBaseName(filename);
-        Image image = repository.findByFilename(filename);
-
-        return image;
+        return repository.findByFilename(filename);
     }
 
-    public void clearStoredImages() throws Exception{
+    public void clearStoredImages(){
         CloudStorageService.clearBucket("pathfinder-bucket");
         repository.deleteAll();
     }

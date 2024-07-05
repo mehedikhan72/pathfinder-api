@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ImageController {
     private final ImageService service;
-    private final CloudStorageService cloudService;
 
     @PostMapping("/save")
     public ResponseEntity<?> saveImage(@RequestParam("image") MultipartFile file){
