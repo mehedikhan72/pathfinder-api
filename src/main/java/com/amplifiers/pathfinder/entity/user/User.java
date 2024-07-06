@@ -1,14 +1,12 @@
 package com.amplifiers.pathfinder.entity.user;
 
+import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.token.Token;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -32,17 +30,24 @@ public class User implements UserDetails {
   private String firstname;
   private String lastname;
   private String email;
+
+  @JsonIgnore
   private String password;
 
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @OneToMany(mappedBy = "user")
-  private List<Token> tokens;
 
-  @OneToMany(mappedBy = "user")
-  private List<Gig> gigs;
+//  @OneToMany(mappedBy = "user")
+//  private List<Token> tokens;
+//
+//  @OneToMany(mappedBy = "user")
+//  private List<Gig> gigs;
+//
+//  @OneToMany(mappedBy = "buyer")
+//  private List<Enrollment> enrollments;
 
+  @JsonIgnore
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return role.getAuthorities();
@@ -58,21 +63,25 @@ public class User implements UserDetails {
     return email;
   }
 
+  @JsonIgnore
   @Override
   public boolean isAccountNonExpired() {
     return true;
   }
 
+  @JsonIgnore
   @Override
   public boolean isAccountNonLocked() {
     return true;
   }
 
+  @JsonIgnore
   @Override
   public boolean isCredentialsNonExpired() {
     return true;
   }
 
+  @JsonIgnore
   @Override
   public boolean isEnabled() {
     return true;

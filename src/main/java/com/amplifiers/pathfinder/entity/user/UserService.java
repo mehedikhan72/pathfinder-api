@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.user;
 
+import com.amplifiers.pathfinder.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,11 +21,11 @@ public class UserService {
 
         // check if the current password is correct
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalStateException("Wrong password");
+            throw new ValidationException("Wrong password. Please try again.");
         }
         // check if the two new passwords are the same
         if (!request.getNewPassword().equals(request.getConfirmationPassword())) {
-            throw new IllegalStateException("Password are not the same");
+            throw new ValidationException("Password do not match. Please try again.");
         }
 
         // update the password
