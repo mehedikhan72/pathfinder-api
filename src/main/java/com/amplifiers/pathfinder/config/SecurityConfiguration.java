@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.config;
 
+import com.amplifiers.pathfinder.auth.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,20 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.amplifiers.pathfinder.entity.user.Permission.ADMIN_CREATE;
-import static com.amplifiers.pathfinder.entity.user.Permission.ADMIN_DELETE;
-import static com.amplifiers.pathfinder.entity.user.Permission.ADMIN_READ;
-import static com.amplifiers.pathfinder.entity.user.Permission.ADMIN_UPDATE;
-import static com.amplifiers.pathfinder.entity.user.Permission.MANAGER_CREATE;
-import static com.amplifiers.pathfinder.entity.user.Permission.MANAGER_DELETE;
-import static com.amplifiers.pathfinder.entity.user.Permission.MANAGER_READ;
-import static com.amplifiers.pathfinder.entity.user.Permission.MANAGER_UPDATE;
+import static com.amplifiers.pathfinder.entity.user.Permission.*;
 import static com.amplifiers.pathfinder.entity.user.Role.ADMIN;
 import static com.amplifiers.pathfinder.entity.user.Role.MANAGER;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -50,6 +41,7 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -74,6 +66,10 @@ public class SecurityConfiguration {
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
                 )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling
+                                .defaultAuthenticationEntryPointFor(customAuthenticationEntryPoint, request -> true)
+                );
         ;
 
         return http.build();

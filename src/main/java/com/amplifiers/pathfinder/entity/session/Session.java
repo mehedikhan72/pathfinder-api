@@ -53,5 +53,12 @@ public class Session {
 
     private boolean buyer_confirmed;
 
+    private boolean cancelled;
+
+    @Enumerated(EnumType.STRING)
+    private CancelledBy cancelled_by;
+    private String cancellation_reason;
+    private LocalDateTime cancelled_at;
+
     // TODO: more data about session will be added here, later.
 }

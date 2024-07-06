@@ -4,12 +4,11 @@ import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
+import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.UnauthorizedException;
+import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -23,7 +22,7 @@ public class SessionService {
     private final UserUtility userUtility;
 
     public Session createSession(SessionCreateRequest request, Integer enrollment_id) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollment_id).orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
+        Enrollment enrollment = enrollmentRepository.findById(enrollment_id).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
 
         // user validation: only the seller can create a session.
         var seller_id = enrollment.getGig().getSeller().getId();
@@ -40,7 +39,7 @@ public class SessionService {
     }
 
     public Session buyerConfirmsSession(Integer session_id) {
-        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new IllegalArgumentException("Session not found"));
+        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         // only the buyer can confirm a session
         User user = userUtility.getCurrentUser();
@@ -55,7 +54,7 @@ public class SessionService {
     }
 
     public Session updateSession(SessionCreateRequest request, Integer session_id) {
-        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new IllegalArgumentException("Session not found"));
+        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         // TODO: for now, let's allow only the seller to update the session
 
@@ -72,7 +71,7 @@ public class SessionService {
     }
 
     public Session completeSession(Integer session_id) {
-        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new IllegalArgumentException("Session not found"));
+        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         // only the seller can complete a session
         var seller = session.getEnrollment().getGig().getSeller();
@@ -81,8 +80,54 @@ public class SessionService {
             throw new UnauthorizedException("Only the seller can complete a session");
         }
 
+        if (session.isCancelled()) {
+            throw new ValidationException("Session is already cancelled");
+        }
+
+        if (session.isCompleted()) {
+            throw new ValidationException("Session already completed");
+        }
+
+        if (!session.isBuyer_confirmed()) {
+            throw new ValidationException("Buyer has not confirmed the session");
+        }
+
         session.setCompleted(true);
         session.setCompleted_at(java.time.LocalDateTime.now());
         return sessionRepository.save(session);
+    }
+
+    public String cancelSession(SessionCancelRequest request, Integer session_id) {
+        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
+
+        User user = userUtility.getCurrentUser();
+        User seller = session.getEnrollment().getGig().getSeller();
+        User buyer = session.getEnrollment().getBuyer();
+
+        if (!Objects.equals(user.getId(), seller.getId()) && !Objects.equals(user.getId(), buyer.getId())) {
+            throw new UnauthorizedException("Only the seller or the buyer can cancel this session");
+        }
+
+        if (session.isCompleted()) {
+            throw new ValidationException("Session is already completed");
+        }
+
+        if (session.isCancelled()) {
+            throw new ValidationException("Session is already cancelled");
+        }
+
+        session.setCancelled(true);
+
+        if (Objects.equals(user.getId(), seller.getId())) {
+            session.setCancelled_by(CancelledBy.SELLER);
+        } else {
+            session.setCancelled_by(CancelledBy.BUYER);
+        }
+        session.setCancellation_reason(request.getCancellation_reason());
+        session.setCancelled_at(java.time.LocalDateTime.now());
+
+        sessionRepository.save(session);
+
+        return "Session cancelled.";
     }
 }
