@@ -28,7 +28,7 @@ public class ImageController {
         try {
             Image image = service.getImage(filename);
             System.out.println("Served image : "+image.getFilename());
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(CloudStorageService.getFile(image.getUrl()));
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(CloudStorageService.getFile(image.getFilename()));
         } catch (Exception E) {
             E.printStackTrace();
             return ResponseEntity.status(400).body(E.getMessage());

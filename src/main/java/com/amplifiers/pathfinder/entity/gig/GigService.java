@@ -1,13 +1,13 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.image.Image;
+import com.amplifiers.pathfinder.entity.image.ImageService;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
-import com.amplifiers.pathfinder.entity.tag.TagRepository;
 import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +24,7 @@ public class GigService {
     private final GigRepository repository;
     private final UserRepository userRepository;
     private final TagService tagService;
+    private final ImageService imageService;
 
     public Gig createGig(GigCreateRequest request) {
         // Get the current authenticated user
@@ -64,5 +65,35 @@ public class GigService {
     public Gig findById(Integer id) {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Gig not found"));
+    }
+
+    public Image setCoverImage(GigImageSetRequest gigCoverSetRequest) throws Exception {
+        // Get the current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        // Fetch user from repository using userEmail
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Gig gig = repository.getReferenceById(gigCoverSetRequest.getId());
+
+        if (!(user.getId() == gig.getUser().getId())){
+            throw new IllegalArgumentException("User not owner of this gig");
+        }
+
+        Image coverImage = imageService.saveImage(gigCoverSetRequest.getImage());
+
+        gig.setGig_cover_image(coverImage);
+        repository.save(gig);
+
+        return coverImage;
+    }
+
+    public Image getCoverImage(int id) {
+        Gig gig = repository.getReferenceById(id);
+
+        return gig.getGig_cover_image();
     }
 }

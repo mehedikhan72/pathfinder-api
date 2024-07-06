@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -53,4 +54,8 @@ public class Gig {
             updatable = false
     )
     private LocalDateTime created_at;
+
+    @OneToOne
+    @JoinColumn(name = "gig_cover_image")
+    private Image gig_cover_image;
 }

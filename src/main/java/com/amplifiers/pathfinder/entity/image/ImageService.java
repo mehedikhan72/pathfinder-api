@@ -85,12 +85,13 @@ public class ImageService {
             throw new Exception("Invalid image file. Please upload .jpg, .png, .gif or .bmp file.");
         }
 
-        String fileName = ("pf-" + FilenameUtils.getBaseName(file.getOriginalFilename()) + "-" + UUID.randomUUID()).replaceAll("\\.", "");
-        String keyName = fileName + "." + "jpg";
+        String basename = ("pf-" + FilenameUtils.getBaseName(file.getOriginalFilename()) + "-" + UUID.randomUUID()).replaceAll("\\.", "");
+        String keyName = basename + "." + "jpg";
 
         byte[] fileData = compressImage(file);
+
         CloudStorageService.uploadFile(fileData, keyName);
-        Image image = Image.builder().filename(fileName).format("jpg").url(keyName).build();
+        Image image = Image.builder().basename(basename).format("jpg").filename(keyName).build();
 
         return repository.save(image);
     }

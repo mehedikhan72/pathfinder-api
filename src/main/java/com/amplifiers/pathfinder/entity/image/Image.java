@@ -2,6 +2,7 @@ package com.amplifiers.pathfinder.entity.image;
 
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,14 +21,14 @@ public class Image {
     @Id
     @GeneratedValue
     private Integer id;
-    private String filename;
+    private String basename;
     private String format;
-    private String url;
 
-    private Integer layoutOrder;
+    @Transient
+    private String filename;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "gig_id")
-    private Gig gig;
+    @PostLoad
+    private void onLoad(){
+        this.filename = this.basename + "." + this.format;
+    }
 }
