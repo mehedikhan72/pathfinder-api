@@ -1,6 +1,7 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 public class EnrollmentController {
     private final EnrollmentService service;
 
-    @PostMapping("/{gig_id}/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/create/{gig_id}")
     public ResponseEntity<?> createEnrollment(
             @RequestBody EnrollmentCreateRequest request,
             @PathVariable Integer gig_id
@@ -18,7 +20,7 @@ public class EnrollmentController {
         return ResponseEntity.ok(service.createEnrollment(request, gig_id));
     }
 
-    @GetMapping("/{gig_id}")
+    @GetMapping("/all/{gig_id}")
     public ResponseEntity<?> findAllByGigId(
             @PathVariable Integer gig_id
     ) {

@@ -2,14 +2,12 @@ package com.amplifiers.pathfinder.entity.enrollment;
 
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -48,6 +46,7 @@ public class Enrollment {
     private float price;
     private Integer num_sessions;
     private Integer num_sessions_completed;
+    private Integer session_duration_in_minutes;
     private boolean buyer_confirmed; // when buyer accepts the offer
     private boolean paid;
 }

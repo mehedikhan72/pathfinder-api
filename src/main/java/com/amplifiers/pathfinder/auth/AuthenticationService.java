@@ -6,12 +6,15 @@ import com.amplifiers.pathfinder.entity.token.TokenRepository;
 import com.amplifiers.pathfinder.entity.token.TokenType;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
+import com.amplifiers.pathfinder.exception.AuthenticationException;
+import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,14 +49,16 @@ public class AuthenticationService {
   }
 
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            request.getEmail(),
-            request.getPassword()
-        )
-    );
-    var user = repository.findByEmail(request.getEmail())
-        .orElseThrow();
+    var user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+
+    try {
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    } catch (BadCredentialsException e) {
+      throw new AuthenticationException("Incorrect email or password. Please try again.");
+    } catch (AuthenticationException e) {
+      throw new AuthenticationException("Authentication failed. Please try again.");
+    }
+
     var jwtToken = jwtService.generateToken(user);
     var refreshToken = jwtService.generateRefreshToken(user);
     revokeAllUserTokens(user);
@@ -99,8 +104,7 @@ public class AuthenticationService {
     refreshToken = authHeader.substring(7);
     userEmail = jwtService.extractUsername(refreshToken);
     if (userEmail != null) {
-      var user = this.repository.findByEmail(userEmail)
-              .orElseThrow();
+      var user = this.repository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
       if (jwtService.isTokenValid(refreshToken, user)) {
         var accessToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
