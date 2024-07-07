@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ErrorDetails {
-        private int statusCode;
+        private int status_code;
         private String message;
     }
 }
