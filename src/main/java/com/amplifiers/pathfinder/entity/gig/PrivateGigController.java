@@ -19,4 +19,25 @@ public class PrivateGigController {
     ) {
         return ResponseEntity.ok(service.createGig(request));
     }
+
+    @PostMapping("/set-cover-image")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<?> setCoverImage(@ModelAttribute GigImageSetRequest gigImageSetRequest) {
+        try {
+            return ResponseEntity.ok(service.setCoverImage(gigImageSetRequest));
+        } catch (Exception E) {
+            E.printStackTrace();
+            return ResponseEntity.status(400).body(E.getMessage());
+        }
+    }
+    @PostMapping("/set-gig-video")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<?> setCoverImage(@ModelAttribute GigVideoSetRequest gigVideoSetRequest) {
+        try {
+            return ResponseEntity.ok(service.setGigVideo(gigVideoSetRequest));
+        } catch (Exception E) {
+            E.printStackTrace();
+            return ResponseEntity.status(400).body(E.getMessage());
+        }
+    }
 }

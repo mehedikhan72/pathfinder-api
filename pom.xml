@@ -120,6 +120,10 @@
 			<version>0.4.20</version>
 		</dependency>
 
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3-transfer-manager</artifactId>
+		</dependency>
 
 	</dependencies>
 

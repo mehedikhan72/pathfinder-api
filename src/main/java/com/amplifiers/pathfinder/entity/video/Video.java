@@ -1,8 +1,5 @@
-package com.amplifiers.pathfinder.entity.image;
+package com.amplifiers.pathfinder.entity.video;
 
-import com.amplifiers.pathfinder.entity.gig.Gig;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +16,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "image")
-public class Image {
+@Table(name = "video")
+public class Video {
     @Id
     @GeneratedValue
     private Integer id;
@@ -34,6 +31,9 @@ public class Image {
     @Transient
     private String filename;
 
+    @Column(columnDefinition="text")
+    private String presignedUrl;
+    private LocalDateTime presignedUrlExpire;
     @PostLoad
     private void onLoad(){
         this.filename = this.basename + "." + this.format;

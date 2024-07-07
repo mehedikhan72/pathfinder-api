@@ -5,6 +5,7 @@ import com.amplifiers.pathfinder.entity.faq.FAQ;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.user.User;
+import com.amplifiers.pathfinder.entity.video.Video;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -62,4 +63,8 @@ public class Gig {
     @OneToOne
     @JoinColumn(name = "gig_cover_image")
     private Image gig_cover_image;
+
+    @OneToOne
+    @JoinColumn(name = "gig_video")
+    private Video gig_video;
 }

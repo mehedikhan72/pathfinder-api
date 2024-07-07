@@ -1,6 +1,7 @@
 package com.amplifiers.pathfinder.entity.image;
 
 import com.amplifiers.pathfinder.cloudstorage.CloudStorageService;
+import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -91,7 +93,9 @@ public class ImageService {
         byte[] fileData = compressImage(file);
 
         CloudStorageService.uploadFile(fileData, keyName);
-        Image image = Image.builder().basename(basename).format("jpg").filename(keyName).build();
+        Image image = Image.builder().basename(basename).created_at(LocalDateTime.now()).format("jpg").filename(keyName).build();
+
+        System.out.println("Saved image : " + image.getFilename());
 
         return repository.save(image);
     }
@@ -100,9 +104,23 @@ public class ImageService {
         return repository.findAll();
     }
 
-    public Image getImage(String filename) {
-        filename = FilenameUtils.getBaseName(filename);
-        return repository.findByFilename(filename);
+    public Image getImage(String name) {
+        String basename = FilenameUtils.getBaseName(name);
+        Image image = repository.findByBasename(basename)
+                .orElseThrow(() -> new ResourceNotFoundException(basename + " does not exist."));
+
+        return image;
+    }
+
+    public void deleteImage(Integer id){
+        Image image = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Image with id " + id + " doesn't exist"));
+
+        CloudStorageService.deleteFile(image.getFilename());
+
+        repository.deleteById(id);
+
+        System.out.println("Deleted image : " + image.getFilename());
     }
 
     public void clearStoredImages(){

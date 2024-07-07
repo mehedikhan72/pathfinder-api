@@ -1,5 +1,7 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.video.Video;
+import com.amplifiers.pathfinder.entity.video.VideoService;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -7,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 
 @RestController
@@ -27,13 +31,4 @@ public class PublicGigController {
         return ResponseEntity.ok(service.findById(id));
     }
 
-    @PostMapping("/set-cover-image")
-    public ResponseEntity<?> setCoverImage(@ModelAttribute GigImageSetRequest gigImageSetRequest) {
-        try {
-            return ResponseEntity.ok(service.setCoverImage(gigImageSetRequest));
-        } catch (Exception E) {
-            E.printStackTrace();
-            return ResponseEntity.status(400).body(E.getMessage());
-        }
-    }
 }
