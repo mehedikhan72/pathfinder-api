@@ -1,18 +1,22 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/pathfinder
+    url: jdbc:postgresql://ep-dry-water-a1yslt0i.ap-southeast-1.aws.neon.tech/pathfinder?user=pathfinder_owner&password=RkTVY3EmQJ6h&sslmode=require
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
 
 application:
   security:
@@ -21,3 +25,10 @@ application:
       expiration: 86400000 # a day
       refresh-token:
         expiration: 604800000 # 7 days
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+      hibernate: ERROR
