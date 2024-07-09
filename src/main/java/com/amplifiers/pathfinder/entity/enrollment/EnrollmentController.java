@@ -20,7 +20,7 @@ public class EnrollmentController {
         return ResponseEntity.ok(service.createEnrollment(request, gig_id));
     }
 
-    @GetMapping("/all/{gig_id}")
+    @GetMapping("/gig/{gig_id}")
     public ResponseEntity<?> findAllByGigId(
             @PathVariable Integer gig_id
     ) {
@@ -28,10 +28,17 @@ public class EnrollmentController {
     }
 
     // A user can see all enrollments they have made
-    @GetMapping("/{buyer_id}")
+    @GetMapping("/buyer/{buyer_id}")
     public ResponseEntity<?> findAllByBuyerId(
             @PathVariable Integer buyer_id
     ) {
         return ResponseEntity.ok(service.findAllByBuyerId(buyer_id));
+    }
+
+    @GetMapping("/deadline-passed/{enrollment_id}")
+    public ResponseEntity<?> hasDeadlinePassed(
+            @PathVariable Integer enrollment_id
+    ) {
+        return ResponseEntity.ok(service.hasDeadlinePassed(enrollment_id));
     }
 }

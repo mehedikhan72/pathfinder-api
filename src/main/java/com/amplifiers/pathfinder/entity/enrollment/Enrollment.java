@@ -41,7 +41,7 @@ public class Enrollment {
             updatable = false
     )
     private LocalDateTime created_at;
-
+    private LocalDateTime deadline;
     private LocalDateTime completed_at;
     private float price;
     private Integer num_sessions;
