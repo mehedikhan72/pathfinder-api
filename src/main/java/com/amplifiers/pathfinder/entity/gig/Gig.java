@@ -1,13 +1,13 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
+import com.amplifiers.pathfinder.entity.faq.FAQ;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,21 +29,11 @@ public class Gig {
     @Id
     @GeneratedValue
     private Integer id;
-
-    @NotBlank(message = "Title is required.")
     private String title;
-
-    @NotBlank(message = "Description is required.")
     private String description;
-
-    @NotBlank(message = "Category is required.")
     private String category;
-
-    @NotNull(message = "Price is required.")
     private float price;
-
     private float rating;
-
     private Integer total_orders;
     private boolean accepted;
 
@@ -53,7 +43,6 @@ public class Gig {
     @JoinColumn(name = "user_id")
     private User seller;
 
-    @NotNull(message = "At least one tag is required.")
     @JsonIgnore
     @ManyToMany
     @JoinTable(

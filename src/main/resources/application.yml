@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/pathfinder
+    url: jdbc:postgresql://ep-dry-water-a1yslt0i.ap-southeast-1.aws.neon.tech/pathfinder?user=pathfinder_owner&password=RkTVY3EmQJ6h&sslmode=require
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -14,6 +14,10 @@ spring:
         format_sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
 
 application:
   security:
