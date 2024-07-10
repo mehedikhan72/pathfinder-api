@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class PrivateGigController {
     private final GigService service;
 
-    @Validated
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createGig(
-            @RequestBody GigCreateRequest request
+            @Valid @RequestBody GigCreateRequest request
     ) {
         return ResponseEntity.ok(service.createGig(request));
     }
