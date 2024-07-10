@@ -1,9 +1,9 @@
 package com.amplifiers.pathfinder.entity.faq;
 
 import com.amplifiers.pathfinder.entity.gig.Gig;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +21,11 @@ public class FAQ {
     @Id
     @GeneratedValue
     private Integer id;
+
+    @NotBlank(message = "Question is required.")
     private String question;
+
+    @NotBlank(message = "Answer is required.")
     private String answer;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
