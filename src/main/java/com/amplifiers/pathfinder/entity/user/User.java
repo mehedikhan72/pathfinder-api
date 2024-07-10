@@ -1,14 +1,10 @@
 package com.amplifiers.pathfinder.entity.user;
 
-import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
-import com.amplifiers.pathfinder.entity.gig.Gig;
-import com.amplifiers.pathfinder.entity.token.Token;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-import java.util.Collection;
-import java.util.List;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,24 +12,36 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user")
+@Table(name = "_user", uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
 public class User implements UserDetails {
 
   @Id
   @GeneratedValue
   private Integer id;
+
+  @NotBlank(message = "First name is required.")
   private String firstname;
+
+  @NotBlank(message = "Last name is required.")
   private String lastname;
+
+  @NotBlank(message = "Email is required")
+  @Email(message = "Invalid email.")
   private String email;
 
+
   @JsonIgnore
+  @NotBlank(message = "Password is required.")
   private String password;
 
+  @NotNull(message = "Role is required.")
   @Enumerated(EnumType.STRING)
   private Role role;
 

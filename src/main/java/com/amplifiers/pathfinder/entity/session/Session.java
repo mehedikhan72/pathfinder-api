@@ -3,10 +3,10 @@ package com.amplifiers.pathfinder.entity.session;
 import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -38,12 +38,15 @@ public class Session {
     )
     private LocalDateTime created_at;
 
+    @NotNull(message = "Scheduled date is required.")
+    @Future(message = "Scheduled date must be in the future.")
     private LocalDateTime scheduled_at;
     private LocalDateTime completed_at;
     private boolean completed;
 
     // string for now, it will be online, offline and
     // stuff like that.
+    @NotBlank(message = "Session type is required.")
     private String session_type;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
