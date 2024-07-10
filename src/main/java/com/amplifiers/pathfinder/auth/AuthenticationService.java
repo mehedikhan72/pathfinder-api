@@ -34,6 +34,17 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) {
+        if (request.getPassword().length() < 8) {
+            throw new AuthenticationException("Password must be at least 8 characters long.");
+        }
+
+        // check if user with email already exists
+        var existing_user = repository.findByEmail(request.getEmail());
+
+        if(!existing_user.isEmpty()) {
+            throw new AuthenticationException("User with this email already exists. Try another one.");
+        }
+
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -54,6 +65,9 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         removeAllExpiredTokens();
+        if(request.getEmail() == null || request.getPassword() == null)
+            throw new AuthenticationException("Email and password are required.");
+
         var user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
 
         try {

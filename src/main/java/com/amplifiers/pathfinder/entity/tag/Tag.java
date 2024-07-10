@@ -3,6 +3,7 @@ package com.amplifiers.pathfinder.entity.tag;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,8 @@ public class Tag {
     @Id
     @GeneratedValue
     private Integer id;
+
+    @NotBlank(message = "Name is required.")
     private String name;
 
     @JsonIgnore

@@ -123,6 +123,11 @@ public class SessionService {
         } else {
             session.setCancelled_by(CancelledBy.BUYER);
         }
+
+        if (request.getCancellation_reason() == null || request.getCancellation_reason().isBlank()) {
+            throw new ValidationException("Cancellation reason is required");
+        }
+
         session.setCancellation_reason(request.getCancellation_reason());
         session.setCancelled_at(java.time.LocalDateTime.now());
 
