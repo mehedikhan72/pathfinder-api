@@ -4,6 +4,9 @@ import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,12 +44,24 @@ public class Enrollment {
             updatable = false
     )
     private LocalDateTime created_at;
+
+    @NotNull(message = "Deadline is required.")
+    @Future(message = "Deadline must be in the future.")
     private LocalDateTime deadline;
+
     private LocalDateTime completed_at;
+
+    @NotNull(message = "Price is required.")
     private float price;
+
+    @NotNull(message = "Number of sessions is required.")
     private Integer num_sessions;
+
     private Integer num_sessions_completed;
+
+    @NotNull(message = "Session duration is required.")
     private Integer session_duration_in_minutes;
+
     private boolean buyer_confirmed; // when buyer accepts the offer
     private boolean paid;
 }

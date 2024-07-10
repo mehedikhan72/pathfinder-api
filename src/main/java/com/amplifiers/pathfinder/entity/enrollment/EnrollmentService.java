@@ -5,6 +5,7 @@ import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -21,6 +22,9 @@ public class EnrollmentService {
     public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gig_id) {
         Gig gig = gigRepository.findById(gig_id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
+
+        if (request.getBuyer_id() == null)
+            throw new ValidationException("Buyer ID is required");
 
         User buyer = userRepository.findById(request.getBuyer_id())
                 .orElseThrow(() -> new ResourceNotFoundException("Buyer not found"));

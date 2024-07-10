@@ -17,7 +17,7 @@ public class PrivateGigController {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createGig(
-            @Valid @RequestBody GigCreateRequest request
+            @RequestBody GigCreateRequest request
     ) {
         return ResponseEntity.ok(service.createGig(request));
     }
