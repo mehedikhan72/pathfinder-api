@@ -2,6 +2,7 @@ package com.amplifiers.pathfinder.entity.image;
 
 import com.amplifiers.pathfinder.cloudstorage.CloudStorageService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
@@ -13,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +28,7 @@ public class ImageService {
     private final Integer MAX_FILE_SIZE = 500 * 1024;
     private final List<String> allowedExts = Arrays.asList("jpg", "jpeg", "gif", "png", "bmp", "wbmp");
 
-    public byte[] compressImage(MultipartFile file) throws Exception {
+    public byte[] compressImage(MultipartFile file) throws IOException {
         BufferedImage pngImg = ImageIO.read(file.getInputStream());
         BufferedImage img = new BufferedImage(
                 pngImg.getWidth(),
@@ -82,9 +84,9 @@ public class ImageService {
 
         return false;
     }
-    public Image saveImage(MultipartFile file) throws Exception {
+    public Image saveImage(MultipartFile file) throws IOException {
         if (!isValidImageFile(file)) {
-            throw new Exception("Invalid image file. Please upload .jpg, .png, .gif or .bmp file.");
+            throw new ValidationException("Invalid image file. Please upload .jpg, .png, .gif or .bmp file.");
         }
 
         String basename = ("pf-" + FilenameUtils.getBaseName(file.getOriginalFilename()) + "-" + UUID.randomUUID()).replaceAll("\\.", "");

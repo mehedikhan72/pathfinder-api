@@ -3,16 +3,14 @@ package com.amplifiers.pathfinder.entity.video;
 import com.amplifiers.pathfinder.cloudstorage.CloudStorageService;
 import com.amplifiers.pathfinder.cloudstorage.PresignedUrlInfo;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URL;
-import java.time.Instant;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -24,13 +22,13 @@ public class VideoService {
     private final Integer MAX_FILE_SIZE = 100 * 1024 * 1024;
     private final List<String> allowedExts = Arrays.asList("mp4", "mkv", "webm");
 
-    public Video saveVideo(MultipartFile file) throws Exception {
+    public Video saveVideo(MultipartFile file) throws IOException {
         if (!isValidVideoFile(file)) {
-            throw new Exception("Invalid video file. Please upload .mp4, .mkv or .webm file.");
+            throw new ValidationException("Invalid video file. Please upload .mp4, .mkv or .webm file.");
         }
 
         if (file.getBytes().length > MAX_FILE_SIZE) {
-            throw new Exception("Video file size can be max 100MB.");
+            throw new ValidationException("Video file size can be max 100MB.");
         }
 
         String basename = ("pf-" + FilenameUtils.getBaseName(file.getOriginalFilename()) + "-" + UUID.randomUUID()).replaceAll("\\.", "");
@@ -49,7 +47,7 @@ public class VideoService {
         return repository.findAll();
     }
 
-    public String createVideoPresignedUrl(Video video) {
+    public void createVideoPresignedUrl(Video video) {
 //        Video video = repository.findById(id)
 //                .orElseThrow(() -> new ResourceNotFoundException("Video with id " + id + " does not exist."));
 
@@ -62,8 +60,6 @@ public class VideoService {
         System.out.println(presignedUrlInfo.presignedUrl);
 
         repository.save(video);
-
-        return presignedUrlInfo.presignedUrl.toExternalForm();
     }
     public void deleteVideo(Integer id){
         Video video = repository.findById(id)

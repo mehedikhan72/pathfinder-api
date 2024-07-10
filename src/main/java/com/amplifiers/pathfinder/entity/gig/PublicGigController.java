@@ -1,16 +1,9 @@
 package com.amplifiers.pathfinder.entity.gig;
 
-import com.amplifiers.pathfinder.entity.video.Video;
-import com.amplifiers.pathfinder.entity.video.VideoService;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.amplifiers.pathfinder.entity.review.ReviewService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 
 @RestController
@@ -18,6 +11,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PublicGigController {
     private final GigService service;
+    private final ReviewService reviewService;
 
     @GetMapping("/all")
     public ResponseEntity<?> findAllGigs() {
@@ -29,6 +23,13 @@ public class PublicGigController {
             @PathVariable Integer id
     ) {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<?> findGigReviews(
+            @PathVariable Integer id
+    ) {
+        return ResponseEntity.ok(reviewService.findAllByGigId(id));
     }
 
 }

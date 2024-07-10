@@ -14,6 +14,7 @@ import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GigService {
     private final GigRepository repository;
-    private final UserRepository userRepository;
     private final TagService tagService;
     private final UserUtility userUtility;
     private final ImageService imageService;
@@ -54,7 +54,7 @@ public class GigService {
         return repository.save(gig);
     }
 
-    public Boolean isGigOfUser(Gig gig) {
+    private Boolean isGigOfUser(Gig gig) {
         User user = userUtility.getCurrentUser();
 
         if (user.getId() == gig.getSeller().getId()) {
@@ -83,11 +83,11 @@ public class GigService {
         return gig;
     }
 
-    public Image setCoverImage(GigImageSetRequest gigCoverSetRequest) throws Exception {
-        Gig gig = repository.getReferenceById(gigCoverSetRequest.getId());
+    public Image setCoverImage(Integer gigId, MultipartFile image) throws Exception {
+        Gig gig = repository.getReferenceById(gigId);
 
         if (gig == null) {
-            throw new ResourceNotFoundException("Gig with id " + gigCoverSetRequest.getId() + " does not exist.");
+            throw new ResourceNotFoundException("Gig id " + gigId + " does not exist.");
         }
 
         if (!isGigOfUser(gig)) {
@@ -96,7 +96,7 @@ public class GigService {
 
         Image prevCoverImage = gig.getGig_cover_image();
 
-        Image coverImage = imageService.saveImage(gigCoverSetRequest.getImage());
+        Image coverImage = imageService.saveImage(image);
 
         gig.setGig_cover_image(coverImage);
         repository.save(gig);
@@ -108,11 +108,11 @@ public class GigService {
         return coverImage;
     }
 
-    public Video setGigVideo(GigVideoSetRequest gigVideoSetRequest) throws Exception {
-        Gig gig = repository.getReferenceById(gigVideoSetRequest.getId());
+    public Video setGigVideo(Integer gigId, MultipartFile video) throws Exception {
+        Gig gig = repository.getReferenceById(gigId);
 
         if (gig == null) {
-            throw new ResourceNotFoundException("Gig with id " + gigVideoSetRequest.getId() + " does not exist.");
+            throw new ResourceNotFoundException("Gig id " + gigId + " does not exist.");
         }
 
         if (!isGigOfUser(gig)) {
@@ -121,7 +121,7 @@ public class GigService {
 
         Video prevGigVideo = gig.getGig_video();
 
-        Video gigVideo = videoService.saveVideo(gigVideoSetRequest.getVideo());
+        Video gigVideo = videoService.saveVideo(video);
 
         gig.setGig_video(gigVideo);
         repository.save(gig);

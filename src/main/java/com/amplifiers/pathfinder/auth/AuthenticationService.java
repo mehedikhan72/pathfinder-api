@@ -9,6 +9,7 @@ import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.AuthenticationException;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -107,7 +108,12 @@ public class AuthenticationService {
         if (tokens.isEmpty())
             return;
         tokens.forEach(token -> {
-            if (jwtService.isTokenExpired(token.getToken())) {
+            try {
+                if (jwtService.isTokenExpired(token.getToken())) {
+                    tokenRepository.delete(token);
+                }
+            } catch (ExpiredJwtException E) {
+                System.out.println(E.getMessage());
                 tokenRepository.delete(token);
             }
         });
@@ -117,7 +123,7 @@ public class AuthenticationService {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        removeAllExpiredTokens();
+//        removeAllExpiredTokens();
         final String refreshToken = getCookieRefreshToken(request);
         final String userEmail;
 
