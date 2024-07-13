@@ -31,4 +31,17 @@ public class PublicGigController {
         return ResponseEntity.ok(service.findById(id));
     }
 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<?> findGigsByCategory(
+            @PathVariable String category
+    ) {
+        return ResponseEntity.ok(service.findByCategory(category));
+    }
+
+    @GetMapping("/search/{query}")
+    public ResponseEntity<?> findGigsByQuery(
+            @PathVariable String query
+    ) {
+        return ResponseEntity.ok(service.findByQuery(query));
+    }
 }

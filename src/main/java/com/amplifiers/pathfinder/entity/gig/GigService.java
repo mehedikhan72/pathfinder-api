@@ -83,6 +83,14 @@ public class GigService {
         return gig;
     }
 
+    public List<Gig> findByCategory(String category) {
+        return repository.findByCategory(category);
+    }
+
+    public List<Gig> findByQuery(String query) {
+        return repository.findByQuery(query);
+    }
+
     public Image setCoverImage(GigImageSetRequest gigCoverSetRequest) throws Exception {
         Gig gig = repository.getReferenceById(gigCoverSetRequest.getId());
 
