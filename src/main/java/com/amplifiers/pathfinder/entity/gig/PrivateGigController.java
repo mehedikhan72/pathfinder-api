@@ -64,4 +64,11 @@ public class PrivateGigController {
         reviewService.deleteReview(gigId, reviewId);
         return "Review id " + reviewId + " successfully deleted.";
     }
+
+    @DeleteMapping("/delete/{gig_id}")
+    public String deleteGig(
+            @PathVariable Integer gig_id
+    ) {
+        return service.deleteGig(gig_id);
+    }
 }

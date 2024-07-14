@@ -16,6 +16,13 @@ public class TagController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/search/{query}")
+    public ResponseEntity<?> findTagsByQuery(
+            @PathVariable String query
+    ) {
+        return ResponseEntity.ok(service.findByQuery(query));
+    }
+
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createTag(

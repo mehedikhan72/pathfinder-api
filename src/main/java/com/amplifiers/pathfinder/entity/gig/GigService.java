@@ -29,6 +29,7 @@ public class GigService {
     private final UserUtility userUtility;
     private final ImageService imageService;
     private final VideoService videoService;
+    private final JdbcTemplate jdbcTemplate;
 
     public Gig createGig(GigCreateRequest request) {
         User user = userUtility.getCurrentUser();
@@ -81,6 +82,31 @@ public class GigService {
         }
 
         return gig;
+    }
+
+    public List<Gig> findByCategory(String category) {
+        return repository.findByCategory(category);
+    }
+
+    public List<Gig> findByQuery(String query) {
+        return repository.findByQuery(query);
+    }
+
+    public String deleteGig(Integer gig_id) {
+        Gig gig = repository.findById(gig_id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
+
+        User user = userUtility.getCurrentUser();
+
+        if (user.getId() != gig.getSeller().getId()) {
+            throw new ValidationException("Only the owner of the gig can delete it.");
+        }
+
+        // INFO: because cascading delete wasn't working for many to many for some reason.
+        jdbcTemplate.update("DELETE FROM gig_tag WHERE gig_id = ?", gig_id);
+        repository.deleteById(gig_id);
+
+        return "deleted";
     }
 
     public Image setCoverImage(Integer gigId, MultipartFile image) throws Exception {

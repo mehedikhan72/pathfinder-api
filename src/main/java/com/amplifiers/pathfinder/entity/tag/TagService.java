@@ -25,4 +25,8 @@ public class TagService {
     public Optional<Tag> findByName(String name) {
         return tagRepository.findByName(name);
     }
+
+    public List<Tag> findByQuery(String query) {
+        return tagRepository.findByQuery(query);
+    }
 }
