@@ -51,15 +51,14 @@ public class Gig {
 
     // @JsonIgnore
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User seller;
 
-    @NotNull(message = "At least one tag is required.")
-    @NotEmpty(message = "At least one tag is required.")
-    @JsonIgnore
-    @ManyToMany
+//    @NotNull(message = "At least one tag is required.")
+//    @NotEmpty(message = "At least one tag, is required.")
+    @ManyToMany()
     @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gig_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags;
 

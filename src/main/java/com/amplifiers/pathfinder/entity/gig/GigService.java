@@ -34,6 +34,12 @@ public class GigService {
 
     public Gig createGig(GigCreateRequest request) {
         User user = userUtility.getCurrentUser();
+
+        // check if tags were provided
+        if (request.getTags() == null || request.getTags().isEmpty()) {
+            throw new ValidationException("At least one tag is required.");
+        }
+
         request.getTags().forEach(
                 name -> tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name))));
 
@@ -111,11 +117,10 @@ public class GigService {
     }
 
     public Image setCoverImage(GigImageSetRequest gigCoverSetRequest) throws Exception {
-        Gig gig = repository.getReferenceById(gigCoverSetRequest.getId());
+        Gig gig = repository.findById(gigCoverSetRequest.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
 
-        if (gig == null) {
-            throw new ResourceNotFoundException("Gig with id " + gigCoverSetRequest.getId() + " does not exist.");
-        }
+        System.out.println("gig ekhane" + gig);
 
         if (!isGigOfUser(gig)) {
             throw new ValidationException("User not owner of this gig");

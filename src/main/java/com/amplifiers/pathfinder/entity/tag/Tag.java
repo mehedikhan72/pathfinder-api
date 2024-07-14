@@ -30,6 +30,6 @@ public class Tag {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.EAGER)
     private Set<Gig> gigs;
 }
