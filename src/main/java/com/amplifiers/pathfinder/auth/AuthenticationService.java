@@ -54,12 +54,13 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
         var savedUser = repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
+        var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
-        saveUserToken(savedUser, jwtToken);
+        saveUserToken(user, accessToken, TokenType.ACCESS);
+        saveUserToken(user, refreshToken, TokenType.REFRESH);
         return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
+                .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
@@ -79,22 +80,23 @@ public class AuthenticationService {
             throw new AuthenticationException("Authentication failed. Please try again.");
         }
 
-        var jwtToken = jwtService.generateToken(user);
+        var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-        revokeAllUserTokens(user);
-        saveUserToken(user, jwtToken);
+        revokeAllUserAccessTokens(user);
+        saveUserToken(user, accessToken, TokenType.ACCESS);
+        saveUserToken(user, refreshToken, TokenType.REFRESH);
+
         return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
+                .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
 
-    private void saveUserToken(User user, String jwtToken) {
+    private void saveUserToken(User user, String jwtToken, TokenType tokenType) {
         var token = Token.builder()
                 .user(user)
                 .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
+                .tokenType(tokenType)
                 .revoked(false)
                 .build();
 
@@ -106,12 +108,11 @@ public class AuthenticationService {
         }
     }
 
-    private void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+    private void revokeAllUserAccessTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidAccessTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
-            token.setExpired(true);
             token.setRevoked(true);
         });
         tokenRepository.saveAll(validUserTokens);
@@ -151,8 +152,11 @@ public class AuthenticationService {
             var user = this.repository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
+
+//                revokeAllUserAccessTokens(user);
+                removeAllExpiredTokens();
+
+                saveUserToken(user, accessToken, TokenType.ACCESS);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
@@ -160,6 +164,8 @@ public class AuthenticationService {
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+
+        System.out.println("Token refreshed for " + userEmail);
     }
 
     public static String getCookieRefreshToken(HttpServletRequest request) {

@@ -5,6 +5,8 @@ import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,9 +29,15 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotEmpty(message = "A title is required.")
     private String title;
+
     @Column(columnDefinition="text")
+    @NotEmpty(message = "Please write your review.")
     private String text;
+
+    @NotNull(message = "Please rate your experience.")
     // Rating out of 5
     private Short rating;
 

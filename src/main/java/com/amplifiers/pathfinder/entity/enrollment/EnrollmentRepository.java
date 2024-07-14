@@ -13,7 +13,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
 
     @Query(value = """
                     select count(e) > 0 from Enrollment e\s
-                    where e.gig.id = :gigId and e.buyer = :buyer and e.completedAt is not null\s
+                    where e.gig.id = :gigId and e.buyer = :buyer and e.completed_at is not null\s
             """)
     boolean existsByGigIdAndBuyerAndCompletedAtNotNull(Integer gigId, User buyer);
 }

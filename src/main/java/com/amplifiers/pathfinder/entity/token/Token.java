@@ -33,11 +33,9 @@ public class Token {
   public String token;
 
   @Enumerated(EnumType.STRING)
-  public TokenType tokenType = TokenType.BEARER;
+  public TokenType tokenType;
 
   public boolean revoked;
-
-  public boolean expired;
 
   @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)

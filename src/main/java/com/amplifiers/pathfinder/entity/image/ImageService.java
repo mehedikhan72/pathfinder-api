@@ -108,10 +108,8 @@ public class ImageService {
 
     public Image getImage(String name) {
         String basename = FilenameUtils.getBaseName(name);
-        Image image = repository.findByBasename(basename)
+        return repository.findByBasename(basename)
                 .orElseThrow(() -> new ResourceNotFoundException(basename + " does not exist."));
-
-        return image;
     }
 
     public void deleteImage(Integer id){

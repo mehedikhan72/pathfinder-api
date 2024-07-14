@@ -23,23 +23,12 @@ public class ImageController {
         }
     }
 
-    @RequestMapping("/{filename}")
+    @GetMapping("/{filename}")
     public ResponseEntity<?> serveImage(@PathVariable("filename") String filename) {
         try {
             Image image = service.getImage(filename);
             System.out.println("Served image : "+image.getFilename());
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(CloudStorageService.getFile(image.getFilename()));
-        } catch (Exception E) {
-            E.printStackTrace();
-            return ResponseEntity.status(400).body(E.getMessage());
-        }
-    }
-
-    @RequestMapping("/delete-all")
-    public ResponseEntity<?> clearStoredImages() {
-        try {
-            service.clearStoredImages();
-            return ResponseEntity.ok("cleared");
         } catch (Exception E) {
             E.printStackTrace();
             return ResponseEntity.status(400).body(E.getMessage());
