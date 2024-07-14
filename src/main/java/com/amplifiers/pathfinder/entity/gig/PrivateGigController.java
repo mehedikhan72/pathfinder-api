@@ -1,10 +1,8 @@
 package com.amplifiers.pathfinder.entity.gig;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -41,5 +39,12 @@ public class PrivateGigController {
             E.printStackTrace();
             return ResponseEntity.status(400).body(E.getMessage());
         }
+    }
+
+    @DeleteMapping("/delete/{gig_id}")
+    public String deleteGig(
+            @PathVariable Integer gig_id
+    ) {
+        return service.deleteGig(gig_id);
     }
 }
