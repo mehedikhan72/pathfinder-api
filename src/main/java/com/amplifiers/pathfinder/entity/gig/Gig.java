@@ -56,8 +56,8 @@ public class Gig {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User seller;
 
-    @NotNull(message = "At least one tag is required.")
-    @NotEmpty(message = "At least one tag is required.")
+//    @NotNull(message = "At least one tag is required.")
+//    @NotEmpty(message = "At least one tag is required.")
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gig_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))

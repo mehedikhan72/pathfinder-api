@@ -122,9 +122,4 @@ public class ImageService {
 
         System.out.println("Deleted image : " + image.getFilename());
     }
-
-    public void clearStoredImages(){
-        CloudStorageService.clearBucket("pathfinder-bucket");
-        repository.deleteAll();
-    }
 }

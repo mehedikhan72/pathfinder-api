@@ -103,6 +103,9 @@ public class GigService {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
+        imageService.deleteImage(gig.getGig_cover_image().getId());
+        videoService.deleteVideo(gig.getGig_video().getId());
+
         // INFO: because cascading delete wasn't working for many to many for some reason.
         jdbcTemplate.update("DELETE FROM gig_tag WHERE gig_id = ?", gig_id);
         repository.deleteById(gig_id);
