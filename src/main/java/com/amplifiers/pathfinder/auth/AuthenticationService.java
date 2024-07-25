@@ -62,6 +62,11 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .id(savedUser.getId())
+                .firstName(savedUser.getFirstname())
+                .lastName(savedUser.getLastname())
+                .email(savedUser.getEmail())
+                .role(user.getRole())
                 .build();
     }
 
@@ -89,6 +94,11 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .id(user.getId())
+                .firstName(user.getFirstname())
+                .lastName(user.getLastname())
+                .email(user.getEmail())
+                .role(user.getRole())
                 .build();
     }
 

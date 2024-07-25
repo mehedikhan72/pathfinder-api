@@ -20,6 +20,13 @@ public class EnrollmentController {
         return ResponseEntity.ok(service.createEnrollment(request, gig_id));
     }
 
+    @PutMapping("buyer-confirms/{enrollment_id}")
+    public ResponseEntity<?> buyerConfirmsEnrollment(
+            @PathVariable Integer enrollment_id
+    ) {
+        return ResponseEntity.ok(service.buyerConfirmsEnrollment(enrollment_id));
+    }
+
     @GetMapping("/gig/{gig_id}")
     public ResponseEntity<?> findAllByGigId(
             @PathVariable Integer gig_id

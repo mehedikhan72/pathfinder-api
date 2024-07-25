@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -83,14 +84,6 @@ public class GigService {
         }
 
         return gig;
-    }
-
-    public List<Gig> findByCategory(String category) {
-        return repository.findByCategory(category);
-    }
-
-    public List<Gig> findByQuery(String query) {
-        return repository.findByQuery(query);
     }
 
     public String deleteGig(Integer gig_id) {
@@ -168,4 +161,47 @@ public class GigService {
 
         return gig.getGig_cover_image();
     }
+
+    // INFO: HOW SEARCH WORKS.
+    // when a user starts typing the query, we recommend them the tags and categories with the 'query' prefix.
+    // If a user clicks on any of those categories or tags, we show em the gigs for that category or tag.
+    // If a user doesn't click any of the tags/categories in the suggestion(under the search box), and clicks
+    // enter after typing the search term, we show them the relevant gigs for the search term. i.e. the gigs where
+    // the title/description/category/tag contain the search term.
+
+    // we will get the results based on scores of the gigs with the touch of a bit of randomness so people can
+    // explore unpopular gigs often. i.e. 20% randomness. // TODO: improve this fetching algorithm.
+
+    // TODO: implement a scoring algorithm.
+    // TODO: update all gig fetch functions to incorporate scoring.
+
+//    public List<Gig> getSimilarGigs() {
+//        // TODO
+//    }
+
+//    public List getCategoryAndTagsForKeyword() {
+//        // TODO: return whether it's a category or tag. so we can call the corresponding function.
+//        // ie. findByCategory() or findByQuery().
+//    }
+
+    public List<Gig> findByCategory(String category) {
+        return repository.findByCategory(category);
+    }
+
+    public List<Gig> findByQuery(String query) {
+        return repository.findByQuery(query);
+    }
+
+//    public List<Gig> findByTag(String tag) {
+//        // TODO
+//    }
+
+//    public List<Gig> getFeaturedGigs() {
+//        // TODO
+//    }
+//
+//    // For explore new talents feature.
+//    public List<Gig> getNewGigs() {
+//        // TODO
+//    }
 }

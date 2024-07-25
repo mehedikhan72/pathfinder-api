@@ -80,4 +80,8 @@ public class Gig {
     @OneToOne
     @JoinColumn(name = "gig_video")
     private Video gig_video;
+
+    // a number of gigs will be featured every once in a while. there will be rolling substitution.
+    // TODO: improve featured idea later.
+//    private boolean featured;
 }
