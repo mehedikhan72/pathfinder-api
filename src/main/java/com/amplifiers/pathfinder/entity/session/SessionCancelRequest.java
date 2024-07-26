@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SessionCancelRequest {
-    private String cancellation_reason;
+    private String cancellationReason;
 }

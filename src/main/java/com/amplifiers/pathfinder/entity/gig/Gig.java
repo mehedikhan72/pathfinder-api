@@ -1,17 +1,13 @@
 package com.amplifiers.pathfinder.entity.gig;
 
-import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
-import com.amplifiers.pathfinder.entity.faq.FAQ;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.video.Video;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,13 +42,13 @@ public class Gig {
     @NotNull(message = "Price is required.")
     private float price;
     private float rating;
-    private Integer total_orders;
+    private Integer totalOrders;
     private boolean accepted;
 
     // @JsonIgnore
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User seller;
 
@@ -60,7 +56,7 @@ public class Gig {
 //    @NotEmpty(message = "At least one tag is required.")
     @JsonIgnore
     @ManyToMany
-    @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gig_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gigId"), inverseJoinColumns = @JoinColumn(name = "tagId"))
     private Set<Tag> tags;
 
     // @OneToMany(mappedBy = "gig")
@@ -71,13 +67,17 @@ public class Gig {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @OneToOne
-    @JoinColumn(name = "gig_cover_image")
-    private Image gig_cover_image;
+    @JoinColumn(name = "gigCoverImage")
+    private Image gigCoverImage;
 
     @OneToOne
-    @JoinColumn(name = "gig_video")
-    private Video gig_video;
+    @JoinColumn(name = "gigVideo")
+    private Video gigVideo;
+
+    // a number of gigs will be featured every once in a while. there will be rolling substitution.
+    // TODO: improve featured idea later.
+//    private boolean featured;
 }

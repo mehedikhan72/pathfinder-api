@@ -47,7 +47,7 @@ public class ReviewService {
                 .title(reviewRequest.getTitle())
                 .text(reviewRequest.getText())
                 .rating(reviewRequest.getRating())
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .reviewer(user)
                 .gig(gig)
                 .build();

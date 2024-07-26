@@ -12,6 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SessionCreateRequest {
-    private LocalDateTime scheduled_at;
-    private String session_type;
+    private LocalDateTime scheduledAt;
+    private String sessionType;
 }

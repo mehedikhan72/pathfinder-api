@@ -29,7 +29,7 @@ public class Image {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @Transient
     private String filename;

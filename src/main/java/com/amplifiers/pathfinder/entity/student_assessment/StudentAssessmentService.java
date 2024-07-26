@@ -18,8 +18,8 @@ public class StudentAssessmentService {
     private final SessionRepository sessionRepository;
     private final UserUtility userUtility;
 
-    public StudentAssessment createStudentAssessment(StudentAssessmentCreateRequest request, Integer session_id) {
-        Session session = sessionRepository.findById(session_id).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
+    public StudentAssessment createStudentAssessment(StudentAssessmentCreateRequest request, Integer sessionId) {
+        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
         User user = userUtility.getCurrentUser();
         User seller = session.getEnrollment().getGig().getSeller();
 
@@ -27,17 +27,17 @@ public class StudentAssessmentService {
             throw new UnauthorizedException("Only the seller can create a student assessment");
         }
 
-        var student_assessment = StudentAssessment.builder().session(session).understanding_rating(request.getUnderstanding_rating()).response_rating(request.getResponse_rating()).feedback(request.getFeedback()).build();
+        var studentAssessment = StudentAssessment.builder().session(session).understandingRating(request.getUnderstandingRating()).responseRating(request.getResponseRating()).feedback(request.getFeedback()).build();
 
-        return studentAssessmentRepository.save(student_assessment);
+        return studentAssessmentRepository.save(studentAssessment);
     }
 
-    public StudentAssessment getStudentAssessmentForASession(Integer session_id) {
-        return studentAssessmentRepository.findBySession_Id(session_id).orElseThrow(() -> new ResourceNotFoundException("Student assessment not found"));
+    public StudentAssessment getStudentAssessmentForASession(Integer sessionId) {
+        return studentAssessmentRepository.findBySessionId(sessionId).orElseThrow(() -> new ResourceNotFoundException("Student assessment not found"));
     }
 
-    public List<StudentAssessment> getAllStudentAssessmentForAnEnrollment(Integer enrollment_id) {
-        return studentAssessmentRepository.findAllBySession_Enrollment_Id(enrollment_id);
+    public List<StudentAssessment> getAllStudentAssessmentForAnEnrollment(Integer enrollmentId) {
+        return studentAssessmentRepository.findAllBySession_Enrollment_Id(enrollmentId);
     }
 }
 

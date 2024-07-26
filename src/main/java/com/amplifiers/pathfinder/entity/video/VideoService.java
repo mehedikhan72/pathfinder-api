@@ -36,7 +36,7 @@ public class VideoService {
         String keyName = basename + "." + ext;
 
         CloudStorageService.uploadFile(file.getBytes(), keyName);
-        Video video = Video.builder().basename(basename).created_at(LocalDateTime.now()).format(ext).filename(keyName).build();
+        Video video = Video.builder().basename(basename).createdAt(LocalDateTime.now()).format(ext).filename(keyName).build();
 
         System.out.println("Saved video : " + video.getFilename());
 

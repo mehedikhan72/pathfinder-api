@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentAssessmentCreateRequest {
-    private Integer understanding_rating;
-    private Integer response_rating;
+    private Integer understandingRating;
+    private Integer responseRating;
     private String feedback;
 }

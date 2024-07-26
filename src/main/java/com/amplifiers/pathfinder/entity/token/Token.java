@@ -40,6 +40,6 @@ public class Token {
   @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "userId")
   public User user;
 }

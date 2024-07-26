@@ -42,29 +42,29 @@ public class Session {
 
     @NotNull(message = "Scheduled date is required.")
     @Future(message = "Scheduled date must be in the future.")
-    private LocalDateTime scheduled_at;
-    private LocalDateTime completed_at;
+    private LocalDateTime scheduledAt;
+    private LocalDateTime completedAt;
     private boolean completed;
 
     // string for now, it will be online, offline and
     // stuff like that.
     @NotBlank(message = "Session type is required.")
-    private String session_type;
+    private String sessionType;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "enrollment_id")
+    @JoinColumn(name = "enrollmentId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Enrollment enrollment;
 
-    private boolean buyer_confirmed;
+    private boolean buyerConfirmed;
 
     private boolean cancelled;
 
     @Enumerated(EnumType.STRING)
-    private CancelledBy cancelled_by;
-    private String cancellation_reason;
-    private LocalDateTime cancelled_at;
+    private CancelledBy cancelledBy;
+    private String cancellationReason;
+    private LocalDateTime cancelledAt;
 
     // TODO: more data about session will be added here, later.
 }
