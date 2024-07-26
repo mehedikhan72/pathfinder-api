@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.user;
 
+import com.amplifiers.pathfinder.entity.image.Image;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -45,6 +46,9 @@ public class User implements UserDetails {
   @Enumerated(EnumType.STRING)
   private Role role;
 
+  @OneToOne
+  @JoinColumn(name = "profile_image")
+  private Image profile_image;
 
 //  @OneToMany(mappedBy = "user")
 //  private List<Token> tokens;

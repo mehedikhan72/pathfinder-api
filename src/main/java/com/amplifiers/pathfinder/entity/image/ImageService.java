@@ -112,7 +112,7 @@ public class ImageService {
                 .orElseThrow(() -> new ResourceNotFoundException(basename + " does not exist."));
     }
 
-    public void deleteImage(Integer id){
+    public void deleteImageById(Integer id){
         Image image = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Image with id " + id + " doesn't exist"));
 

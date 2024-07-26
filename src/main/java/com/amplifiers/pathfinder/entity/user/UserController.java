@@ -1,8 +1,10 @@
 package com.amplifiers.pathfinder.entity.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -22,8 +24,18 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/profile-image")
+    @ResponseStatus(HttpStatus.OK)
+    public String setProfileImage(
+            @RequestParam("file") MultipartFile file,
+            Principal connectedUser
+    ) {
+        return service.setProfileImage(file, connectedUser);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> findAllUsers() {
         return ResponseEntity.ok(service.findAll());
     }
+
 }

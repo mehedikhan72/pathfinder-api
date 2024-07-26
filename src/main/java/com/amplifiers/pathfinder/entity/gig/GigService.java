@@ -6,7 +6,6 @@ import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
 import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.entity.user.User;
-import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.entity.video.Video;
 import com.amplifiers.pathfinder.entity.video.VideoService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -103,7 +102,7 @@ public class GigService {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
-        imageService.deleteImage(gig.getGig_cover_image().getId());
+        imageService.deleteImageById(gig.getGig_cover_image().getId());
         videoService.deleteVideo(gig.getGig_video().getId());
 
         // INFO: because cascading delete wasn't working for many to many for some reason.
@@ -132,7 +131,7 @@ public class GigService {
         repository.save(gig);
 
         if (prevCoverImage != null) {
-            imageService.deleteImage(prevCoverImage.getId());
+            imageService.deleteImageById(prevCoverImage.getId());
         }
 
         return coverImage;
