@@ -12,40 +12,40 @@ public class EnrollmentController {
     private final EnrollmentService service;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create/{gig_id}")
+    @PostMapping("/create/{gigId}")
     public ResponseEntity<?> createEnrollment(
             @RequestBody EnrollmentCreateRequest request,
-            @PathVariable Integer gig_id
+            @PathVariable Integer gigId
     ) {
-        return ResponseEntity.ok(service.createEnrollment(request, gig_id));
+        return ResponseEntity.ok(service.createEnrollment(request, gigId));
     }
 
-    @PutMapping("buyer-confirms/{enrollment_id}")
+    @PutMapping("buyer-confirms/{enrollmentId}")
     public ResponseEntity<?> buyerConfirmsEnrollment(
-            @PathVariable Integer enrollment_id
+            @PathVariable Integer enrollmentId
     ) {
-        return ResponseEntity.ok(service.buyerConfirmsEnrollment(enrollment_id));
+        return ResponseEntity.ok(service.buyerConfirmsEnrollment(enrollmentId));
     }
 
-    @GetMapping("/gig/{gig_id}")
+    @GetMapping("/gig/{gigId}")
     public ResponseEntity<?> findAllByGigId(
-            @PathVariable Integer gig_id
+            @PathVariable Integer gigId
     ) {
-        return ResponseEntity.ok(service.findAllByGigId(gig_id));
+        return ResponseEntity.ok(service.findAllByGigId(gigId));
     }
 
     // A user can see all enrollments they have made
     @GetMapping("/buyer/{buyer_id}")
     public ResponseEntity<?> findAllByBuyerId(
-            @PathVariable Integer buyer_id
+            @PathVariable Integer buyerId
     ) {
-        return ResponseEntity.ok(service.findAllByBuyerId(buyer_id));
+        return ResponseEntity.ok(service.findAllByBuyerId(buyerId));
     }
 
-    @GetMapping("/deadline-passed/{enrollment_id}")
+    @GetMapping("/deadline-passed/{enrollmentId}")
     public ResponseEntity<?> hasDeadlinePassed(
-            @PathVariable Integer enrollment_id
+            @PathVariable Integer enrollmentId
     ) {
-        return ResponseEntity.ok(service.hasDeadlinePassed(enrollment_id));
+        return ResponseEntity.ok(service.hasDeadlinePassed(enrollmentId));
     }
 }

@@ -95,7 +95,7 @@ public class ImageService {
         byte[] fileData = compressImage(file);
 
         CloudStorageService.uploadFile(fileData, keyName);
-        Image image = Image.builder().basename(basename).created_at(LocalDateTime.now()).format("jpg").filename(keyName).build();
+        Image image = Image.builder().basename(basename).createdAt(LocalDateTime.now()).format("jpg").filename(keyName).build();
 
         System.out.println("Saved image : " + image.getFilename());
 

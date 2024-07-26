@@ -96,11 +96,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ErrorDetails {
-        private int status_code;
+        private int statusCode;
         private String message;
 
-        public ErrorDetails(int status_code, String message) {
-            this.status_code = status_code;
+        public ErrorDetails(int statusCode, String message) {
+            this.statusCode = statusCode;
             this.message = message;
         }
 

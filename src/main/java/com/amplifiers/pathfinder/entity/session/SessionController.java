@@ -12,41 +12,41 @@ public class SessionController {
     private final SessionService service;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create/{enrollment_id}")
+    @PostMapping("/create/{enrollmentId}")
     public ResponseEntity<?> createSession(
             @RequestBody SessionCreateRequest request,
-            @PathVariable Integer enrollment_id
+            @PathVariable Integer enrollmentId
     ) {
-        return ResponseEntity.ok(service.createSession(request, enrollment_id));
+        return ResponseEntity.ok(service.createSession(request, enrollmentId));
     }
 
-    @PutMapping("/buyer-confirms/{session_id}")
+    @PutMapping("/buyer-confirms/{sessionId}")
     public ResponseEntity<?> buyerConfirmsSession(
-            @PathVariable Integer session_id
+            @PathVariable Integer sessionId
     ) {
-        return ResponseEntity.ok(service.buyerConfirmsSession(session_id));
+        return ResponseEntity.ok(service.buyerConfirmsSession(sessionId));
     }
 
-    @PutMapping("/update/{session_id}")
+    @PutMapping("/update/{sessionId}")
     public ResponseEntity<?> updateSession(
             @RequestBody SessionCreateRequest request,
-            @PathVariable Integer session_id
+            @PathVariable Integer sessionId
     ) {
-        return ResponseEntity.ok(service.updateSession(request, session_id));
+        return ResponseEntity.ok(service.updateSession(request, sessionId));
     }
 
-    @PutMapping("/complete/{session_id}")
+    @PutMapping("/complete/{sessionId}")
     public ResponseEntity<?> completeSession(
-            @PathVariable Integer session_id
+            @PathVariable Integer sessionId
     ) {
-        return ResponseEntity.ok(service.completeSession(session_id));
+        return ResponseEntity.ok(service.completeSession(sessionId));
     }
 
-    @PutMapping("/cancel/{session_id}")
+    @PutMapping("/cancel/{sessionId}")
     public ResponseEntity<?> cancelSession(
             @RequestBody SessionCancelRequest request,
-            @PathVariable Integer session_id
+            @PathVariable Integer sessionId
     ) {
-        return ResponseEntity.ok(service.cancelSession(request, session_id));
+        return ResponseEntity.ok(service.cancelSession(request, sessionId));
     }
 }

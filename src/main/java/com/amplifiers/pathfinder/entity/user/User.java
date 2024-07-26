@@ -27,10 +27,10 @@ public class User implements UserDetails {
   private Integer id;
 
   @NotBlank(message = "First name is required.")
-  private String firstname;
+  private String firstName;
 
   @NotBlank(message = "Last name is required.")
-  private String lastname;
+  private String lastName;
 
   @NotBlank(message = "Email is required")
   @Email(message = "Invalid email.")

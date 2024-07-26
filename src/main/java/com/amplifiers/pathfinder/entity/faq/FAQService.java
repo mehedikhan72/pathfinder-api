@@ -21,16 +21,16 @@ public class FAQService {
 
     private final UserUtility userUtility;
 
-    public FAQ createFAQ(FAQCreateRequest request, Integer gig_id) {
+    public FAQ createFAQ(FAQCreateRequest request, Integer gigId) {
 
-        Gig gig = gigRepository.findById(gig_id)
+        Gig gig = gigRepository.findById(gigId)
             .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
 
         // make sure the request is coming from the seller.
         User user = userUtility.getCurrentUser();
-        User gig_seller = gig.getSeller();
+        User gigSeller = gig.getSeller();
 
-        if (!user.getId().equals(gig_seller.getId())) {
+        if (!user.getId().equals(gigSeller.getId())) {
             throw new UnauthorizedException("Only the gig seller can create a FAQ for this gig.");
         }
 

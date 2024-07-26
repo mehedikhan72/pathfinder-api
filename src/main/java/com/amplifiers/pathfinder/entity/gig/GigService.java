@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,11 +49,11 @@ public class GigService {
                 .price(request.getPrice())
                 .category(request.getCategory())
                 .rating(0.0f)
-                .total_orders(0)
+                .totalOrders(0)
                 .accepted(false)
                 .seller(user)
                 .tags(tags)
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
         return repository.save(gig);
     }
@@ -60,11 +61,7 @@ public class GigService {
     private Boolean isGigOfUser(Gig gig) {
         User user = userUtility.getCurrentUser();
 
-        if (user.getId() == gig.getSeller().getId()) {
-            return true;
-        }
-
-        return false;
+        return Objects.equals(user.getId(), gig.getSeller().getId());
     }
 
     public List<Gig> findAll() {
@@ -75,7 +72,7 @@ public class GigService {
         Gig gig = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
 
-        Video video = gig.getGig_video();
+        Video video = gig.getGigVideo();
 
         if (video != null) {
             if (video.getPresignedUrl() == null || video.getPresignedUrlExpire() == null || LocalDateTime.now().isAfter(video.getPresignedUrlExpire())) {
@@ -86,8 +83,8 @@ public class GigService {
         return gig;
     }
 
-    public String deleteGig(Integer gig_id) {
-        Gig gig = repository.findById(gig_id)
+    public String deleteGig(Integer gigId) {
+        Gig gig = repository.findById(gigId)
                 .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
 
         User user = userUtility.getCurrentUser();
@@ -96,12 +93,12 @@ public class GigService {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
-        imageService.deleteImage(gig.getGig_cover_image().getId());
-        videoService.deleteVideo(gig.getGig_video().getId());
+        imageService.deleteImage(gig.getGigCoverImage().getId());
+        videoService.deleteVideo(gig.getGigVideo().getId());
 
         // INFO: because cascading delete wasn't working for many to many for some reason.
-        jdbcTemplate.update("DELETE FROM gig_tag WHERE gig_id = ?", gig_id);
-        repository.deleteById(gig_id);
+        jdbcTemplate.update("DELETE FROM gig_tag WHERE gigId = ?", gigId);
+        repository.deleteById(gigId);
 
         return "deleted";
     }
@@ -117,11 +114,11 @@ public class GigService {
             throw new ValidationException("User not owner of this gig");
         }
 
-        Image prevCoverImage = gig.getGig_cover_image();
+        Image prevCoverImage = gig.getGigCoverImage();
 
         Image coverImage = imageService.saveImage(image);
 
-        gig.setGig_cover_image(coverImage);
+        gig.setGigCoverImage(coverImage);
         repository.save(gig);
 
         if (prevCoverImage != null) {
@@ -142,11 +139,11 @@ public class GigService {
             throw new ValidationException("User not owner of this gig");
         }
 
-        Video prevGigVideo = gig.getGig_video();
+        Video prevGigVideo = gig.getGigVideo();
 
         Video gigVideo = videoService.saveVideo(video);
 
-        gig.setGig_video(gigVideo);
+        gig.setGigVideo(gigVideo);
         repository.save(gig);
 
         if (prevGigVideo != null) {
@@ -159,7 +156,7 @@ public class GigService {
     public Image getCoverImage(int id) {
         Gig gig = repository.getReferenceById(id);
 
-        return gig.getGig_cover_image();
+        return gig.getGigCoverImage();
     }
 
     // INFO: HOW SEARCH WORKS.

@@ -65,10 +65,10 @@ public class PrivateGigController {
         return "Review id " + reviewId + " successfully deleted.";
     }
 
-    @DeleteMapping("/delete/{gig_id}")
+    @DeleteMapping("/delete/{gigId}")
     public String deleteGig(
-            @PathVariable Integer gig_id
+            @PathVariable Integer gigId
     ) {
-        return service.deleteGig(gig_id);
+        return service.deleteGig(gigId);
     }
 }

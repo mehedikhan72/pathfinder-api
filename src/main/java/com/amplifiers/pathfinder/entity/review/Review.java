@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "gig_id"})
+        @UniqueConstraint(columnNames = {"userId", "gigId"})
 })
 public class Review {
     @Id
@@ -45,17 +45,17 @@ public class Review {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "email", "role", "username"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User reviewer;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gig_id")
+    @JoinColumn(name = "gigId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Gig gig;
 }

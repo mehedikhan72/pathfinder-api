@@ -23,28 +23,28 @@ public class EnrollmentService {
     private final UserUtility userUtility;
 
 
-    public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gig_id) {
-        Gig gig = gigRepository.findById(gig_id)
+    public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gigId) {
+        Gig gig = gigRepository.findById(gigId)
                 .orElseThrow(() -> new ResourceNotFoundException("Gig not found."));
 
-        var seller_id = gig.getSeller().getId();
+        var sellerId = gig.getSeller().getId();
         User user = userUtility.getCurrentUser();
 
-        if(!Objects.equals(user.getId(), seller_id)) {
+        if(!Objects.equals(user.getId(), sellerId)) {
             throw new UnauthorizedException("Only the seller can create an enrollment.");
         }
 
-        if (request.getBuyer_id() == null)
+        if (request.getBuyerId() == null)
             throw new ValidationException("Buyer ID is required.");
 
-        User buyer = userRepository.findById(request.getBuyer_id())
+        User buyer = userRepository.findById(request.getBuyerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Buyer not found."));
 
-        if(request.getNum_sessions() <= 0) {
+        if(request.getNumSessions() <= 0) {
             throw new ValidationException("Number of sessions must be positive.");
         }
 
-        if(request.getSession_duration_in_minutes() <= 0) {
+        if(request.getSessionDurationInMinutes() <= 0) {
             throw new ValidationException("Session duration must be positive.");
         }
 
@@ -55,20 +55,20 @@ public class EnrollmentService {
         var enrollment = Enrollment.builder()
                 .gig(gig)
                 .price(request.getPrice())
-                .num_sessions(request.getNum_sessions())
-                .session_duration_in_minutes(request.getSession_duration_in_minutes())
+                .numSessions(request.getNumSessions())
+                .sessionDurationInMinutes(request.getSessionDurationInMinutes())
                 .buyer(buyer)
                 .deadline(request.getDeadline())
-                .num_sessions_completed(0)
-                .buyer_confirmed(false)
+                .numSessionsCompleted(0)
+                .buyerConfirmed(false)
                 .paid(false)
                 .build();
 
         return enrollmentRepository.save(enrollment);
     }
 
-    public Enrollment buyerConfirmsEnrollment(Integer enrollment_id) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollment_id).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+    public Enrollment buyerConfirmsEnrollment(Integer enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
         User user = userUtility.getCurrentUser();
         User buyer = enrollment.getBuyer();
@@ -77,7 +77,7 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the buyer can confirm an enrollment.");
         }
 
-        enrollment.setBuyer_confirmed(true);
+        enrollment.setBuyerConfirmed(true);
         return enrollmentRepository.save(enrollment);
     }
 

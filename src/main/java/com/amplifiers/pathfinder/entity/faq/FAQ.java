@@ -32,7 +32,7 @@ public class FAQ {
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gig_id")
+    @JoinColumn(name = "gigId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Gig gig;
 }

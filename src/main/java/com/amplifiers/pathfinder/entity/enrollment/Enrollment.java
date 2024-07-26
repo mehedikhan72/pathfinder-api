@@ -32,13 +32,13 @@ public class Enrollment {
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gig_id")
+    @JoinColumn(name = "gigId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Gig gig;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User buyer;
 
@@ -47,25 +47,25 @@ public class Enrollment {
             nullable = false,
             updatable = false
     )
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @NotNull(message = "Deadline is required.")
     @Future(message = "Deadline must be in the future.")
     private LocalDateTime deadline;
 
-    private LocalDateTime completed_at;
+    private LocalDateTime completedAt;
 
     @NotNull(message = "Price is required.")
     private float price;
 
     @NotNull(message = "Number of sessions is required.")
-    private Integer num_sessions;
+    private Integer numSessions;
 
-    private Integer num_sessions_completed;
+    private Integer numSessionsCompleted;
 
     @NotNull(message = "Session duration is required.")
-    private Integer session_duration_in_minutes;
+    private Integer sessionDurationInMinutes;
 
-    private boolean buyer_confirmed; // when buyer accepts the offer
+    private boolean buyerConfirmed; // when buyer accepts the offer
     private boolean paid;
 }

@@ -13,25 +13,25 @@ public class StudentAssessmentController {
     private final StudentAssessmentService service;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/create/{session_id}")
+    @PostMapping("/create/{sessionId}")
     public ResponseEntity<?> createStudentAssessment(
             @RequestBody StudentAssessmentCreateRequest request,
-            @PathVariable Integer session_id
+            @PathVariable Integer sessionId
     ) {
-        return ResponseEntity.ok(service.createStudentAssessment(request, session_id));
+        return ResponseEntity.ok(service.createStudentAssessment(request, sessionId));
     }
 
-    @GetMapping("/session/{session_id}")
+    @GetMapping("/session/{sessionId}")
     public ResponseEntity<?> getStudentAssessmentForASession(
-            @PathVariable Integer session_id
+            @PathVariable Integer sessionId
     ) {
-        return ResponseEntity.ok(service.getStudentAssessmentForASession(session_id));
+        return ResponseEntity.ok(service.getStudentAssessmentForASession(sessionId));
     }
 
-    @GetMapping("/enrollment/{enrollment_id}")
+    @GetMapping("/enrollment/{enrollmentId}")
     public ResponseEntity<?> getAllStudentAssessmentForAnEnrollment(
-            @PathVariable Integer enrollment_id
+            @PathVariable Integer enrollmentId
     ) {
-        return ResponseEntity.ok(service.getAllStudentAssessmentForAnEnrollment(enrollment_id));
+        return ResponseEntity.ok(service.getAllStudentAssessmentForAnEnrollment(enrollmentId));
     }
 }

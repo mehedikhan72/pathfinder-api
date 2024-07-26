@@ -47,8 +47,8 @@ public class AuthenticationService {
         }
 
         var user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
@@ -63,8 +63,8 @@ public class AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .id(savedUser.getId())
-                .firstName(savedUser.getFirstname())
-                .lastName(savedUser.getLastname())
+                .firstName(savedUser.getFirstName())
+                .lastName(savedUser.getLastName())
                 .email(savedUser.getEmail())
                 .role(user.getRole())
                 .build();
@@ -95,8 +95,8 @@ public class AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .id(user.getId())
-                .firstName(user.getFirstname())
-                .lastName(user.getLastname())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();

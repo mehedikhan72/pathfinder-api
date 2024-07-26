@@ -27,15 +27,15 @@ public class StudentAssessment {
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id")
+    @JoinColumn(name = "sessionId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Session session;
 
     @NotNull(message = "Understanding rating is required.")
-    private Integer understanding_rating; // outtie 10
+    private Integer understandingRating; // outtie 10
 
     @NotNull(message = "Response rating is required.")
-    private Integer response_rating; // outtie 10
+    private Integer responseRating; // outtie 10
 
     @NotBlank(message = "Feedback is required.")
     private String feedback; // for the student

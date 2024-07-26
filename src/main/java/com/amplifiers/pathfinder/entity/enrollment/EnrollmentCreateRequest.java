@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class EnrollmentCreateRequest {
     private Integer price;
-    private Integer num_sessions;
-    private Integer session_duration_in_minutes;
-    private Integer buyer_id;
+    private Integer numSessions;
+    private Integer sessionDurationInMinutes;
+    private Integer buyerId;
     private LocalDateTime deadline;
 }
