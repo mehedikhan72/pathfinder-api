@@ -1,7 +1,11 @@
 package com.amplifiers.pathfinder.entity.gig;
 
 import com.amplifiers.pathfinder.entity.review.ReviewService;
+import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class PublicGigController {
     private final GigService service;
     private final ReviewService reviewService;
+    Integer numGigsPerPage = Variables.PaginationSettings.NUM_GIGS_PER_PAGE;
 
     @GetMapping("/all")
-    public ResponseEntity<?> findAllGigs() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<?> findAllGigs(
+        @RequestParam(name="page", defaultValue = "0") Integer page
+    ) {
+        Pageable pageable = PageRequest.of(page, numGigsPerPage);
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -34,15 +42,19 @@ public class PublicGigController {
 
     @GetMapping("/category/{category}")
     public ResponseEntity<?> findGigsByCategory(
+            @RequestParam(name="page", defaultValue = "0") Integer page,
             @PathVariable String category
     ) {
-        return ResponseEntity.ok(service.findByCategory(category));
+        Pageable pageable = PageRequest.of(page, numGigsPerPage);
+        return ResponseEntity.ok(service.findByCategory(pageable, category));
     }
 
-    @GetMapping("/search/{query}")
+    @GetMapping("/search")
     public ResponseEntity<?> findGigsByQuery(
-            @PathVariable String query
+            @RequestParam(name="query") String query,
+            @RequestParam(name="page", defaultValue = "0") Integer page
     ) {
-        return ResponseEntity.ok(service.findByQuery(query));
+        Pageable pageable = PageRequest.of(page, numGigsPerPage);
+        return ResponseEntity.ok(service.findByQuery(pageable, query));
     }
 }

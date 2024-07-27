@@ -1,6 +1,9 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
+import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class EnrollmentController {
     private final EnrollmentService service;
+    Integer numEnrollmentsPerPage = Variables.PaginationSettings.NUM_ENROLLMENTS_PER_PAGE;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create/{gigId}")
@@ -29,17 +33,21 @@ public class EnrollmentController {
 
     @GetMapping("/gig/{gigId}")
     public ResponseEntity<?> findAllByGigId(
+            @RequestParam(name="page", defaultValue = "0") Integer page,
             @PathVariable Integer gigId
     ) {
-        return ResponseEntity.ok(service.findAllByGigId(gigId));
+        Pageable pageable = PageRequest.of(page, numEnrollmentsPerPage);
+        return ResponseEntity.ok(service.findAllByGigId(pageable, gigId));
     }
 
     // A user can see all enrollments they have made
     @GetMapping("/buyer/{buyer_id}")
     public ResponseEntity<?> findAllByBuyerId(
+            @RequestParam(name="page", defaultValue = "0") Integer page,
             @PathVariable Integer buyerId
     ) {
-        return ResponseEntity.ok(service.findAllByBuyerId(buyerId));
+        Pageable pageable = PageRequest.of(page, numEnrollmentsPerPage);
+        return ResponseEntity.ok(service.findAllByBuyerId(pageable, buyerId));
     }
 
     @GetMapping("/deadline-passed/{enrollmentId}")

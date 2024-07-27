@@ -12,13 +12,13 @@ import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,8 +63,8 @@ public class GigService {
         return Objects.equals(user.getId(), gig.getSeller().getId());
     }
 
-    public List<Gig> findAll() {
-        return repository.findAll();
+    public Page<Gig> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     public Gig findById(Integer id) {
@@ -92,7 +92,7 @@ public class GigService {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
-        imageService.deleteImage(gig.getGigCoverImage().getId());
+        imageService.deleteImageById(gig.getGigCoverImage().getId());
         videoService.deleteVideo(gig.getGigVideo().getId());
 
         // INFO: because cascading delete wasn't working for many to many for some reason.
@@ -180,12 +180,12 @@ public class GigService {
 //        // ie. findByCategory() or findByQuery().
 //    }
 
-    public List<Gig> findByCategory(String category) {
-        return repository.findByCategory(category);
+    public Page<Gig> findByCategory(Pageable pageable, String category) {
+        return repository.findByCategory(pageable, category);
     }
 
-    public List<Gig> findByQuery(String query) {
-        return repository.findByQuery(query);
+    public Page<Gig> findByQuery(Pageable pageable, String query) {
+        return repository.findByQuery(pageable, query);
     }
 
 //    public List<Gig> findByTag(String tag) {
