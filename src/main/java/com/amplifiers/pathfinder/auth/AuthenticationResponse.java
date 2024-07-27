@@ -1,6 +1,7 @@
 package com.amplifiers.pathfinder.auth;
 
 import com.amplifiers.pathfinder.entity.user.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ public class AuthenticationResponse {
 
   @JsonProperty("accessToken")
   private String accessToken;
-  @JsonProperty("refreshToken")
+  @JsonIgnore
   private String refreshToken;
   @JsonProperty("userId")
   private Integer id;

@@ -5,6 +5,7 @@ import com.amplifiers.pathfinder.entity.token.Token;
 import com.amplifiers.pathfinder.entity.token.TokenRepository;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
+import com.amplifiers.pathfinder.exception.ForbiddenException;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +52,7 @@ public class LogoutService implements LogoutHandler {
         final String userEmail;
 
         if (refreshToken == null) {
+            response.setStatus(404);
             return;
         }
 
