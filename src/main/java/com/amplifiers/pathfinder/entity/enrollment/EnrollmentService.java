@@ -9,6 +9,8 @@ import com.amplifiers.pathfinder.exception.UnauthorizedException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -84,12 +86,12 @@ public class EnrollmentService {
     // TODO: Update enrollment.
     // TODO: Cancel enrollment.
 
-    public List<Enrollment> findAllByGigId(Integer id) {
-        return enrollmentRepository.findAllByGigId(id);
+    public Page<Enrollment> findAllByGigId(Pageable pageable, Integer id) {
+        return enrollmentRepository.findAllByGigId(pageable, id);
     }
 
-    public List<Enrollment> findAllByBuyerId(Integer id) {
-        return enrollmentRepository.findAllByBuyerId(id);
+    public Page<Enrollment> findAllByBuyerId(Pageable pageable, Integer id) {
+        return enrollmentRepository.findAllByBuyerId(pageable, id);
     }
 
     public boolean hasDeadlinePassed(Integer id) {
