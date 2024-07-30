@@ -92,7 +92,7 @@ public class GigService {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
-        imageService.deleteImage(gig.getGigCoverImage().getId());
+        imageService.deleteImageById(gig.getGigCoverImage().getId());
         videoService.deleteVideo(gig.getGigVideo().getId());
 
         // INFO: because cascading delete wasn't working for many to many for some reason.

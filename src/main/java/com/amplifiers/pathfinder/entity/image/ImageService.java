@@ -106,10 +106,16 @@ public class ImageService {
         return repository.findAll();
     }
 
-    public Image getImage(String name) {
+    public Image getImageByName(String name) {
         String basename = FilenameUtils.getBaseName(name);
         return repository.findByBasename(basename)
                 .orElseThrow(() -> new ResourceNotFoundException(basename + " does not exist."));
+    }
+
+    public byte[] getImageDataById(Integer id) {
+        Image image =  repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Image does not exist."));
+        return CloudStorageService.getFile(image.getFilename());
     }
 
     public void deleteImageById(Integer id){
