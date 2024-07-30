@@ -26,5 +26,8 @@ public class ChatMessage {
     private Integer receiverId;
     private String message;
     private LocalDateTime timestamp;
-    private boolean read;
+    private boolean read; // by the receiver.
+
+    private String senderFullName;
+    private String receiverFullName;
 }

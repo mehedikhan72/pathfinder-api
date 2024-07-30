@@ -98,6 +98,10 @@ public class User implements UserDetails {
     return role.getAuthorities();
   }
 
+  public String getFullName() {
+    return firstName + " " + lastName;
+  }
+
   @Override
   public String getPassword() {
     return password;

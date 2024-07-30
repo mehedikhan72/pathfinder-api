@@ -1,5 +1,9 @@
 package com.amplifiers.pathfinder.entity.ChatRoom;
 
+import com.amplifiers.pathfinder.entity.user.User;
+import com.amplifiers.pathfinder.entity.user.UserRepository;
+import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,40 +13,56 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
+    private final UserRepository userRepository;
+    private final UserUtility userUtility;
 
     public Optional<String> getChatRoomId(
-            Integer senderId,
-            Integer receiverId,
+            Integer firstUserId,
+            Integer secondUserId,
             boolean createNewRoomIfNotExists
     ) {
-        return chatRoomRepository.findBySenderIdAndReceiverId(senderId, receiverId)
+        // the smaller user id is the first user id.
+        if (firstUserId > secondUserId) {
+            var temp = firstUserId;
+            firstUserId = secondUserId;
+            secondUserId = temp;
+        }
+        // final variables for the lambda functions. (java being weird ik)
+        Integer finalFirstUserId = firstUserId;
+        Integer finalSecondUserId = secondUserId;
+
+        return chatRoomRepository.findByFirstUserIdAndSecondUserId(finalFirstUserId, finalSecondUserId)
                 .map(ChatRoom::getChatId)
                 .or(() -> {
                     if(createNewRoomIfNotExists) {
-                        var chatId = createChatId(senderId, receiverId);
+                        var chatId = createChatId(finalFirstUserId, finalSecondUserId);
                         return Optional.of(chatId);
                     }
                     return Optional.empty();
                 });
     }
 
-    public String createChatId(Integer senderId, Integer receiverId) {
-        var chatId = String.format("%s_%s", String.valueOf(senderId), String.valueOf(receiverId));
+    public String createChatId(Integer firstUserId, Integer secondUserId) {
+        var chatId = "";
+        if (firstUserId < secondUserId) {
+            chatId = String.format("%s_%s", String.valueOf(firstUserId), String.valueOf(secondUserId));
+        } else {
+            chatId = String.format("%s_%s", String.valueOf(secondUserId), String.valueOf(firstUserId));
+        }
 
-        ChatRoom senderReceiver = ChatRoom.builder()
+
+        User firstUser = userRepository.findById(firstUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User secondUser = userRepository.findById(secondUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        var chatRoom = ChatRoom.builder()
                 .chatId(chatId)
-                .senderId(senderId)
-                .receiverId(receiverId)
+                .firstUserId(firstUserId)
+                .secondUserId(secondUserId)
+                .firstUserFullName(firstUser.getFullName())
+                .secondUserFullName(secondUser.getFullName())
                 .build();
 
-        ChatRoom receiverSender = ChatRoom.builder()
-                .chatId(chatId)
-                .senderId(receiverId)
-                .receiverId(senderId)
-                .build();
-
-        chatRoomRepository.save(senderReceiver);
-        chatRoomRepository.save(receiverSender);
+        chatRoomRepository.save(chatRoom);
 
         return chatId;
     }
