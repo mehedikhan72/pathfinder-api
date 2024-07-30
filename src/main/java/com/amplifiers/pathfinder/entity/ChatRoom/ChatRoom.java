@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,6 +21,9 @@ public class ChatRoom {
     @GeneratedValue
     private Integer id;
     private String chatId;
-    private Integer senderId;
-    private Integer receiverId;
+    private Integer firstUserId;
+    private Integer secondUserId;
+    private String firstUserFullName;
+    private String secondUserFullName;
+    private LocalDateTime lastActive;
 }
