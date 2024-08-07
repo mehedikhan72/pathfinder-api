@@ -24,6 +24,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/find/{id}")
+    public ResponseEntity<?> findUserById(
+            @PathVariable Integer id
+    ) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
     @PostMapping("/profile-image")
     @ResponseStatus(HttpStatus.OK)
     public String setProfileImage(

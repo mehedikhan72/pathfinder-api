@@ -23,7 +23,6 @@ public class ChatMessage {
     @GeneratedValue
     private Integer id;
 
-
     private String chatId;
     private Integer senderId;
     private Integer receiverId;

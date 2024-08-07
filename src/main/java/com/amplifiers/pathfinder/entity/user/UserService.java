@@ -21,6 +21,10 @@ public class UserService {
     private final UserRepository repository;
     private final ImageService imageService;
 
+    public User findById(Integer id) {
+        return repository.findById(id).orElseThrow(() -> new ValidationException("User not found"));
+    }
+
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
         var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
