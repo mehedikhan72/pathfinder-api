@@ -28,7 +28,6 @@ public class NotificationService {
                 .build();
 
         Notification savedNotification = notificationRepository.save(notification);
-
         simpMessagingTemplate.convertAndSendToUser(
                 savedNotification.getReceiver().getEmail(),
                 "/queue/notifications",
@@ -38,6 +37,18 @@ public class NotificationService {
 
     public List<Notification> getCurrentUsersNotifications() {
         User receiver = userUtility.getCurrentUser();
-        return notificationRepository.findByReceiver(receiver);
+        return notificationRepository.findByReceiverOrderByTimeStampDesc(receiver);
+    }
+
+    public boolean userHasUnreadNotifications() {
+        User receiver = userUtility.getCurrentUser();
+        return notificationRepository.userHasUnreadNotifications(receiver);
+    }
+
+    public void markAllUsersNotificationAsRead() {
+        User receiver = userUtility.getCurrentUser();
+        List<Notification> unreadNotifications = notificationRepository.findByReceiverAndRead(receiver, false);
+        unreadNotifications.forEach(notification -> notification.setRead(true));
+        notificationRepository.saveAll(unreadNotifications);
     }
 }

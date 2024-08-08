@@ -71,8 +71,9 @@ public class EnrollmentService {
                 .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+        String notificationTxt = savedEnrollment.getGig().getSeller().getFullName() + " has offered you a new enrollment.";
         NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
-                .text("You have been offered a new enrollment!")
+                .text(notificationTxt)
                 .receiver(savedEnrollment.getBuyer())
                 .type(NotificationType.ENROLLMENT)
                 // interaction/user/{id} is a link to the interaction page where id is the
