@@ -2,6 +2,9 @@ package com.amplifiers.pathfinder.entity.enrollment;
 
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
+import com.amplifiers.pathfinder.entity.notification.NotificationCreateRequest;
+import com.amplifiers.pathfinder.entity.notification.NotificationService;
+import com.amplifiers.pathfinder.entity.notification.NotificationType;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -23,6 +26,7 @@ public class EnrollmentService {
     private final GigRepository gigRepository;
     private final UserRepository userRepository;
     private final UserUtility userUtility;
+    private final NotificationService notificationService;
 
 
     public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gigId) {
@@ -66,7 +70,18 @@ public class EnrollmentService {
                 .paid(false)
                 .build();
 
-        return enrollmentRepository.save(enrollment);
+        Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+        NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
+                .text("You have been offered a new enrollment!")
+                .receiver(savedEnrollment.getBuyer())
+                .type(NotificationType.ENROLLMENT)
+                // interaction/user/{id} is a link to the interaction page where id is the
+                // user id of the person im talking to.
+                .linkSuffix("interaction/user/" + savedEnrollment.getGig().getSeller().getId())
+                .build();
+
+        notificationService.createNotification(notificationCreateRequest);
+        return savedEnrollment;
     }
 
     public Enrollment buyerConfirmsEnrollment(Integer enrollmentId) {
