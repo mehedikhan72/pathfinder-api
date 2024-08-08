@@ -105,4 +105,8 @@ public class ChatMessageService {
         chatMessage.setRead(true);
         chatMessageRepository.save(chatMessage);
     }
+
+    public boolean userHasUnreadMessages(Integer userId) {
+        return chatMessageRepository.userHasUnreadMessages(userId);
+    }
 }

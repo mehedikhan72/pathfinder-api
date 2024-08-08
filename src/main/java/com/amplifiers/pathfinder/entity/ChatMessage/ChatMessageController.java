@@ -52,4 +52,11 @@ public class ChatMessageController {
     ) {
         chatMessageService.readSingleMessage(messageId);
     }
+
+    @GetMapping("/messages/has-unread-messages/{userId}")
+    public ResponseEntity<?> userHasUnreadMessages(
+            @PathVariable Integer userId
+    ) {
+        return ResponseEntity.ok(chatMessageService.userHasUnreadMessages(userId));
+    }
 }
