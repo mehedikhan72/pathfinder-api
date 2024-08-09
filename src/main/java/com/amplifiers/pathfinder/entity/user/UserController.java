@@ -17,26 +17,25 @@ public class UserController {
 
     @PatchMapping
     public ResponseEntity<?> changePassword(
-          @RequestBody ChangePasswordRequest request,
-          Principal connectedUser
-    ) {
+            @RequestBody ChangePasswordRequest request,
+            Principal connectedUser) {
         service.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/find/{id}")
-    public ResponseEntity<?> findUserById(
-            @PathVariable Integer id
-    ) {
-        return ResponseEntity.ok(service.findById(id));
+    @PatchMapping("/edit-profile")
+    public ResponseEntity<?> editProfile(
+            @RequestBody ProfileEditRequest request,
+            Principal connectedUser) {
+        service.editProfile(request, connectedUser);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/profile-image")
     @ResponseStatus(HttpStatus.OK)
     public String setProfileImage(
             @RequestParam("file") MultipartFile file,
-            Principal connectedUser
-    ) {
+            Principal connectedUser) {
         return service.setProfileImage(file, connectedUser);
     }
 

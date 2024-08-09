@@ -1,6 +1,7 @@
 package com.amplifiers.pathfinder.entity.user;
 
 import com.amplifiers.pathfinder.entity.image.Image;
+import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -14,13 +15,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user", uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
+@Table(name = "_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
 public class User implements UserDetails {
 
   @Id
@@ -37,7 +40,6 @@ public class User implements UserDetails {
   @Email(message = "Invalid email.")
   private String email;
 
-
   @JsonIgnore
   @NotBlank(message = "Password is required.")
   private String password;
@@ -48,16 +50,41 @@ public class User implements UserDetails {
 
   @OneToOne
   @JoinColumn(name = "profile_image")
-  private Image profile_image;
+  private Image profileImage;
 
-//  @OneToMany(mappedBy = "user")
-//  private List<Token> tokens;
-//
-//  @OneToMany(mappedBy = "user")
-//  private List<Gig> gigs;
-//
-//  @OneToMany(mappedBy = "buyer")
-//  private List<Enrollment> enrollments;
+  // @OneToMany(mappedBy = "user")
+  // private List<Token> tokens;
+  //
+  // @OneToMany(mappedBy = "user")
+  // private List<Gig> gigs;
+  //
+  // @OneToMany(mappedBy = "buyer")
+  // private List<Enrollment> enrollments;
+
+  //// Extra Profile Data
+  @JsonIgnore
+  @ManyToMany
+  @JoinTable(name = "user_tag", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  private Set<Tag> tags;
+
+  @JsonIgnore
+  private Integer age;
+
+  @JsonIgnore
+  @Column(columnDefinition = "text")
+  private String description;
+
+  @JsonIgnore
+  @ElementCollection(targetClass = Achievement.class)
+  @CollectionTable(name = "educations", joinColumns = @JoinColumn(name = "user_id"))
+  @Column(name = "educations")
+  private List<Achievement> educations;
+
+  @JsonIgnore
+  @ElementCollection(targetClass = Achievement.class)
+  @CollectionTable(name = "qualifications", joinColumns = @JoinColumn(name = "user_id"))
+  @Column(name = "qualifications")
+  private List<Achievement> qualifications;
 
   @JsonIgnore
   @Override

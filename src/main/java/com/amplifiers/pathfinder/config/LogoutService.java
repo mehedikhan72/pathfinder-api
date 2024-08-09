@@ -5,7 +5,6 @@ import com.amplifiers.pathfinder.entity.token.Token;
 import com.amplifiers.pathfinder.entity.token.TokenRepository;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
-import com.amplifiers.pathfinder.exception.ForbiddenException;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +38,7 @@ public class LogoutService implements LogoutHandler {
     public void logout(
             HttpServletRequest request,
             HttpServletResponse response,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
         Cookie responseCookie = new Cookie("refresh_token", "");
         responseCookie.setPath("/");
         responseCookie.setMaxAge(0);
@@ -58,7 +56,8 @@ public class LogoutService implements LogoutHandler {
 
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = userRepository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+            var user = userRepository.findByEmail(userEmail).orElseThrow(
+                    () -> new ResourceNotFoundException("No user found with this email. Please try again."));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 revokeAllUserTokens(user);
                 Token token = tokenRepository.findByToken(refreshToken).get();

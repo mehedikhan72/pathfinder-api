@@ -36,9 +36,8 @@ public class ImageService {
                 BufferedImage.TYPE_INT_RGB);
         img.createGraphics().drawImage(pngImg, 0, 0, Color.WHITE, null);
 
-
         // Resizing
-//        System.out.println("Original Size : " + file.getBytes().length);
+        // System.out.println("Original Size : " + file.getBytes().length);
         BufferedImage compressedImage = Thumbnails.of(img)
                 .size(2000, 2000)
                 .keepAspectRatio(true)
@@ -47,7 +46,7 @@ public class ImageService {
         ByteArrayOutputStream finalImageBAOS = new ByteArrayOutputStream();
         ImageIO.write(compressedImage, "jpg", finalImageBAOS);
         byte[] finalImageData = finalImageBAOS.toByteArray();
-//        System.out.println("Size after resizing : " + finalImageData.length);
+        // System.out.println("Size after resizing : " + finalImageData.length);
 
         // Pass to reduce size
         int count = 1;
@@ -63,10 +62,11 @@ public class ImageService {
 
             count++;
 
-//            System.out.println("Size after pass " + count + " : " +finalImageData.length);
+            // System.out.println("Size after pass " + count + " : "
+            // +finalImageData.length);
         }
 
-//        System.out.println(finalImageData.length / (float)file.getBytes().length);
+        // System.out.println(finalImageData.length / (float)file.getBytes().length);
 
         ImageIO.write(compressedImage, "jpg", new File("test.jpg"));
 
@@ -84,18 +84,21 @@ public class ImageService {
 
         return false;
     }
+
     public Image saveImage(MultipartFile file) throws IOException {
         if (!isValidImageFile(file)) {
             throw new ValidationException("Invalid image file. Please upload .jpg, .png, .gif or .bmp file.");
         }
 
-        String basename = ("pf-" + FilenameUtils.getBaseName(file.getOriginalFilename()) + "-" + UUID.randomUUID()).replaceAll("\\.", "");
+        String basename = ("pf-" + FilenameUtils.getBaseName(file.getOriginalFilename()) + "-" + UUID.randomUUID())
+                .replaceAll("\\.", "");
         String keyName = basename + "." + "jpg";
 
         byte[] fileData = compressImage(file);
 
         CloudStorageService.uploadFile(fileData, keyName);
-        Image image = Image.builder().basename(basename).createdAt(LocalDateTime.now()).format("jpg").filename(keyName).build();
+        Image image = Image.builder().basename(basename).createdAt(LocalDateTime.now()).format("jpg").filename(keyName)
+                .build();
 
         System.out.println("Saved image : " + image.getFilename());
 
@@ -106,13 +109,19 @@ public class ImageService {
         return repository.findAll();
     }
 
-    public Image getImage(String name) {
+    public Image getImageByName(String name) {
         String basename = FilenameUtils.getBaseName(name);
         return repository.findByBasename(basename)
                 .orElseThrow(() -> new ResourceNotFoundException(basename + " does not exist."));
     }
 
-    public void deleteImageById(Integer id){
+    public byte[] getImageDataById(Integer id) {
+        Image image = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Image does not exist."));
+        return CloudStorageService.getFile(image.getFilename());
+    }
+
+    public void deleteImageById(Integer id) {
         Image image = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Image with id " + id + " doesn't exist"));
 

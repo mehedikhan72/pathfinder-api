@@ -11,7 +11,9 @@ import java.util.Optional;
 
 public interface GigRepository extends JpaRepository<Gig, Integer> {
     Optional<Gig> findById(int id);
+
     Page<Gig> findByCategory(Pageable pageable, String category);
+
     @Query("SELECT g FROM Gig g LEFT JOIN g.tags t WHERE " +
             "LOWER(g.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(g.description) LIKE LOWER(CONCAT('%', :query, '%')) OR " +

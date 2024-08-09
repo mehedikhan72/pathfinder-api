@@ -20,8 +20,7 @@ public class ChatRoomService {
     public Optional<String> getChatRoomId(
             Integer firstUserId,
             Integer secondUserId,
-            boolean createNewRoomIfNotExists
-    ) {
+            boolean createNewRoomIfNotExists) {
         // the smaller user id is the first user id.
         if (firstUserId > secondUserId) {
             var temp = firstUserId;
@@ -35,7 +34,7 @@ public class ChatRoomService {
         return chatRoomRepository.findByFirstUserIdAndSecondUserId(finalFirstUserId, finalSecondUserId)
                 .map(ChatRoom::getChatId)
                 .or(() -> {
-                    if(createNewRoomIfNotExists) {
+                    if (createNewRoomIfNotExists) {
                         var chatId = createChatId(finalFirstUserId, finalSecondUserId);
                         return Optional.of(chatId);
                     }
@@ -51,9 +50,10 @@ public class ChatRoomService {
             chatId = String.format("%s_%s", String.valueOf(secondUserId), String.valueOf(firstUserId));
         }
 
-
-        User firstUser = userRepository.findById(firstUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        User secondUser = userRepository.findById(secondUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User firstUser = userRepository.findById(firstUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User secondUser = userRepository.findById(secondUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         var chatRoom = ChatRoom.builder()
                 .chatId(chatId)
