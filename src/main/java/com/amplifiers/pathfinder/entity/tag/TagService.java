@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.tag;
 
+import com.amplifiers.pathfinder.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,9 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public Tag createTag(TagCreateRequest tagCreateRequest) {
+        if (tagCreateRequest.getName().isBlank()) {
+            throw new ValidationException("Tag cannot be blank.");
+        }
         Tag tag = Tag.builder()
                 .name(tagCreateRequest.getName())
                 .build();
@@ -27,6 +31,7 @@ public class TagService {
     }
 
     public List<Tag> findByQuery(String query) {
+        if (query == null) return tagRepository.findAll();
         return tagRepository.findByQuery(query);
     }
 }

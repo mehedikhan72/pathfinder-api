@@ -24,6 +24,15 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/edit-profile")
+    public ResponseEntity<?> editProfile(
+            @RequestBody ProfileEditRequest request,
+            Principal connectedUser
+    ) {
+        service.editProfile(request, connectedUser);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/profile-image")
     @ResponseStatus(HttpStatus.OK)
     public String setProfileImage(

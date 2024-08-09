@@ -1,6 +1,5 @@
 package com.amplifiers.pathfinder.entity.user;
 
-import com.amplifiers.pathfinder.entity.tag.Tag;
 import lombok.Builder;
 import lombok.Data;
 
@@ -28,7 +27,9 @@ public class UserProfileDTO {
 
     private String description;
 
-    private Set<Tag> tags;
+    private Set<String> tags;
+
+    private Set<String> interests;
 
     private Float rating;
 
@@ -38,7 +39,7 @@ public class UserProfileDTO {
 
     private Integer totalCompletedEnrollments;
 
-    private List<Achievement> education;
+    private List<Achievement> educations;
 
-    private List<Achievement> qualification;
+    private List<Achievement> qualifications;
 }

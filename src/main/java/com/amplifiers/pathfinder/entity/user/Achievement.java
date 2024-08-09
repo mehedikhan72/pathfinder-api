@@ -12,5 +12,5 @@ import java.time.Year;
 @AllArgsConstructor
 public class Achievement {
     String title;
-    Year year;
+    Integer year;
 }
