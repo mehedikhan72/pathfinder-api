@@ -2,6 +2,9 @@ package com.amplifiers.pathfinder.entity.enrollment;
 
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
+import com.amplifiers.pathfinder.entity.notification.NotificationCreateRequest;
+import com.amplifiers.pathfinder.entity.notification.NotificationService;
+import com.amplifiers.pathfinder.entity.notification.NotificationType;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -23,7 +26,7 @@ public class EnrollmentService {
     private final GigRepository gigRepository;
     private final UserRepository userRepository;
     private final UserUtility userUtility;
-
+    private final NotificationService notificationService;
 
     public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gigId) {
         Gig gig = gigRepository.findById(gigId)
@@ -32,7 +35,7 @@ public class EnrollmentService {
         var sellerId = gig.getSeller().getId();
         User user = userUtility.getCurrentUser();
 
-        if(!Objects.equals(user.getId(), sellerId)) {
+        if (!Objects.equals(user.getId(), sellerId)) {
             throw new UnauthorizedException("Only the seller can create an enrollment.");
         }
 
@@ -42,15 +45,15 @@ public class EnrollmentService {
         User buyer = userRepository.findById(request.getBuyerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Buyer not found."));
 
-        if(request.getNumSessions() <= 0) {
+        if (request.getNumSessions() <= 0) {
             throw new ValidationException("Number of sessions must be positive.");
         }
 
-        if(request.getSessionDurationInMinutes() <= 0) {
+        if (request.getSessionDurationInMinutes() <= 0) {
             throw new ValidationException("Session duration must be positive.");
         }
 
-        if(request.getPrice() <= 0) {
+        if (request.getPrice() <= 0) {
             throw new ValidationException("You didn't provide a price. Are you some kind of saint?");
         }
 
@@ -66,11 +69,25 @@ public class EnrollmentService {
                 .paid(false)
                 .build();
 
-        return enrollmentRepository.save(enrollment);
+        Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+        String notificationTxt = savedEnrollment.getGig().getSeller().getFullName()
+                + " has offered you a new enrollment.";
+        NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
+                .text(notificationTxt)
+                .receiver(savedEnrollment.getBuyer())
+                .type(NotificationType.ENROLLMENT)
+                // interaction/user/{id} is a link to the interaction page where id is the
+                // user id of the person im talking to.
+                .linkSuffix("interaction/user/" + savedEnrollment.getGig().getSeller().getId())
+                .build();
+
+        notificationService.createNotification(notificationCreateRequest);
+        return savedEnrollment;
     }
 
     public Enrollment buyerConfirmsEnrollment(Integer enrollmentId) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
         User user = userUtility.getCurrentUser();
         User buyer = enrollment.getBuyer();

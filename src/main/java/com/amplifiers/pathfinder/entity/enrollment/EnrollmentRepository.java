@@ -14,14 +14,15 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
     Page<Enrollment> findAllByBuyerId(Pageable pageable, Integer id);
 
     @Query("""
-    select count(e) from Enrollment e left join Gig g on e.gig = g
-    where g.seller.id = :sellerId and e.completedAt is not null
-""")
+                select count(e) from Enrollment e left join Gig g on e.gig = g
+                where g.seller.id = :sellerId and e.completedAt is not null
+            """)
     Integer countCompletedBySellerId(Integer sellerId);
+
     @Query("""
-    select count(distinct e.buyer) from Enrollment e left join Gig g on e.gig = g
-    where g.seller.id = :sellerId
-""")
+                select count(distinct e.buyer) from Enrollment e left join Gig g on e.gig = g
+                where g.seller.id = :sellerId
+            """)
     Integer countDistinctStudentsBySellerId(Integer sellerId);
 
     @Query(value = """

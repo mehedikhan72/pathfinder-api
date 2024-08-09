@@ -31,7 +31,8 @@ public class TagService {
     }
 
     public List<Tag> findByQuery(String query) {
-        if (query == null) return tagRepository.findAll();
+        if (query == null)
+            return tagRepository.findAll();
         return tagRepository.findByQuery(query);
     }
 }

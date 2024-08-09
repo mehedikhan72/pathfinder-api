@@ -23,7 +23,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user", uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
+@Table(name = "_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
 public class User implements UserDetails {
 
   @Id
@@ -40,7 +40,6 @@ public class User implements UserDetails {
   @Email(message = "Invalid email.")
   private String email;
 
-
   @JsonIgnore
   @NotBlank(message = "Password is required.")
   private String password;
@@ -53,24 +52,19 @@ public class User implements UserDetails {
   @JoinColumn(name = "profile_image")
   private Image profileImage;
 
-//  @OneToMany(mappedBy = "user")
-//  private List<Token> tokens;
-//
-//  @OneToMany(mappedBy = "user")
-//  private List<Gig> gigs;
-//
-//  @OneToMany(mappedBy = "buyer")
-//  private List<Enrollment> enrollments;
-
+  // @OneToMany(mappedBy = "user")
+  // private List<Token> tokens;
+  //
+  // @OneToMany(mappedBy = "user")
+  // private List<Gig> gigs;
+  //
+  // @OneToMany(mappedBy = "buyer")
+  // private List<Enrollment> enrollments;
 
   //// Extra Profile Data
   @JsonIgnore
   @ManyToMany
-  @JoinTable(
-          name = "user_tag",
-          joinColumns = @JoinColumn(name = "user_id"),
-          inverseJoinColumns = @JoinColumn(name = "tag_id")
-  )
+  @JoinTable(name = "user_tag", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
   private Set<Tag> tags;
 
   @JsonIgnore

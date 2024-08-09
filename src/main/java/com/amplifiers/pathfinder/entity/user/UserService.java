@@ -57,7 +57,6 @@ public class UserService {
         repository.save(user);
     }
 
-
     @Transactional
     public void editProfile(ProfileEditRequest request, Principal connectedUser) {
         User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -65,19 +64,18 @@ public class UserService {
         System.out.println(request);
 
         if (request.getFirstName() != null) {
-            if(request.getFirstName().isBlank()) {
+            if (request.getFirstName().isBlank()) {
                 throw new ValidationException("First Name cannot be blank.");
             }
             user.setFirstName(request.getFirstName());
         }
 
         if (request.getLastName() != null) {
-            if(request.getLastName().isBlank()) {
+            if (request.getLastName().isBlank()) {
                 throw new ValidationException("Last Name cannot be blank.");
             }
             user.setLastName(request.getLastName());
         }
-
 
         if (request.getAge() != null) {
             user.setAge(request.getAge());
@@ -89,14 +87,16 @@ public class UserService {
 
         if (request.getEducations() != null) {
             request.getEducations().forEach(e -> {
-                if (e.title.isBlank()) throw new ValidationException("Education field cannot be blank");
+                if (e.title.isBlank())
+                    throw new ValidationException("Education field cannot be blank");
             });
             user.setEducations(request.getEducations());
         }
 
         if (request.getQualifications() != null) {
             request.getQualifications().forEach(e -> {
-                if (e.title.isBlank()) throw new ValidationException("Qualification field cannot be blank");
+                if (e.title.isBlank())
+                    throw new ValidationException("Qualification field cannot be blank");
             });
             user.setQualifications(request.getQualifications());
         }
@@ -141,28 +141,28 @@ public class UserService {
             imageService.deleteImageById(prevProfileImage.getId());
         }
 
-        return "Successfully " + (prevProfileImage != null ? "updated" : "set") + " the profile image of " + user.getUsername();
+        return "Successfully " + (prevProfileImage != null ? "updated" : "set") + " the profile image of "
+                + user.getUsername();
     }
 
     @Transactional
     public UserProfileDTO getUserProfileData(Integer id, HttpServletRequest request) {
-        User user = repository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Profile not found."));
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found."));
 
-
-        Set<String> tags = user.getTags().stream().map(tag-> tag.getName()).collect(Collectors.toSet());
+        Set<String> tags = user.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet());
 
         String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null).build().toUriString();
 
         List<Float> ratingList = reviewRepository.findAllRatingsBySellerId(id);
-         Float rating = ratingList.size() > 0 ? (ratingList
-                 .stream()
-                 .reduce(Float.valueOf(0), (subtotal, gigRating) -> subtotal + gigRating)) / ratingList.size() : null;
+        Float rating = ratingList.size() > 0 ? (ratingList
+                .stream()
+                .reduce(Float.valueOf(0), (subtotal, gigRating) -> subtotal + gigRating)) / ratingList.size() : null;
 
-         Integer ratedByCount = ratingList.size();
+        Integer ratedByCount = ratingList.size();
 
-         Integer totalStudents = enrollmentRepository.countDistinctStudentsBySellerId(id);
+        Integer totalStudents = enrollmentRepository.countDistinctStudentsBySellerId(id);
 
-         Integer totalCompletedEnrollments = enrollmentRepository.countCompletedBySellerId(id);
+        Integer totalCompletedEnrollments = enrollmentRepository.countCompletedBySellerId(id);
 
         return UserProfileDTO.builder()
                 .id(user.getId())
@@ -170,7 +170,9 @@ public class UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .username(user.getUsername())
-                .profileImage(user.getProfileImage() != null ? baseUrl + "/api/v1/public/images/" + user.getProfileImage().getFilename() : null)
+                .profileImage(user.getProfileImage() != null
+                        ? baseUrl + "/api/v1/public/images/" + user.getProfileImage().getFilename()
+                        : null)
                 .role(user.getRole())
                 .age(user.getAge())
                 .description(user.getDescription())
@@ -186,10 +188,11 @@ public class UserService {
     }
 
     public byte[] getProfileImageDataByUserId(Integer id) {
-        User user = repository.findById(id).orElseThrow(()-> new ResourceNotFoundException("User not found."));
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
         return imageService.getImageDataById(user.getProfileImage().getId());
     }
+
     public List<User> findAll() {
         return repository.findAll();
     }

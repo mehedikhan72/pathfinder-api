@@ -8,13 +8,12 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
-
     List<Review> findAllByGigId(Integer gigId);
 
     @Query("""
-    select r.rating from Review r left join Gig g on r.gig = g
-    where g.seller.id = :sellerId
-""")
+                select r.rating from Review r left join Gig g on r.gig = g
+                where g.seller.id = :sellerId
+            """)
     List<Float> findAllRatingsBySellerId(Integer sellerId);
 
     boolean existsByIdAndGigId(Integer id, Integer gigId);

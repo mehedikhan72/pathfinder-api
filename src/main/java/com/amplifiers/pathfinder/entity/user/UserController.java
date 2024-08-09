@@ -17,9 +17,8 @@ public class UserController {
 
     @PatchMapping
     public ResponseEntity<?> changePassword(
-          @RequestBody ChangePasswordRequest request,
-          Principal connectedUser
-    ) {
+            @RequestBody ChangePasswordRequest request,
+            Principal connectedUser) {
         service.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
     }
@@ -27,8 +26,7 @@ public class UserController {
     @PatchMapping("/edit-profile")
     public ResponseEntity<?> editProfile(
             @RequestBody ProfileEditRequest request,
-            Principal connectedUser
-    ) {
+            Principal connectedUser) {
         service.editProfile(request, connectedUser);
         return ResponseEntity.ok().build();
     }
@@ -37,8 +35,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public String setProfileImage(
             @RequestParam("file") MultipartFile file,
-            Principal connectedUser
-    ) {
+            Principal connectedUser) {
         return service.setProfileImage(file, connectedUser);
     }
 

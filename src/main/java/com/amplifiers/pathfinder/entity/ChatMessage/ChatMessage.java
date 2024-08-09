@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -25,7 +27,7 @@ public class ChatMessage {
     private Integer senderId;
     private Integer receiverId;
     private String message;
-    private LocalDateTime timestamp;
+    private OffsetDateTime timeStamp;
     private boolean read; // by the receiver.
 
     private String senderFullName;

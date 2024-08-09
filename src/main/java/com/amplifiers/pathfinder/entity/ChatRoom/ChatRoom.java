@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.ChatRoom;
 
+import com.amplifiers.pathfinder.entity.ChatMessage.ChatMessage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -20,10 +22,15 @@ public class ChatRoom {
     @Id
     @GeneratedValue
     private Integer id;
+    @Column(unique = true)
     private String chatId;
     private Integer firstUserId;
     private Integer secondUserId;
     private String firstUserFullName;
     private String secondUserFullName;
-    private LocalDateTime lastActive;
+    private OffsetDateTime lastActive;
+
+    @OneToOne
+    @JoinColumn(name = "lastMessageId")
+    private ChatMessage lastMessage;
 }
