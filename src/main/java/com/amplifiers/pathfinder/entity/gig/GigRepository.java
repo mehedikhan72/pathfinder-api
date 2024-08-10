@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ import java.util.Optional;
 
 public interface GigRepository extends JpaRepository<Gig, Integer> {
     Optional<Gig> findById(int id);
+
+    List<Gig> findGigsBySeller(User seller);
 
     Page<Gig> findByCategory(Pageable pageable, String category);
 

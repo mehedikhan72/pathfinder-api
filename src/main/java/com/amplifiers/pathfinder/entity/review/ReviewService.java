@@ -3,7 +3,9 @@ package com.amplifiers.pathfinder.entity.review;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
+import com.amplifiers.pathfinder.entity.gig.GigService;
 import com.amplifiers.pathfinder.entity.user.User;
+import com.amplifiers.pathfinder.entity.user.UserShortDTO;
 import com.amplifiers.pathfinder.exception.ForbiddenException;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
@@ -106,4 +108,39 @@ public class ReviewService {
 
         return repository.save(review);
     }
+
+    public static ReviewCardDTO createReviewCardDTO(Review review, boolean includeGig) {
+        UserShortDTO reviewer = UserShortDTO.builder()
+                .id(review.getReviewer().getId())
+                .firstName(review.getReviewer().getFirstName())
+                .lastName(review.getReviewer().getLastName())
+                .build();
+
+        var reviewCardDTOBuilder = ReviewCardDTO.builder()
+                .id(review.getId())
+                .title(review.getTitle())
+                .text(review.getText())
+                .rating(review.getRating())
+                .createdAt(review.getCreatedAt())
+                .reviewer(reviewer);
+
+        if (includeGig) {
+            reviewCardDTOBuilder = reviewCardDTOBuilder.gig(GigService.createGigShortDTO(review.getGig()));
+        }
+
+        return reviewCardDTOBuilder.build();
+    }
+
+    public static ReviewCardDTO createReviewCardDTO(Review review) {
+        return createReviewCardDTO(review, true);
+    }
+    public List<ReviewCardDTO> getReviewCardsBySellerId(Integer sellerId) {
+        List<Review> reviews = repository.findAllReviewsBySellerId(sellerId);
+
+        List<ReviewCardDTO> reviewCardDTOS = reviews.stream().map(r -> createReviewCardDTO(r)).toList();
+
+        return reviewCardDTOS;
+    }
+
+
 }

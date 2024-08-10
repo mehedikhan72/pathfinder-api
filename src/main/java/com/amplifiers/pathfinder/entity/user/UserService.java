@@ -1,10 +1,14 @@
 package com.amplifiers.pathfinder.entity.user;
 
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
-import com.amplifiers.pathfinder.entity.gig.GigRepository;
+import com.amplifiers.pathfinder.entity.gig.Gig;
+import com.amplifiers.pathfinder.entity.gig.GigCardDTO;
+import com.amplifiers.pathfinder.entity.gig.GigService;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
+import com.amplifiers.pathfinder.entity.review.ReviewCardDTO;
 import com.amplifiers.pathfinder.entity.review.ReviewRepository;
+import com.amplifiers.pathfinder.entity.review.ReviewService;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
 import com.amplifiers.pathfinder.entity.tag.TagService;
@@ -21,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,9 +36,10 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
-    private final GigRepository gigRepository;
-    private final TagService tagService;
     private final ReviewRepository reviewRepository;
+    private final GigService gigService;
+    private final ReviewService reviewService;
+    private final TagService tagService;
     private final EnrollmentRepository enrollmentRepository;
     private final ImageService imageService;
 
@@ -146,12 +152,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileDTO getUserProfileData(Integer id, HttpServletRequest request) {
+    public UserProfileDTO getUserProfileData(Integer id) {
         User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found."));
 
         Set<String> tags = user.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet());
-
-        String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request).replacePath(null).build().toUriString();
 
         List<Float> ratingList = reviewRepository.findAllRatingsBySellerId(id);
         Float rating = ratingList.size() > 0 ? (ratingList
@@ -170,9 +174,6 @@ public class UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .username(user.getUsername())
-                .profileImage(user.getProfileImage() != null
-                        ? baseUrl + "/api/v1/public/images/" + user.getProfileImage().getFilename()
-                        : null)
                 .role(user.getRole())
                 .age(user.getAge())
                 .description(user.getDescription())
@@ -197,4 +198,19 @@ public class UserService {
         return repository.findAll();
     }
 
+    public List<Gig> getGigs(Integer id) {
+        User seller = repository.getReferenceById(id);
+
+        return gigService.getGigsBySeller(seller);
+    }
+
+    public List<GigCardDTO> getGigCards(Integer id) {
+        User seller = repository.getReferenceById(id);
+
+        return gigService.getGigCardsBySeller(seller);
+    }
+
+    public List<ReviewCardDTO> getReviewCards(Integer id) {
+        return reviewService.getReviewCardsBySellerId(id);
+    }
 }

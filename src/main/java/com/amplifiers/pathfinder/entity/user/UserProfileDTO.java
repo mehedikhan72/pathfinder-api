@@ -21,8 +21,6 @@ public class UserProfileDTO {
 
     private Role role;
 
-    private String profileImage;
-
     private Integer age;
 
     private String description;

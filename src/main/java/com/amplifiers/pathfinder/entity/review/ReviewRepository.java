@@ -16,6 +16,12 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
             """)
     List<Float> findAllRatingsBySellerId(Integer sellerId);
 
+    @Query("""
+                select r from Review r left join Gig g on r.gig = g
+                where g.seller.id = :sellerId
+            """)
+    List<Review> findAllReviewsBySellerId(Integer sellerId);
+
     boolean existsByIdAndGigId(Integer id, Integer gigId);
 
     boolean existsByIdAndReviewer(Integer id, User reviewer);

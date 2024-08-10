@@ -2,10 +2,12 @@ package com.amplifiers.pathfinder.entity.gig;
 
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
+import com.amplifiers.pathfinder.entity.review.ReviewRepository;
 import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
 import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.entity.user.User;
+import com.amplifiers.pathfinder.entity.user.UserShortDTO;
 import com.amplifiers.pathfinder.entity.video.Video;
 import com.amplifiers.pathfinder.entity.video.VideoService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,11 +29,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class GigService {
-    private final GigRepository repository;
-    private final TagService tagService;
     private final UserUtility userUtility;
+
+    private final GigRepository repository;
+    private final ReviewRepository reviewRepository;
+
+    private final TagService tagService;
     private final ImageService imageService;
     private final VideoService videoService;
+
     private final JdbcTemplate jdbcTemplate;
 
     public Gig createGig(GigCreateRequest request) {
@@ -88,7 +95,7 @@ public class GigService {
 
         User user = userUtility.getCurrentUser();
 
-        if (user.getId() != gig.getSeller().getId()) {
+        if (!user.getId().equals( gig.getSeller().getId())) {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
@@ -103,11 +110,8 @@ public class GigService {
     }
 
     public Image setCoverImage(Integer gigId, MultipartFile image) throws Exception {
-        Gig gig = repository.getReferenceById(gigId);
-
-        if (gig == null) {
-            throw new ResourceNotFoundException("Gig id " + gigId + " does not exist.");
-        }
+        Gig gig = repository.findById(gigId)
+                .orElseThrow(()-> new ResourceNotFoundException("Gig id " + gigId + " does not exist."));
 
         if (!isGigOfUser(gig)) {
             throw new ValidationException("User not owner of this gig");
@@ -128,11 +132,8 @@ public class GigService {
     }
 
     public Video setGigVideo(Integer gigId, MultipartFile video) throws Exception {
-        Gig gig = repository.getReferenceById(gigId);
-
-        if (gig == null) {
-            throw new ResourceNotFoundException("Gig id " + gigId + " does not exist.");
-        }
+        Gig gig = repository.findById(gigId)
+                .orElseThrow(()-> new ResourceNotFoundException("Gig id " + gigId + " does not exist."));
 
         if (!isGigOfUser(gig)) {
             throw new ValidationException("User not owner of this gig");
@@ -157,6 +158,63 @@ public class GigService {
 
         return gig.getGigCoverImage();
     }
+
+    public List<Gig> getGigsBySeller(User seller) {
+        return repository.findGigsBySeller(seller);
+    }
+
+    public static GigShortDTO createGigShortDTO(Gig gig) {
+        return GigShortDTO.builder()
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .build();
+    }
+    public GigCardDTO createGigCardDTO(Gig gig, boolean includeUser) {
+        List<Float> ratingList = reviewRepository.findAllByGigId(gig.getId()).stream().map(r -> Float.valueOf(r.getRating())).toList();
+
+        float rating = ratingList.size() > 0 ? (ratingList
+                .stream()
+                .reduce((float) 0, Float::sum)) / ratingList.size() : 0;
+
+        int ratedByCount = ratingList.size();
+
+
+
+        var gigCardDTOBuilder = GigCardDTO.builder()
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .price(gig.getPrice())
+                .rating(rating)
+                .ratedByCount(ratedByCount)
+                .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .tags(gig.getTags().stream().map(Tag::getName).collect(Collectors.toSet()));
+
+
+        if (includeUser) {
+            UserShortDTO userShortDTO = UserShortDTO.builder()
+                    .id(gig.getSeller().getId())
+                    .firstName(gig.getSeller().getFirstName())
+                    .lastName(gig.getSeller().getLastName())
+                    .build();
+
+            gigCardDTOBuilder = gigCardDTOBuilder.user(userShortDTO);
+        }
+
+
+        return gigCardDTOBuilder.build();
+    }
+
+    public GigCardDTO createGigCardDTO(Gig gig) {
+        return createGigCardDTO(gig, true);
+    }
+
+    public List<GigCardDTO> getGigCardsBySeller(User seller) {
+        List<Gig> gigs = repository.findGigsBySeller(seller);
+
+        return gigs.stream().map(g -> createGigCardDTO(g, false)).toList();
+    }
+
 
     // INFO: HOW SEARCH WORKS.
     // when a user starts typing the query, we recommend them the tags and categories with the 'query' prefix.
@@ -187,6 +245,8 @@ public class GigService {
     public Page<Gig> findByQuery(Pageable pageable, String query) {
         return repository.findByQuery(pageable, query);
     }
+
+
 
 //    public List<Gig> findByTag(String tag) {
 //        // TODO
