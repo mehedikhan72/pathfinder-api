@@ -3,12 +3,15 @@ package com.amplifiers.pathfinder.entity.ChatMessage;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import com.amplifiers.pathfinder.utility.Variables;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -20,6 +23,7 @@ public class ChatMessageController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
     private final UserRepository userRepository;
+    Integer numMessagesPerPage = Variables.PaginationSettings.NUM_MESSAGES_PER_PAGE;
 
     @MessageMapping("/chat")
     public void processMessage(
@@ -39,9 +43,11 @@ public class ChatMessageController {
 
     @GetMapping("/messages/{firstUserId}/{secondUserId}")
     public ResponseEntity<?> findChatMessages(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @PathVariable Integer firstUserId,
             @PathVariable Integer secondUserId) {
-        return ResponseEntity.ok(chatMessageService.findChatMessages(firstUserId, secondUserId));
+        Pageable pageable = PageRequest.of(page, numMessagesPerPage);
+        return ResponseEntity.ok(chatMessageService.findChatMessages(pageable, firstUserId, secondUserId));
     }
 
     @PutMapping("/messages/read/{messageId}")
