@@ -25,7 +25,7 @@ public class UserProfileDTO {
 
     private String description;
 
-    private Set<String> tags;
+    private Set<String> teachTags;
 
     private Set<String> interests;
 
