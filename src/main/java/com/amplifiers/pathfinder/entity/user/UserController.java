@@ -44,4 +44,8 @@ public class UserController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/find/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
 }

@@ -213,4 +213,8 @@ public class UserService {
     public List<ReviewCardDTO> getReviewCards(Integer id) {
         return reviewService.getReviewCardsBySellerId(id);
     }
+
+    public User findById(Integer id) {
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found."));
+    }
 }
