@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,9 @@ public class EnrollmentService {
     private final UserRepository userRepository;
     private final UserUtility userUtility;
     private final NotificationService notificationService;
+
+    // TODO: update later - there can be only one concurrent enrollment between a buyer and seller. the
+    // TODO: seller won't be able to initiate any new offers to the same buyer.
 
     public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gigId) {
         Gig gig = gigRepository.findById(gigId)
@@ -41,6 +45,12 @@ public class EnrollmentService {
 
         if (request.getBuyerId() == null)
             throw new ValidationException("Buyer ID is required.");
+
+        // since only one incomplete enrollment can exist at a time.
+        Optional<Enrollment> existingEnrollment = findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, request.getBuyerId());
+        if (existingEnrollment.isPresent()) {
+            throw new ValidationException("An incomplete enrollment already exists between you and this buyer. Please complete this one first.");
+        }
 
         User buyer = userRepository.findById(request.getBuyerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Buyer not found."));
@@ -102,6 +112,10 @@ public class EnrollmentService {
 
     // TODO: Update enrollment.
     // TODO: Cancel enrollment.
+
+    public Optional<Enrollment> findIncompleteEnrollmentBySellerIdAndBuyerId(Integer sellerId, Integer buyerId) {
+        return enrollmentRepository.findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, buyerId);
+    }
 
     public Page<Enrollment> findAllByGigId(Pageable pageable, Integer id) {
         return enrollmentRepository.findAllByGigId(pageable, id);
