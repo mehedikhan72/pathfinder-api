@@ -56,4 +56,12 @@ public class EnrollmentController {
     ) {
         return ResponseEntity.ok(service.hasDeadlinePassed(enrollmentId));
     }
+
+    @GetMapping("/get/incomplete/seller/{sellerId}/buyer/{buyerId}")
+    public ResponseEntity<?> findUnconfirmedBySellerIdAndBuyerId(
+            @PathVariable Integer sellerId,
+            @PathVariable Integer buyerId
+    ) {
+        return ResponseEntity.ok(service.findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, buyerId));
+    }
 }

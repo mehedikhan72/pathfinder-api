@@ -9,6 +9,8 @@ import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -60,7 +62,7 @@ public class ChatMessageService {
         return savedChatMessage;
     }
 
-    public List<ChatMessage> findChatMessages(Integer firstUserId, Integer secondUserId) {
+    public Page<ChatMessage> findChatMessages(Pageable pageable, Integer firstUserId, Integer secondUserId) {
         if (firstUserId == null || secondUserId == null) {
             throw new ValidationException("User id cannot be null");
         }
@@ -77,16 +79,16 @@ public class ChatMessageService {
         }
 
         var chatId = chatRoomService.getChatRoomId(firstUserId, secondUserId, true).orElseThrow();
-        readMessages(chatId, currentUserId); // calling it here ensures no further validation is needed.
-        return chatMessageRepository.findAllByChatIdOrderByTimeStampAsc(chatId);
+        readMessages(pageable, chatId, currentUserId); // calling it here ensures no further validation is needed.
+        return chatMessageRepository.findAllByChatIdOrderByTimeStampAsc(pageable, chatId);
     }
 
     // when a user fetches all the recent messages, it's obvious that the user has
     // read them.
     // so we can mark the messages as read, with receiverId as the current user id,
     // in the chat room.
-    public void readMessages(String chatId, Integer currentUserId) {
-        chatMessageRepository.findAllByChatIdOrderByTimeStampAsc(chatId)
+    public void readMessages(Pageable pageable, String chatId, Integer currentUserId) {
+        chatMessageRepository.findAllByChatIdOrderByTimeStampAsc(pageable, chatId)
                 .stream()
                 .filter(chatMessage -> Objects.equals(chatMessage.getReceiverId(), currentUserId))
                 .forEach(chatMessage -> {

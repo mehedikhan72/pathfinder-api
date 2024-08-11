@@ -4,6 +4,8 @@ import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -35,9 +37,9 @@ public class NotificationService {
         );
     }
 
-    public List<Notification> getCurrentUsersNotifications() {
+    public Page<Notification> getCurrentUsersNotifications(Pageable pageable) {
         User receiver = userUtility.getCurrentUser();
-        return notificationRepository.findByReceiverOrderByTimeStampDesc(receiver);
+        return notificationRepository.findByReceiverOrderByTimeStampDesc(pageable,receiver);
     }
 
     public boolean userHasUnreadNotifications() {
