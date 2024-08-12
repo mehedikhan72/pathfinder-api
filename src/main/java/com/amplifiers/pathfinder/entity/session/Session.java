@@ -31,13 +31,7 @@ public class Session {
     // the seller will schedule each session and the buyer will
     // accept it. This is to make sure that the buyer is available
     // at that time. More info incoming.
-
-    @CreatedDate
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 
     @NotNull(message = "Scheduled date is required.")
     @Future(message = "Scheduled date must be in the future.")

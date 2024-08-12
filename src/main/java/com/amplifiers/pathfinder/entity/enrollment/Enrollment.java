@@ -42,11 +42,6 @@ public class Enrollment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User buyer;
 
-    @CreatedDate
-    @Column(
-            nullable = false,
-            updatable = false
-    )
     private OffsetDateTime createdAt;
 
     @NotNull(message = "Deadline is required.")

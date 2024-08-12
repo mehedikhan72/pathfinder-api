@@ -77,6 +77,7 @@ public class EnrollmentService {
                 .numSessionsCompleted(0)
                 .buyerConfirmed(false)
                 .paid(false)
+                .createdAt(OffsetDateTime.now())
                 .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);

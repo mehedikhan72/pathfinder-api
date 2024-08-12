@@ -64,9 +64,9 @@ public class Gig {
 
     // @OneToMany(mappedBy = "gig")
     // private Set<Enrollment> enrollments;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
+//
+//    @CreatedDate
+//    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @OneToOne

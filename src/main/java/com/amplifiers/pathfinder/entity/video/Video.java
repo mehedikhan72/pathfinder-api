@@ -24,8 +24,6 @@ public class Video {
     private String basename;
     private String format;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @Transient

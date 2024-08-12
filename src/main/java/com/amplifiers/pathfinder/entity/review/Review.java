@@ -43,8 +43,6 @@ public class Review {
     // Rating out of 5
     private Short rating;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "email", "role", "username"})

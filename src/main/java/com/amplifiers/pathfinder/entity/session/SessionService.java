@@ -11,6 +11,7 @@ import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Service
@@ -33,7 +34,14 @@ public class SessionService {
             throw new UnauthorizedException("Only the seller can create a session.");
         }
 
-        var session = Session.builder().enrollment(enrollment).scheduledAt(request.getScheduledAt()).sessionType(request.getSessionType()).buyerConfirmed(false).completed(false).build();
+        var session = Session.builder()
+                .enrollment(enrollment)
+                .scheduledAt(request.getScheduledAt())
+                .sessionType(request.getSessionType())
+                .buyerConfirmed(false)
+                .completed(false)
+                .createdAt(OffsetDateTime.now())
+                .build();
 
         return sessionRepository.save(session);
     }
