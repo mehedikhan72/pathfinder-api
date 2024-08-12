@@ -31,6 +31,14 @@ public class EnrollmentController {
         return ResponseEntity.ok(service.buyerConfirmsEnrollment(enrollmentId));
     }
 
+    @DeleteMapping("buyer-declines/{enrollmentId}")
+    public String buyerDeclinesEnrollment(
+            @PathVariable Integer enrollmentId
+    ) {
+        service.buyerDeclinesEnrollment(enrollmentId);
+        return "declined.";
+    }
+
     @GetMapping("/gig/{gigId}")
     public ResponseEntity<?> findAllByGigId(
             @RequestParam(name="page", defaultValue = "0") Integer page,

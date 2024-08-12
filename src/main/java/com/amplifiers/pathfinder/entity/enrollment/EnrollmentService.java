@@ -107,8 +107,30 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the buyer can confirm an enrollment.");
         }
 
+        // TODO: handle payment here.
+
+        // Info: for now, payment bypassed.
+        enrollment.setPaid(true);
+
         enrollment.setBuyerConfirmed(true);
+
+        // TODO: notify seller
         return enrollmentRepository.save(enrollment);
+    }
+
+    public void buyerDeclinesEnrollment(Integer enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+
+        User user = userUtility.getCurrentUser();
+        User buyer = enrollment.getBuyer();
+
+        if (!Objects.equals(user.getId(), buyer.getId())) {
+            throw new UnauthorizedException("Only the buyer can decline an enrollment.");
+        }
+
+        // TODO: notify seller
+        enrollmentRepository.delete(enrollment);
     }
 
     // TODO: Update enrollment.
