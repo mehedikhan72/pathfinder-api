@@ -14,18 +14,15 @@ import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
 import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -155,12 +152,18 @@ public class UserService {
     public UserProfileDTO getUserProfileData(Integer id) {
         User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Profile not found."));
 
-        Set<String> tags = user.getTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet());
+        Set<String> interests = user.getTags().stream().map(Tag::getName).collect(Collectors.toSet());
+
+        Set<String> teachTags = gigService.getGigsBySeller(user).stream()
+                .map(Gig::getTags)
+                .flatMap(Set::stream)
+                .map(Tag::getName)
+                .collect(Collectors.toSet());
 
         List<Float> ratingList = reviewRepository.findAllRatingsBySellerId(id);
-        Float rating = ratingList.size() > 0 ? (ratingList
+        Float rating = (ratingList.size() > 0) ? ((ratingList
                 .stream()
-                .reduce(Float.valueOf(0), (subtotal, gigRating) -> subtotal + gigRating)) / ratingList.size() : null;
+                .reduce((float) 0, Float::sum)) / ratingList.size()) : null;
 
         Integer ratedByCount = ratingList.size();
 
@@ -177,8 +180,8 @@ public class UserService {
                 .role(user.getRole())
                 .age(user.getAge())
                 .description(user.getDescription())
-                .tags(tags)
-                .interests(tags)
+                .teachTags(teachTags)
+                .interests(interests)
                 .rating(rating)
                 .ratedByCount(ratedByCount)
                 .totalStudents(totalStudents)

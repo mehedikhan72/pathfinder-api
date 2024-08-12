@@ -16,7 +16,8 @@ public enum Category {
     Human_Computer_Interaction("Human-Computer Interaction"),
     Computer_Graphics("Computer Graphics"),
     Embedded_Systems("Embedded Systems"),
-    Operating_Systems("Operating Systems");
+    Operating_Systems("Operating Systems"),
+    Others("Others");
 
     private final String displayName;
 
