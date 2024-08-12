@@ -1,6 +1,10 @@
 package com.amplifiers.pathfinder.entity.gig;
 
 import com.amplifiers.pathfinder.entity.review.ReviewService;
+import com.amplifiers.pathfinder.entity.user.User;
+import com.amplifiers.pathfinder.entity.user.UserRepository;
+import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.utility.UserUtility;
 import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class PublicGigController {
     private final GigService service;
     private final ReviewService reviewService;
+    private final UserRepository userRepository;
     Integer numGigsPerPage = Variables.PaginationSettings.NUM_GIGS_PER_PAGE;
 
     @GetMapping("/all")
@@ -31,6 +36,14 @@ public class PublicGigController {
             @PathVariable Integer id
     ) {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping("/seller/{userId}")
+    public ResponseEntity<?> findGigsByseller(
+            @PathVariable Integer userId
+    ) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return ResponseEntity.ok(service.getGigCardsBySeller(user));
     }
 
     @GetMapping("/{id}/reviews")

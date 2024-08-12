@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class VideoService {
         String keyName = basename + "." + ext;
 
         CloudStorageService.uploadFile(file.getBytes(), keyName);
-        Video video = Video.builder().basename(basename).createdAt(LocalDateTime.now()).format(ext).filename(keyName).build();
+        Video video = Video.builder().basename(basename).createdAt(OffsetDateTime.now()).format(ext).filename(keyName).build();
 
         System.out.println("Saved video : " + video.getFilename());
 

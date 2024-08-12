@@ -93,14 +93,14 @@ public class SessionService {
         }
 
         session.setCompleted(true);
-        session.setCompletedAt(java.time.LocalDateTime.now());
+        session.setCompletedAt(java.time.OffsetDateTime.now());
 
         // update relevant enrollment info.
         Enrollment enrollment = session.getEnrollment();
         enrollment.setNumSessionsCompleted(enrollment.getNumSessionsCompleted() + 1);
 
         if(Objects.equals(enrollment.getNumSessions(), enrollment.getNumSessionsCompleted())) {
-            enrollment.setCompletedAt(java.time.LocalDateTime.now());
+            enrollment.setCompletedAt(java.time.OffsetDateTime.now());
         }
         enrollmentRepository.save(enrollment);
         return sessionRepository.save(session);
@@ -138,7 +138,7 @@ public class SessionService {
         }
 
         session.setCancellationReason(request.getCancellationReason());
-        session.setCancelledAt(java.time.LocalDateTime.now());
+        session.setCancelledAt(java.time.OffsetDateTime.now());
 
         sessionRepository.save(session);
 

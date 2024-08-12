@@ -13,7 +13,7 @@ import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -49,7 +49,7 @@ public class ReviewService {
                 .title(reviewRequest.getTitle())
                 .text(reviewRequest.getText())
                 .rating(reviewRequest.getRating())
-                .createdAt(LocalDateTime.now())
+                .createdAt(OffsetDateTime.now())
                 .reviewer(user)
                 .gig(gig)
                 .build();

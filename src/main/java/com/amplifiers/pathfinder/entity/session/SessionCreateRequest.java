@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class SessionCreateRequest {
-    private LocalDateTime scheduledAt;
+    private OffsetDateTime scheduledAt;
     private String sessionType;
 }
