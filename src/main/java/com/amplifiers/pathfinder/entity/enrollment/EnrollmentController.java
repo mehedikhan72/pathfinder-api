@@ -72,4 +72,12 @@ public class EnrollmentController {
     ) {
         return ResponseEntity.ok(service.findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, buyerId));
     }
+
+//    @GetMapping("/get/running/{userId1}/{userId2}")
+//    public ResponseEntity<?> findRunningBySellerIdAndBuyerId(
+//            @PathVariable Integer userId1,
+//            @PathVariable Integer userId2
+//    ) {
+//        return ResponseEntity.ok(service.findRunningEnrollmentBetweenTwoUsers(userId1, userId2));
+//    }
 }

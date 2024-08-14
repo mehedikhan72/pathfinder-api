@@ -44,6 +44,9 @@ public class Enrollment {
 
     private OffsetDateTime createdAt;
 
+    // starts when the buyer confirms it.
+    private OffsetDateTime startedAt;
+
     @NotNull(message = "Deadline is required.")
     @Future(message = "Deadline must be in the future.")
     private OffsetDateTime  deadline;
@@ -63,4 +66,6 @@ public class Enrollment {
 
     private boolean buyerConfirmed; // when buyer accepts the offer
     private boolean paid;
+
+    // TODO: add an enrollment offer description field.
 }

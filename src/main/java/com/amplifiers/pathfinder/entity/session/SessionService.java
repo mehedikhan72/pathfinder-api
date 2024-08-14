@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,17 @@ public class SessionService {
 
         if (!Objects.equals(user.getId(), sellerId)) {
             throw new UnauthorizedException("Only the seller can create a session.");
+        }
+
+        // if a session is running, then the seller can't create a new session.
+        Optional<Session> runningSession = findRunningSessionByEnrollmentId(enrollmentId);
+        if (runningSession.isPresent()) {
+            throw new ValidationException("A session is already running for this enrollment.");
+        }
+
+        // make sure schduled time is in the future
+        if (request.getScheduledAt().isBefore(OffsetDateTime.now())) {
+            throw new ValidationException("Scheduled time must be in the future.");
         }
 
         var session = Session.builder()
@@ -59,6 +71,21 @@ public class SessionService {
 
         session.setBuyerConfirmed(true);
         return sessionRepository.save(session);
+    }
+
+    public String buyerDeclinesSession(Integer sessionId) {
+        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found."));
+
+        // only the buyer can decline a session
+        User user = userUtility.getCurrentUser();
+        User buyer = session.getEnrollment().getBuyer();
+
+        if (!Objects.equals(user.getId(), buyer.getId())) {
+            throw new UnauthorizedException("Only the buyer can decline a session.");
+        }
+
+        sessionRepository.delete(session);
+        return "deleted";
     }
 
     public Session updateSession(SessionCreateRequest request, Integer sessionId) {
@@ -151,5 +178,9 @@ public class SessionService {
         sessionRepository.save(session);
 
         return "Session cancelled.";
+    }
+
+    public Optional<Session> findRunningSessionByEnrollmentId(Integer EnrollmentId) {
+        return sessionRepository.findRunningSessionByEnrollmentId(EnrollmentId);
     }
 }

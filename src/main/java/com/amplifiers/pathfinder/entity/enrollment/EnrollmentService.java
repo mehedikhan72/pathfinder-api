@@ -113,6 +113,7 @@ public class EnrollmentService {
         enrollment.setPaid(true);
 
         enrollment.setBuyerConfirmed(true);
+        enrollment.setStartedAt(OffsetDateTime.now());
 
         // TODO: notify seller
         return enrollmentRepository.save(enrollment);
@@ -139,6 +140,10 @@ public class EnrollmentService {
     public Optional<Enrollment> findIncompleteEnrollmentBySellerIdAndBuyerId(Integer sellerId, Integer buyerId) {
         return enrollmentRepository.findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, buyerId);
     }
+
+//    public Optional<Enrollment> findRunningEnrollmentBetweenTwoUsers(Integer userId1, Integer userId2) {
+//        return enrollmentRepository.findRunningEnrollmentBetweenTwoUsers(userId1, userId2);
+//    }
 
     public Page<Enrollment> findAllByGigId(Pageable pageable, Integer id) {
         return enrollmentRepository.findAllByGigId(pageable, id);

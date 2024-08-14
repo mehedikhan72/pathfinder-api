@@ -34,7 +34,6 @@ public class Session {
     private OffsetDateTime createdAt;
 
     @NotNull(message = "Scheduled date is required.")
-    @Future(message = "Scheduled date must be in the future.")
     private OffsetDateTime scheduledAt;
     private OffsetDateTime completedAt;
     private boolean completed;
