@@ -81,18 +81,12 @@ public class EnrollmentService {
                 .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+
+        // Sending notification to receiver
         String notificationTxt = savedEnrollment.getGig().getSeller().getFullName()
                 + " has offered you a new enrollment.";
-        NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
-                .text(notificationTxt)
-                .receiver(savedEnrollment.getBuyer())
-                .type(NotificationType.ENROLLMENT)
-                // interaction/user/{id} is a link to the interaction page where id is the
-                // user id of the person im talking to.
-                .linkSuffix("interaction/user/" + savedEnrollment.getGig().getSeller().getId())
-                .build();
-
-        notificationService.createNotification(notificationCreateRequest);
+        String linkSuffix = "interaction/user/" + savedEnrollment.getGig().getSeller().getId();
+        notificationService.sendNotification(notificationTxt, savedEnrollment.getBuyer(), NotificationType.ENROLLMENT, linkSuffix);
         return savedEnrollment;
     }
 
@@ -115,7 +109,11 @@ public class EnrollmentService {
         enrollment.setBuyerConfirmed(true);
         enrollment.setStartedAt(OffsetDateTime.now());
 
-        // TODO: notify seller
+        // Sending notification
+        String notificationTxt = enrollment.getBuyer().getFullName()
+                + " has accepted your enrollment offer.";
+        String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
+        notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
         return enrollmentRepository.save(enrollment);
     }
 
@@ -130,7 +128,11 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the buyer can decline an enrollment.");
         }
 
-        // TODO: notify seller
+        // Sending notification
+        String notificationTxt = enrollment.getBuyer().getFullName()
+                + " has declined your enrollment offer.";
+        String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
+        notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
         enrollmentRepository.delete(enrollment);
     }
 

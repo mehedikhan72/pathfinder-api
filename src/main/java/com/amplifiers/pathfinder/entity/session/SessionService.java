@@ -2,6 +2,8 @@ package com.amplifiers.pathfinder.entity.session;
 
 import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
+import com.amplifiers.pathfinder.entity.notification.NotificationService;
+import com.amplifiers.pathfinder.entity.notification.NotificationType;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -22,6 +24,7 @@ public class SessionService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
     private final UserUtility userUtility;
+    private final NotificationService notificationService;
 
     public Session createSession(SessionCreateRequest request, Integer enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
@@ -55,7 +58,13 @@ public class SessionService {
                 .createdAt(OffsetDateTime.now())
                 .build();
 
-        return sessionRepository.save(session);
+        Session savedSession = sessionRepository.save(session);
+        // Send notification
+        String notificationTxt = session.getEnrollment().getGig().getSeller().getFullName() + " has scheduled a session for you. It's waiting for your confirmation.";
+        String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
+        notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
+
+        return savedSession;
     }
 
     public Session buyerConfirmsSession(Integer sessionId) {
@@ -70,6 +79,12 @@ public class SessionService {
         }
 
         session.setBuyerConfirmed(true);
+
+        // Send notification
+        String notificationTxt = session.getEnrollment().getBuyer().getFullName() + " has confirmed the session.";
+        String linkSuffix = "interaction/user/" + session.getEnrollment().getBuyer().getId();
+        notificationService.sendNotification(notificationTxt, session.getEnrollment().getGig().getSeller(), NotificationType.SESSION, linkSuffix);
+
         return sessionRepository.save(session);
     }
 
@@ -85,6 +100,11 @@ public class SessionService {
         }
 
         sessionRepository.delete(session);
+
+        // Send notification
+        String notificationTxt = session.getEnrollment().getBuyer().getFullName() + " has declined the session.";
+        String linkSuffix = "interaction/user/" + session.getEnrollment().getBuyer().getId();
+        notificationService.sendNotification(notificationTxt, session.getEnrollment().getGig().getSeller(), NotificationType.SESSION, linkSuffix);
         return "deleted";
     }
 
@@ -138,6 +158,11 @@ public class SessionService {
             enrollment.setCompletedAt(java.time.OffsetDateTime.now());
         }
         enrollmentRepository.save(enrollment);
+
+        // Send notification
+        String notificationTxt = session.getEnrollment().getGig().getSeller().getFullName() + " has marked one session completed.";
+        String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
+        notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
         return sessionRepository.save(session);
     }
 
