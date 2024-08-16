@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
 import com.amplifiers.pathfinder.entity.review.ReviewRepository;
@@ -33,6 +34,7 @@ public class GigService {
 
     private final GigRepository repository;
     private final ReviewRepository reviewRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
     private final TagService tagService;
     private final ImageService imageService;
@@ -40,8 +42,23 @@ public class GigService {
 
     private final JdbcTemplate jdbcTemplate;
 
+    public boolean gigCreateRequestValidation(GigCreateRequest request) {
+        if (request.getTags().size() < 3) {
+            throw new ValidationException("At least three tags required.");
+        }
+
+        if (request.getFaqs().size() < 3) {
+            throw new ValidationException("At least three faqs required.");
+        }
+
+        return true;
+    }
+
     public Gig createGig(GigCreateRequest request) {
         User user = userUtility.getCurrentUser();
+
+        gigCreateRequestValidation(request);
+
         request.getTags().forEach(
                 name -> tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name))));
 
@@ -53,12 +70,14 @@ public class GigService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .price(request.getPrice())
+                .offerText(request.getOfferText())
                 .category(request.getCategory())
                 .rating(0.0f)
                 .totalOrders(0)
                 .accepted(false)
                 .seller(user)
                 .tags(tags)
+                .faqs(request.getFaqs())
                 .createdAt(LocalDateTime.now())
                 .build();
         return repository.save(gig);
@@ -74,7 +93,7 @@ public class GigService {
         return repository.findAll(pageable);
     }
 
-    public Gig findById(Integer id) {
+    public GigPageDTO findById(Integer id) {
         Gig gig = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
 
@@ -86,7 +105,7 @@ public class GigService {
             }
         }
 
-        return gig;
+        return createGigPageDTO(gig);
     }
 
     public String deleteGig(Integer gigId) {
@@ -107,6 +126,34 @@ public class GigService {
         repository.deleteById(gigId);
 
         return "deleted";
+    }
+
+    public void editGig(GigCreateRequest request, Integer gigId) {
+        Gig gig = repository.findById(gigId)
+                .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
+
+        if (!isGigOfUser(gig)) {
+            throw new ValidationException("User not owner of this gig");
+        }
+
+        gigCreateRequestValidation(request);
+
+        request.getTags().forEach(
+                name -> tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name))));
+
+        Set<Tag> tags = request.getTags().stream()
+                .map(name -> tagService.findByName(name).get())
+                .collect(Collectors.toSet());
+
+        gig.setTitle(request.getTitle());
+        gig.setDescription(request.getDescription());
+        gig.setPrice(request.getPrice());
+        gig.setOfferText(request.getOfferText());
+        gig.setCategory(request.getCategory());
+        gig.setTags(tags);
+        gig.setFaqs(request.getFaqs());
+
+        repository.save(gig);
     }
 
     public Image setCoverImage(Integer gigId, MultipartFile image) throws Exception {
@@ -161,6 +208,41 @@ public class GigService {
 
     public List<Gig> getGigsBySeller(User seller) {
         return repository.findGigsBySeller(seller);
+    }
+
+    public GigPageDTO createGigPageDTO(Gig gig) {
+
+        List<Float> ratingList = reviewRepository.findAllByGigId(gig.getId()).stream().map(r -> Float.valueOf(r.getRating())).toList();
+
+        float rating = ratingList.size() > 0 ? (ratingList
+                .stream()
+                .reduce((float) 0, Float::sum)) / ratingList.size() : 0;
+
+
+
+        return GigPageDTO.builder()
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .category(gig.getCategory())
+                .description(gig.getDescription())
+                .offerText(gig.getOfferText())
+                .price(gig.getPrice())
+                .gigCoverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .gigVideo(gig.getGigVideo() != null ? gig.getGigVideo().getPresignedUrl() : null)
+                .tags(gig.getTags().stream().map(Tag::getName).toList())
+                .faqs(gig.getFaqs())
+                .rating(rating)
+                .totalReviews(ratingList.size())
+                .totalCompleted(enrollmentRepository.countByGigAndCompletedAtNotNull(gig))
+                .totalOrders(enrollmentRepository.countByGig(gig))
+                .accepted(gig.isAccepted())
+                .seller(UserShortDTO.builder()
+                        .id(gig.getSeller().getId())
+                        .firstName(gig.getSeller().getFirstName())
+                        .lastName(gig.getSeller().getLastName())
+                        .build())
+                .createdAt(gig.getCreatedAt())
+                .build();
     }
 
     public static GigShortDTO createGigShortDTO(Gig gig) {

@@ -13,8 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 public class GigCreateRequest {
     private String title;
-    private String description;
-    private float price;
     private String category;
     private List<String> tags;
+    private String description;
+    private String offerText;
+    private float price;
+    private List<FAQ> faqs;
 }

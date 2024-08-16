@@ -20,11 +20,11 @@ import java.util.UUID;
 public class VideoService {
     private final VideoRepository repository;
     private final Integer MAX_FILE_SIZE = 100 * 1024 * 1024;
-    private final List<String> allowedExts = Arrays.asList("mp4", "mkv", "webm");
+    private final List<String> allowedExts = Arrays.asList("mp4", "webm");
 
     public Video saveVideo(MultipartFile file) throws IOException {
         if (!isValidVideoFile(file)) {
-            throw new ValidationException("Invalid video file. Please upload .mp4, .mkv or .webm file.");
+            throw new ValidationException("Invalid video file. Please upload .mp4 or .webm file.");
         }
 
         if (file.getBytes().length > MAX_FILE_SIZE) {

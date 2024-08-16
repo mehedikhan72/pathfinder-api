@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
+import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
                 where g.seller.id = :sellerId
             """)
     Integer countDistinctStudentsBySellerId(Integer sellerId);
+
+    Integer countByGig(Gig gig);
+
+    Integer countByGigAndCompletedAtNotNull(Gig gig);
 
     @Query(value = """
                     select count(e) > 0 from Enrollment e\s

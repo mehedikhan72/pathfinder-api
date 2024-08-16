@@ -24,7 +24,7 @@ public class PublicUserController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(service.getProfileImageDataByUserId(id));
     }
 
-    @GetMapping("/{id}/gigs/")
+    @GetMapping("/{id}/gigs")
     public ResponseEntity<?> getGigs(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getGigs(id));
     }

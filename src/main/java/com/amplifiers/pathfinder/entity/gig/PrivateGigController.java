@@ -25,6 +25,16 @@ public class PrivateGigController {
         return ResponseEntity.ok(service.createGig(request));
     }
 
+    @PatchMapping("/{gigId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> editGig(
+            @PathVariable Integer gigId,
+            @RequestBody GigCreateRequest request
+    ) {
+        service.editGig(request, gigId);
+        return ResponseEntity.ok("Gig id " + gigId + " successfully edited.");
+    }
+
     @PostMapping("/{gigId}/cover-image")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> setCoverImage(@PathVariable Integer gigId, @RequestParam("file") MultipartFile file) {

@@ -19,6 +19,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -36,31 +37,36 @@ public class Gig {
     @NotBlank(message = "Title is required.")
     private String title;
     @NotBlank(message = "Description is required.")
+    @Column(columnDefinition = "TEXT")
     private String description;
     @NotBlank(message = "Category is required.")
     private String category;
     @NotNull(message = "Price is required.")
-    private float price;
+    private Float price;
+    @NotBlank(message = "Offer text is required.")
+    private String offerText;
+
     private float rating;
     private Integer totalOrders;
     private boolean accepted;
 
     // @JsonIgnore
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User seller;
 
-//    @NotNull(message = "At least one tag is required.")
-//    @NotEmpty(message = "At least one tag is required.")
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gigId"), inverseJoinColumns = @JoinColumn(name = "tagId"))
     private Set<Tag> tags;
 
-    // @OneToMany(mappedBy = "gig")
-    // private Set<FAQ> faqs;
+    @JsonIgnore
+    @ElementCollection(targetClass = FAQ.class)
+    @CollectionTable(name = "faqs", joinColumns = @JoinColumn(name = "gigId"))
+    @Column(name = "faqs")
+    private List<FAQ> faqs;
 
     // @OneToMany(mappedBy = "gig")
     // private Set<Enrollment> enrollments;

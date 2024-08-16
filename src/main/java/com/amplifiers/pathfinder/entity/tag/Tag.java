@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Objects;
@@ -37,6 +39,7 @@ public class Tag {
     @JsonIgnore
     @ToString.Exclude
     @ManyToMany(mappedBy = "tags")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<User> users;
 
     @Override
