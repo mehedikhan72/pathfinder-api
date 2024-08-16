@@ -107,6 +107,10 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the buyer can confirm an enrollment.");
         }
 
+        if(enrollment.isPaid() && enrollment.isBuyerConfirmed() && enrollment.getStartedAt() != null){
+            throw new ValidationException("You have already paid and confirmed this enrollment.");
+        }
+
         // TODO: handle payment here.
         String url;
         try {

@@ -1,6 +1,7 @@
 package com.amplifiers.pathfinder.entity.transaction;
 
 import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,10 @@ public class Transaction {
 
     private String tranxId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // many to one since one enrollment can have many transactions. i.e. failed/incomplete transactions.
+    // only one will be successful. the last one.
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollmentId")
     private Enrollment enrollment;
     private OffsetDateTime paidAt;

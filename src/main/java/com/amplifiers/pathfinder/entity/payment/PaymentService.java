@@ -30,7 +30,6 @@ public class PaymentService {
 
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
-        // TODO - send price, customer name etc to postData.
 
         String tranxId = UUID.randomUUID().toString();
         Transaction transaction = Transaction.builder()
@@ -131,18 +130,10 @@ public class PaymentService {
     }
 
     public void paymentFail(Object request) {
-        // delete transaction
-        String tranxId = ((Map<String, String>) request).get("tran_id");
-        Optional<Transaction> transaction = transactionRepository.findByTranxId(tranxId);
-        transaction.ifPresent(transactionRepository::delete);
         System.out.println("Transaction deleted cause payment failed.");
     }
 
     public void paymentCancel(Object request) {
-        // delete transaction
-        String tranxId = ((Map<String, String>) request).get("tran_id");
-        Optional<Transaction> transaction = transactionRepository.findByTranxId(tranxId);
-        transaction.ifPresent(transactionRepository::delete);
         System.out.println("Transaction deleted cause payment cancelled.");
     }
 }
