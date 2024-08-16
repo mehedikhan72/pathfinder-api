@@ -1,10 +1,14 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
+import com.amplifiers.pathfinder.entity.payment.PaymentService;
+import com.amplifiers.pathfinder.utility.Variables.SslCommerzSettings;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationCreateRequest;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
 import com.amplifiers.pathfinder.entity.notification.NotificationType;
+import com.amplifiers.pathfinder.entity.sslcommerz.SSLCommerz;
+import com.amplifiers.pathfinder.entity.sslcommerz.utility.ParameterBuilder;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -17,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,6 +33,7 @@ public class EnrollmentService {
     private final UserRepository userRepository;
     private final UserUtility userUtility;
     private final NotificationService notificationService;
+    private final PaymentService paymentService;
 
     // TODO: update later - there can be only one concurrent enrollment between a buyer and seller. the
     // TODO: seller won't be able to initiate any new offers to the same buyer.
@@ -90,7 +96,7 @@ public class EnrollmentService {
         return savedEnrollment;
     }
 
-    public Enrollment buyerConfirmsEnrollment(Integer enrollmentId) {
+    public String buyerConfirmsEnrollment(Integer enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
@@ -102,19 +108,27 @@ public class EnrollmentService {
         }
 
         // TODO: handle payment here.
+        String url;
+        try {
+            url = paymentService.handleOnlinePayment(enrollment);
+        } catch (Exception e) {
+            throw new ValidationException("Payment failed. Please try again.");
+        }
+
+        return url;
 
         // Info: for now, payment bypassed.
-        enrollment.setPaid(true);
-
-        enrollment.setBuyerConfirmed(true);
-        enrollment.setStartedAt(OffsetDateTime.now());
-
-        // Sending notification
-        String notificationTxt = enrollment.getBuyer().getFullName()
-                + " has accepted your enrollment offer.";
-        String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
-        notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
-        return enrollmentRepository.save(enrollment);
+//        enrollment.setPaid(true);
+//
+//        enrollment.setBuyerConfirmed(true);
+//        enrollment.setStartedAt(OffsetDateTime.now());
+//
+//        // Sending notification
+//        String notificationTxt = enrollment.getBuyer().getFullName()
+//                + " has accepted your enrollment offer.";
+//        String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
+//        notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
+//        return enrollmentRepository.save(enrollment);
     }
 
     public void buyerDeclinesEnrollment(Integer enrollmentId) {

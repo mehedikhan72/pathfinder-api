@@ -25,10 +25,10 @@ public class EnrollmentController {
     }
 
     @PutMapping("buyer-confirms/{enrollmentId}")
-    public ResponseEntity<?> buyerConfirmsEnrollment(
+    public String buyerConfirmsEnrollment(
             @PathVariable Integer enrollmentId
     ) {
-        return ResponseEntity.ok(service.buyerConfirmsEnrollment(enrollmentId));
+        return service.buyerConfirmsEnrollment(enrollmentId);
     }
 
     @DeleteMapping("buyer-declines/{enrollmentId}")
