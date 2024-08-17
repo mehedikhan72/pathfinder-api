@@ -42,7 +42,7 @@ public class GigService {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public boolean gigCreateRequestValidation(GigCreateRequest request) {
+    public void gigCreateRequestValidation(GigCreateRequest request) {
         if (request.getTags().size() < 3) {
             throw new ValidationException("At least three tags required.");
         }
@@ -51,7 +51,6 @@ public class GigService {
             throw new ValidationException("At least three faqs required.");
         }
 
-        return true;
     }
 
     public Gig createGig(GigCreateRequest request) {
@@ -114,7 +113,7 @@ public class GigService {
 
         User user = userUtility.getCurrentUser();
 
-        if (!user.getId().equals( gig.getSeller().getId())) {
+        if (!user.getId().equals(gig.getSeller().getId())) {
             throw new ValidationException("Only the owner of the gig can delete it.");
         }
 
@@ -158,7 +157,7 @@ public class GigService {
 
     public Image setCoverImage(Integer gigId, MultipartFile image) throws Exception {
         Gig gig = repository.findById(gigId)
-                .orElseThrow(()-> new ResourceNotFoundException("Gig id " + gigId + " does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Gig id " + gigId + " does not exist."));
 
         if (!isGigOfUser(gig)) {
             throw new ValidationException("User not owner of this gig");
@@ -180,7 +179,7 @@ public class GigService {
 
     public Video setGigVideo(Integer gigId, MultipartFile video) throws Exception {
         Gig gig = repository.findById(gigId)
-                .orElseThrow(()-> new ResourceNotFoundException("Gig id " + gigId + " does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Gig id " + gigId + " does not exist."));
 
         if (!isGigOfUser(gig)) {
             throw new ValidationException("User not owner of this gig");
@@ -200,12 +199,6 @@ public class GigService {
         return gigVideo;
     }
 
-    public Image getCoverImage(int id) {
-        Gig gig = repository.getReferenceById(id);
-
-        return gig.getGigCoverImage();
-    }
-
     public List<Gig> getGigsBySeller(User seller) {
         return repository.findGigsBySeller(seller);
     }
@@ -217,7 +210,6 @@ public class GigService {
         float rating = ratingList.size() > 0 ? (ratingList
                 .stream()
                 .reduce((float) 0, Float::sum)) / ratingList.size() : 0;
-
 
 
         return GigPageDTO.builder()
@@ -252,6 +244,7 @@ public class GigService {
                 .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
                 .build();
     }
+
     public GigCardDTO createGigCardDTO(Gig gig, boolean includeUser) {
         List<Float> ratingList = reviewRepository.findAllByGigId(gig.getId()).stream().map(r -> Float.valueOf(r.getRating())).toList();
 
@@ -260,7 +253,6 @@ public class GigService {
                 .reduce((float) 0, Float::sum)) / ratingList.size() : 0;
 
         int ratedByCount = ratingList.size();
-
 
 
         var gigCardDTOBuilder = GigCardDTO.builder()
@@ -327,7 +319,6 @@ public class GigService {
     public Page<Gig> findByQuery(Pageable pageable, String query) {
         return repository.findByQuery(pageable, query);
     }
-
 
 
 //    public List<Gig> findByTag(String tag) {

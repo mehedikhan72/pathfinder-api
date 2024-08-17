@@ -4,9 +4,8 @@ import com.amplifiers.pathfinder.entity.user.UserShortDTO;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -27,5 +26,5 @@ public class GigPageDTO {
     private Integer totalOrders;
     private boolean accepted;
     private UserShortDTO seller;
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 }
