@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 import java.net.URI;
 import java.net.URL;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -79,7 +79,7 @@ public class CloudStorageService {
                     .build();
 
             Integer duration = 10;
-            LocalDateTime expires = LocalDateTime.now().plusMinutes(10);
+            OffsetDateTime expires = OffsetDateTime.now().plusMinutes(10);
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                     .signatureDuration(Duration.ofMinutes(duration))  // The URL will expire in 10 minutes.
                     .getObjectRequest(objectRequest)

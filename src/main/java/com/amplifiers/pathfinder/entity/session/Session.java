@@ -9,11 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -32,18 +31,11 @@ public class Session {
     // the seller will schedule each session and the buyer will
     // accept it. This is to make sure that the buyer is available
     // at that time. More info incoming.
-
-    @CreatedDate
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private LocalDateTime created_at;
+    private OffsetDateTime createdAt;
 
     @NotNull(message = "Scheduled date is required.")
-    @Future(message = "Scheduled date must be in the future.")
-    private LocalDateTime scheduledAt;
-    private LocalDateTime completedAt;
+    private OffsetDateTime scheduledAt;
+    private OffsetDateTime completedAt;
     private boolean completed;
 
     // string for now, it will be online, offline and
@@ -64,7 +56,7 @@ public class Session {
     @Enumerated(EnumType.STRING)
     private CancelledBy cancelledBy;
     private String cancellationReason;
-    private LocalDateTime cancelledAt;
+    private OffsetDateTime cancelledAt;
 
     // TODO: more data about session will be added here, later.
 }

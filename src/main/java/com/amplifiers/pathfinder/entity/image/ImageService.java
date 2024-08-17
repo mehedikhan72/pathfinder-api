@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -97,7 +97,7 @@ public class ImageService {
         byte[] fileData = compressImage(file);
 
         CloudStorageService.uploadFile(fileData, keyName);
-        Image image = Image.builder().basename(basename).createdAt(LocalDateTime.now()).format("jpg").filename(keyName)
+        Image image = Image.builder().basename(basename).createdAt(OffsetDateTime.now()).format("jpg").filename(keyName)
                 .build();
 
         System.out.println("Saved image : " + image.getFilename());

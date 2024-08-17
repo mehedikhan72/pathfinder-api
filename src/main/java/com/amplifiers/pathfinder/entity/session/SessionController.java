@@ -27,6 +27,13 @@ public class SessionController {
         return ResponseEntity.ok(service.buyerConfirmsSession(sessionId));
     }
 
+    @PutMapping("/buyer-declines/{sessionId}")
+    public ResponseEntity<?> buyerDeclinesSession(
+            @PathVariable Integer sessionId
+    ) {
+        return ResponseEntity.ok(service.buyerDeclinesSession(sessionId));
+    }
+
     @PutMapping("/update/{sessionId}")
     public ResponseEntity<?> updateSession(
             @RequestBody SessionCreateRequest request,
@@ -48,5 +55,12 @@ public class SessionController {
             @PathVariable Integer sessionId
     ) {
         return ResponseEntity.ok(service.cancelSession(request, sessionId));
+    }
+
+    @GetMapping("/running/enrollment/{enrollmentId}")
+    public ResponseEntity<?> findRunningSessionByEnrollmentId(
+            @PathVariable Integer enrollmentId
+    ) {
+        return ResponseEntity.ok(service.findRunningSessionByEnrollmentId(enrollmentId));
     }
 }

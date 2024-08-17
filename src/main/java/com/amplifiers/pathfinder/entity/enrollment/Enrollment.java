@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -42,18 +42,16 @@ public class Enrollment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User buyer;
 
-    @CreatedDate
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
+
+    // starts when the buyer confirms it.
+    private OffsetDateTime startedAt;
 
     @NotNull(message = "Deadline is required.")
     @Future(message = "Deadline must be in the future.")
-    private LocalDateTime deadline;
+    private OffsetDateTime  deadline;
 
-    private LocalDateTime completedAt;
+    private OffsetDateTime completedAt;
 
     @NotNull(message = "Price is required.")
     private float price;
@@ -68,4 +66,6 @@ public class Enrollment {
 
     private boolean buyerConfirmed; // when buyer accepts the offer
     private boolean paid;
+
+    // TODO: add an enrollment offer description field.
 }

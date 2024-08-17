@@ -1,10 +1,14 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
+import com.amplifiers.pathfinder.entity.payment.PaymentService;
+import com.amplifiers.pathfinder.utility.Variables.SslCommerzSettings;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationCreateRequest;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
 import com.amplifiers.pathfinder.entity.notification.NotificationType;
+import com.amplifiers.pathfinder.entity.sslcommerz.SSLCommerz;
+import com.amplifiers.pathfinder.entity.sslcommerz.utility.ParameterBuilder;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -15,8 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,6 +33,7 @@ public class EnrollmentService {
     private final UserRepository userRepository;
     private final UserUtility userUtility;
     private final NotificationService notificationService;
+    private final PaymentService paymentService;
 
     // TODO: update later - there can be only one concurrent enrollment between a buyer and seller. the
     // TODO: seller won't be able to initiate any new offers to the same buyer.
@@ -77,25 +83,20 @@ public class EnrollmentService {
                 .numSessionsCompleted(0)
                 .buyerConfirmed(false)
                 .paid(false)
+                .createdAt(OffsetDateTime.now())
                 .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
+
+        // Sending notification to receiver
         String notificationTxt = savedEnrollment.getGig().getSeller().getFullName()
                 + " has offered you a new enrollment.";
-        NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
-                .text(notificationTxt)
-                .receiver(savedEnrollment.getBuyer())
-                .type(NotificationType.ENROLLMENT)
-                // interaction/user/{id} is a link to the interaction page where id is the
-                // user id of the person im talking to.
-                .linkSuffix("interaction/user/" + savedEnrollment.getGig().getSeller().getId())
-                .build();
-
-        notificationService.createNotification(notificationCreateRequest);
+        String linkSuffix = "interaction/user/" + savedEnrollment.getGig().getSeller().getId();
+        notificationService.sendNotification(notificationTxt, savedEnrollment.getBuyer(), NotificationType.ENROLLMENT, linkSuffix);
         return savedEnrollment;
     }
 
-    public Enrollment buyerConfirmsEnrollment(Integer enrollmentId) {
+    public String buyerConfirmsEnrollment(Integer enrollmentId) {
         Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
@@ -106,8 +107,51 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the buyer can confirm an enrollment.");
         }
 
-        enrollment.setBuyerConfirmed(true);
-        return enrollmentRepository.save(enrollment);
+        if(enrollment.isPaid() && enrollment.isBuyerConfirmed() && enrollment.getStartedAt() != null){
+            throw new ValidationException("You have already paid and confirmed this enrollment.");
+        }
+
+        // TODO: handle payment here.
+        String url;
+        try {
+            url = paymentService.handleOnlinePayment(enrollment);
+        } catch (Exception e) {
+            throw new ValidationException("Payment failed. Please try again.");
+        }
+
+        return url;
+
+        // Info: for now, payment bypassed.
+//        enrollment.setPaid(true);
+//
+//        enrollment.setBuyerConfirmed(true);
+//        enrollment.setStartedAt(OffsetDateTime.now());
+//
+//        // Sending notification
+//        String notificationTxt = enrollment.getBuyer().getFullName()
+//                + " has accepted your enrollment offer.";
+//        String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
+//        notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
+//        return enrollmentRepository.save(enrollment);
+    }
+
+    public void buyerDeclinesEnrollment(Integer enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+
+        User user = userUtility.getCurrentUser();
+        User buyer = enrollment.getBuyer();
+
+        if (!Objects.equals(user.getId(), buyer.getId())) {
+            throw new UnauthorizedException("Only the buyer can decline an enrollment.");
+        }
+
+        // Sending notification
+        String notificationTxt = enrollment.getBuyer().getFullName()
+                + " has declined your enrollment offer.";
+        String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
+        notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
+        enrollmentRepository.delete(enrollment);
     }
 
     // TODO: Update enrollment.
@@ -116,6 +160,10 @@ public class EnrollmentService {
     public Optional<Enrollment> findIncompleteEnrollmentBySellerIdAndBuyerId(Integer sellerId, Integer buyerId) {
         return enrollmentRepository.findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, buyerId);
     }
+
+//    public Optional<Enrollment> findRunningEnrollmentBetweenTwoUsers(Integer userId1, Integer userId2) {
+//        return enrollmentRepository.findRunningEnrollmentBetweenTwoUsers(userId1, userId2);
+//    }
 
     public Page<Enrollment> findAllByGigId(Pageable pageable, Integer id) {
         return enrollmentRepository.findAllByGigId(pageable, id);
@@ -129,7 +177,7 @@ public class EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         return now.isAfter(enrollment.getDeadline());
     }
 }

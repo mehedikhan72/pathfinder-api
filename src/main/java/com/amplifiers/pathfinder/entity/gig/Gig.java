@@ -18,7 +18,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +51,7 @@ public class Gig {
     private boolean accepted;
 
     // @JsonIgnore
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -70,10 +70,10 @@ public class Gig {
 
     // @OneToMany(mappedBy = "gig")
     // private Set<Enrollment> enrollments;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+//
+//    @CreatedDate
+//    @Column(nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
 
     @OneToOne
     @JoinColumn(name = "gigCoverImage")

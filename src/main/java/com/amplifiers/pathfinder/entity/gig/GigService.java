@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -78,7 +78,7 @@ public class GigService {
                 .seller(user)
                 .tags(tags)
                 .faqs(request.getFaqs())
-                .createdAt(LocalDateTime.now())
+                .createdAt(OffsetDateTime.now())
                 .build();
         return repository.save(gig);
     }
@@ -100,7 +100,7 @@ public class GigService {
         Video video = gig.getGigVideo();
 
         if (video != null) {
-            if (video.getPresignedUrl() == null || video.getPresignedUrlExpire() == null || LocalDateTime.now().isAfter(video.getPresignedUrlExpire())) {
+            if (video.getPresignedUrl() == null || video.getPresignedUrlExpire() == null || OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())) {
                 videoService.createVideoPresignedUrl(video);
             }
         }

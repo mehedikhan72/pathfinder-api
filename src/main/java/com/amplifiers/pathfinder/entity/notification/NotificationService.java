@@ -53,4 +53,15 @@ public class NotificationService {
         unreadNotifications.forEach(notification -> notification.setRead(true));
         notificationRepository.saveAll(unreadNotifications);
     }
+
+    public void sendNotification(String text, User receiver, NotificationType type, String linkSuffix) {
+        NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
+                .text(text)
+                .receiver(receiver)
+                .type(type)
+                .linkSuffix(linkSuffix)
+                .build();
+
+        createNotification(notificationCreateRequest);
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,13 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
                 where g.seller.id = :sellerId and e.buyer.id = :buyerId and e.completedAt is null
             """)
     Optional<Enrollment> findIncompleteEnrollmentBySellerIdAndBuyerId(Integer sellerId, Integer buyerId);
+
+//    @Query("""
+//                select e from Enrollment e left join Gig g on e.gig = g
+//                where (g.seller.id = :userId1 or g.seller.id = :userId2)
+//                and (e.buyer.id = :userId1 or e.buyer.id =:userId2) and e.completedAt is null
+//            """)
+//    Optional<Enrollment> findRunningEnrollmentBetweenTwoUsers(Integer userId1, Integer userId2);
 
     // But this function returns a list cause the same users could possibly have completed an enrollment in the past.
     @Query("""

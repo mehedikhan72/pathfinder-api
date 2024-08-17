@@ -5,7 +5,7 @@ import com.amplifiers.pathfinder.entity.user.UserShortDTO;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -14,7 +14,7 @@ public class ReviewCardDTO {
     private String title;
     private String text;
     private Short rating;
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     private UserShortDTO reviewer;
     private GigShortDTO gig;
 }

@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -16,5 +15,5 @@ public class EnrollmentCreateRequest {
     private Integer numSessions;
     private Integer sessionDurationInMinutes;
     private Integer buyerId;
-    private LocalDateTime deadline;
+    private OffsetDateTime deadline;
 }
