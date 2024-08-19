@@ -13,9 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -80,7 +78,7 @@ public class ChatMessageService {
 
         var chatId = chatRoomService.getChatRoomId(firstUserId, secondUserId, true).orElseThrow();
         readMessages(pageable, chatId, currentUserId); // calling it here ensures no further validation is needed.
-        return chatMessageRepository.findAllByChatIdOrderByTimeStampAsc(pageable, chatId);
+        return chatMessageRepository.findAllByChatIdOrderByTimeStampDesc(pageable, chatId);
     }
 
     // when a user fetches all the recent messages, it's obvious that the user has
@@ -88,7 +86,7 @@ public class ChatMessageService {
     // so we can mark the messages as read, with receiverId as the current user id,
     // in the chat room.
     public void readMessages(Pageable pageable, String chatId, Integer currentUserId) {
-        chatMessageRepository.findAllByChatIdOrderByTimeStampAsc(pageable, chatId)
+        chatMessageRepository.findAllByChatIdOrderByTimeStampDesc(pageable, chatId)
                 .stream()
                 .filter(chatMessage -> Objects.equals(chatMessage.getReceiverId(), currentUserId))
                 .forEach(chatMessage -> {
