@@ -55,6 +55,7 @@ public class NotificationService {
     }
 
     public void sendNotification(String text, User receiver, NotificationType type, String linkSuffix) {
+        System.out.println("notification type: " + type);
         NotificationCreateRequest notificationCreateRequest = NotificationCreateRequest.builder()
                 .text(text)
                 .receiver(receiver)

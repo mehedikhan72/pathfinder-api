@@ -34,6 +34,8 @@ public class Notification {
     private User receiver;
 
     private boolean read;
+
+    @Enumerated(EnumType.STRING)
     private NotificationType type;
     private String linkSuffix; // because we want to click on a notif and be redirected to a specific page.
 }
