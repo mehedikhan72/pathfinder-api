@@ -4,12 +4,11 @@ import com.amplifiers.pathfinder.entity.review.ReviewService;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
-import com.amplifiers.pathfinder.utility.UserUtility;
 import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class PublicGigController {
 
     @GetMapping("/all")
     public ResponseEntity<?> findAllGigs(
-        @RequestParam(name="page", defaultValue = "0") Integer page
+            @RequestParam(name = "page", defaultValue = "0") Integer page
     ) {
         Pageable pageable = PageRequest.of(page, numGigsPerPage);
         return ResponseEntity.ok(service.findAll(pageable));
@@ -54,7 +53,7 @@ public class PublicGigController {
 
     @GetMapping("/category/{category}")
     public ResponseEntity<?> findGigsByCategory(
-            @RequestParam(name="page", defaultValue = "0") Integer page,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @PathVariable String category
     ) {
         Pageable pageable = PageRequest.of(page, numGigsPerPage);
@@ -63,10 +62,17 @@ public class PublicGigController {
 
     @GetMapping("/search")
     public ResponseEntity<?> findGigsByQuery(
-            @RequestParam(name="query") String query,
-            @RequestParam(name="page", defaultValue = "0") Integer page
+            @RequestParam(name = "query") String query,
+            @RequestParam(name = "page", defaultValue = "0") Integer page
     ) {
         Pageable pageable = PageRequest.of(page, numGigsPerPage);
         return ResponseEntity.ok(service.findByQuery(pageable, query));
+    }
+
+    // recombee recommendation for anonymous users
+    @GetMapping("/recommendations/popular-gigs")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getPopularGigsForUser() {
+        return ResponseEntity.ok(service.getRecommendationsForAnonymousUsers("popular_gigs"));
     }
 }

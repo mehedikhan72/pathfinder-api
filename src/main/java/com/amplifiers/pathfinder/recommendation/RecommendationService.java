@@ -70,8 +70,15 @@ public class RecommendationService {
     public RecommendationResponse getRecommendationsForUser(Integer userId, Integer numItems, String scenario) {
         try {
             if (scenario != null) {
-                return client.send(new RecommendItemsToUser(userId.toString(), numItems)
-                        .setScenario(scenario));
+                if (userId == -1) {
+                    // popular gigs for anonymous users
+                    return client.send(new RecommendItemsToUser("dummyUser123", numItems)
+                            .setScenario(scenario));
+                } else {
+                    return client.send(new RecommendItemsToUser(userId.toString(), numItems)
+                            .setScenario(scenario));
+                }
+
             } else {
                 // basic recommendation
                 return client.send(new RecommendItemsToUser(userId.toString(), numItems));

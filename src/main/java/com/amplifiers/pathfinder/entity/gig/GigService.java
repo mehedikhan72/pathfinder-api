@@ -325,6 +325,14 @@ public class GigService {
         return getReturnDataForRecommendation(recommended);
     }
 
+    public Object getRecommendationsForAnonymousUsers(String scenario) {
+        // for globally popular gigs.
+        // -1 means no user. handled in recommendation service.
+        RecommendationResponse recommended = recommendationService.getRecommendationsForUser(-1, PaginationSettings.NUM_RECOMMENDED_GIGS, scenario);
+
+        return getReturnDataForRecommendation(recommended);
+    }
+
     public Object getRecommendationsForItem(Integer gigId, String scenario) {
         User user = userUtility.getCurrentUser();
         RecommendationResponse recommended = recommendationService.getRecommendationsForItem(gigId, user.getId(), PaginationSettings.NUM_RECOMMENDED_GIGS, scenario);
