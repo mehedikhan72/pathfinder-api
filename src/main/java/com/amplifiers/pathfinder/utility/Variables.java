@@ -12,6 +12,7 @@ public class Variables {
 
         public static final Integer NUM_REVIEWS_PER_PAGE = 5;
         public static final Integer NUM_MESSAGES_PER_PAGE = 10;
+        public static final Integer NUM_RECOMMENDED_GIGS = 5;
     }
 
     public static class SslCommerzSettings {

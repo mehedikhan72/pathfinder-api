@@ -1,14 +1,10 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
-import com.amplifiers.pathfinder.entity.payment.PaymentService;
-import com.amplifiers.pathfinder.utility.Variables.SslCommerzSettings;
+import com.amplifiers.pathfinder.payment.PaymentService;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
-import com.amplifiers.pathfinder.entity.notification.NotificationCreateRequest;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
 import com.amplifiers.pathfinder.entity.notification.NotificationType;
-import com.amplifiers.pathfinder.entity.sslcommerz.SSLCommerz;
-import com.amplifiers.pathfinder.entity.sslcommerz.utility.ParameterBuilder;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
@@ -20,8 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
