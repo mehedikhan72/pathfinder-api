@@ -58,7 +58,7 @@ public class Gig {
     private User seller;
 
 //    @JsonIgnore
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gigId"), inverseJoinColumns = @JoinColumn(name = "tagId"))
     private Set<Tag> tags;
 

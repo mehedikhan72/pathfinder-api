@@ -25,6 +25,15 @@ public class PrivateGigController {
         return ResponseEntity.ok(service.createGig(request));
     }
 
+    @GetMapping("/get/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> findGigById(
+            @PathVariable Integer id
+    ) {
+        return ResponseEntity.ok(service.privateFindById(id));
+    }
+
+
     @PatchMapping("/{gigId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> editGig(
@@ -80,5 +89,48 @@ public class PrivateGigController {
             @PathVariable Integer gigId
     ) {
         return service.deleteGig(gigId);
+    }
+
+    // RECOMBEE
+
+    @GetMapping("/recommendations")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getRecommendationsForUser() {
+        return ResponseEntity.ok(service.getRecommendationsForUser(""));
+    }
+
+    @GetMapping("/recommendations/popular-gigs")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getPopularGigsForUser() {
+        return ResponseEntity.ok(service.getRecommendationsForUser("popular_gigs"));
+    }
+
+    @GetMapping("/recommendations/recently-viewed")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getRecentlyViewedForUser() {
+        return ResponseEntity.ok(service.getRecommendationsForUser("recently_viewed_gigs"));
+    }
+
+    @GetMapping("/recommendations/top-picks")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getTopPicksForUser() {
+        return ResponseEntity.ok(service.getRecommendationsForUser("top_picks_for_you"));
+    }
+
+    @GetMapping("/recommendations/similar-gigs/{gigId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getSimilarGigsForGig(
+            @PathVariable Integer gigId
+    ) {
+        return ResponseEntity.ok(service.getRecommendationsForItem(gigId, "similar_gigs"));
+    }
+
+
+    @GetMapping("/next-recommendations/{recommId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getNextRecommendationsForUser(
+            @PathVariable String recommId
+    ) {
+        return ResponseEntity.ok(service.getNextRecommendationsForUser(recommId));
     }
 }

@@ -13,7 +13,10 @@ import com.amplifiers.pathfinder.entity.video.Video;
 import com.amplifiers.pathfinder.entity.video.VideoService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
+import com.amplifiers.pathfinder.recommendation.RecommendationService;
 import com.amplifiers.pathfinder.utility.UserUtility;
+import com.amplifiers.pathfinder.utility.Variables.PaginationSettings;
+import com.recombee.api_client.bindings.RecommendationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +42,7 @@ public class GigService {
     private final VideoService videoService;
 
     private final JdbcTemplate jdbcTemplate;
+    private final RecommendationService recommendationService;
 
     public void gigCreateRequestValidation(GigCreateRequest request) {
         if (request.getTags().size() < 3) {
@@ -79,7 +81,10 @@ public class GigService {
                 .faqs(request.getFaqs())
                 .createdAt(OffsetDateTime.now())
                 .build();
-        return repository.save(gig);
+
+        Gig savedGig = repository.save(gig);
+        recommendationService.sendGigValues(savedGig);
+        return savedGig;
     }
 
     private Boolean isGigOfUser(Gig gig) {
@@ -102,6 +107,27 @@ public class GigService {
             if (video.getPresignedUrl() == null || video.getPresignedUrlExpire() == null || OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())) {
                 videoService.createVideoPresignedUrl(video);
             }
+        }
+
+        return createGigPageDTO(gig);
+    }
+
+    public GigPageDTO privateFindById(Integer id) {
+        Gig gig = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
+
+        Video video = gig.getGigVideo();
+
+        if (video != null) {
+            if (video.getPresignedUrl() == null || video.getPresignedUrlExpire() == null || OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())) {
+                videoService.createVideoPresignedUrl(video);
+            }
+        }
+
+        User currentUser = userUtility.getCurrentUser();
+        if (!Objects.equals(currentUser.getId(), gig.getId())) {
+            recommendationService.addDetailView(currentUser.getId(), gig.getId());
+            System.out.println("added detail view");
         }
 
         return createGigPageDTO(gig);
@@ -287,6 +313,50 @@ public class GigService {
         List<Gig> gigs = repository.findGigsBySeller(seller);
 
         return gigs.stream().map(g -> createGigCardDTO(g, false)).toList();
+    }
+
+    // Recombee
+    // getting recommended gigs for a user
+
+    public Object getRecommendationsForUser(String scenario) {
+        User user = userUtility.getCurrentUser();
+        RecommendationResponse recommended = recommendationService.getRecommendationsForUser(user.getId(), PaginationSettings.NUM_RECOMMENDED_GIGS, scenario);
+
+        return getReturnDataForRecommendation(recommended);
+    }
+
+    public Object getRecommendationsForItem(Integer gigId, String scenario) {
+        User user = userUtility.getCurrentUser();
+        RecommendationResponse recommended = recommendationService.getRecommendationsForItem(gigId, user.getId(), PaginationSettings.NUM_RECOMMENDED_GIGS, scenario);
+
+        return getReturnDataForRecommendation(recommended);
+    }
+
+    public Object getNextRecommendationsForUser(String recommId) {
+        RecommendationResponse recommended = recommendationService.getNextRecommendationsForUser(recommId, PaginationSettings.NUM_RECOMMENDED_GIGS);
+        return getReturnDataForRecommendation(recommended);
+    }
+
+    public Object getReturnDataForRecommendation(RecommendationResponse recommended) {
+        String recommId = recommended.getRecommId();
+        String[] recomms = recommended.getIds();
+
+        Integer[] recommsInt = new Integer[recomms.length];
+        for (int i = 0; i < recomms.length; i++) {
+            recommsInt[i] = Integer.parseInt(recomms[i]);
+        }
+
+        // Fetch gigs and create DTOs
+        List<GigCardDTO> recommendedGigs = repository.findAllById(List.of(recommsInt)).stream()
+                .map(this::createGigCardDTO)
+                .toList();
+
+        // Using a Map to hold return data
+        Map<String, Object> returnData = new HashMap<>();
+        returnData.put("recommId", recommId);
+        returnData.put("gigs", recommendedGigs);
+
+        return returnData;
     }
 
 

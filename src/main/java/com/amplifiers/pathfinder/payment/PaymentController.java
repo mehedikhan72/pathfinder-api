@@ -1,6 +1,5 @@
-package com.amplifiers.pathfinder.entity.payment;
+package com.amplifiers.pathfinder.payment;
 
-import com.amplifiers.pathfinder.entity.enrollment.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
