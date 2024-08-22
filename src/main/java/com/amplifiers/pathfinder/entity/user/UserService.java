@@ -15,6 +15,8 @@ import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -213,8 +215,8 @@ public class UserService {
         return gigService.getGigCardsBySeller(seller);
     }
 
-    public List<ReviewCardDTO> getReviewCards(Integer id) {
-        return reviewService.getReviewCardsBySellerId(id);
+    public Page<ReviewCardDTO> getReviewCards(Pageable pageable, Integer id) {
+        return reviewService.getReviewCardsBySellerId(pageable, id);
     }
 
     public User findById(Integer id) {

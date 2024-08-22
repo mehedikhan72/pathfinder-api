@@ -4,14 +4,15 @@ import com.amplifiers.pathfinder.entity.review.ReviewService;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
-import com.amplifiers.pathfinder.utility.UserUtility;
 import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.amplifiers.pathfinder.utility.Variables.PaginationSettings.NUM_REVIEWS_PER_PAGE;
 
 
 @RestController
@@ -39,7 +40,7 @@ public class PublicGigController {
     }
 
     @GetMapping("/seller/{userId}")
-    public ResponseEntity<?> findGigsByseller(
+    public ResponseEntity<?> findGigsBySeller(
             @PathVariable Integer userId
     ) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -48,9 +49,13 @@ public class PublicGigController {
 
     @GetMapping("/{id}/reviews")
     public ResponseEntity<?> findGigReviews(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "sort", defaultValue = "createdAt") String sort,
+            @RequestParam(name = "order", defaultValue = "DESC") Sort.Direction order,
             @PathVariable Integer id
     ) {
-        return ResponseEntity.ok(reviewService.findAllByGigId(id));
+        Pageable pageable = PageRequest.of(page, NUM_REVIEWS_PER_PAGE, Sort.by(order, sort));
+        return ResponseEntity.ok(reviewService.findAllCardsByGigId(pageable, id));
     }
 
     @GetMapping("/category/{category}")
