@@ -3,8 +3,6 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-src/main/resources/curr-user1-access-token.txt
-src/main/resources/curr-user2-access-token.txt
 .env
 
 ### STS ###
