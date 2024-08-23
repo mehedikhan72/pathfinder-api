@@ -9,7 +9,6 @@ import com.amplifiers.pathfinder.entity.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
-import com.amplifiers.pathfinder.recommendation.RecommendationService;
 import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ public class PaymentService {
     private final TransactionResponseValidator transactionResponseValidator;
     private final NotificationService notificationService;
     private final EnrollmentRepository enrollmentRepository;
-    private final RecommendationService recommendationService;
 
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
