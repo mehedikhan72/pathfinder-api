@@ -1,10 +1,9 @@
-package com.amplifiers.pathfinder.entity.sslcommerz;
+package com.amplifiers.pathfinder.sslcommerz;
 
-import com.amplifiers.pathfinder.entity.sslcommerz.utility.ParameterBuilder;
-import com.amplifiers.pathfinder.entity.sslcommerz.utility.Util;
-import com.amplifiers.pathfinder.entity.sslcommerz.parametermappings.SSLCommerzInitResponse;
-import com.amplifiers.pathfinder.entity.sslcommerz.parametermappings.SSLCommerzValidatorResponse;
-import com.amplifiers.pathfinder.utility.Variables.SslCommerzSettings;
+import com.amplifiers.pathfinder.sslcommerz.utility.ParameterBuilder;
+import com.amplifiers.pathfinder.sslcommerz.utility.Util;
+import com.amplifiers.pathfinder.sslcommerz.parametermappings.SSLCommerzInitResponse;
+import com.amplifiers.pathfinder.sslcommerz.parametermappings.SSLCommerzValidatorResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;

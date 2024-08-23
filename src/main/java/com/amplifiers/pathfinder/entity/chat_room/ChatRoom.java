@@ -1,6 +1,6 @@
-package com.amplifiers.pathfinder.entity.ChatRoom;
+package com.amplifiers.pathfinder.entity.chat_room;
 
-import com.amplifiers.pathfinder.entity.ChatMessage.ChatMessage;
+import com.amplifiers.pathfinder.entity.chat_message.ChatMessage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Data

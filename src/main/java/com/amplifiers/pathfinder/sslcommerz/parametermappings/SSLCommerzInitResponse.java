@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.sslcommerz.parametermappings;
+package com.amplifiers.pathfinder.sslcommerz.parametermappings;
 
 import java.util.List;
 

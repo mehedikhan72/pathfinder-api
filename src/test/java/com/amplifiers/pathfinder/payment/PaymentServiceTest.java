@@ -4,7 +4,7 @@ import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
-import com.amplifiers.pathfinder.entity.sslcommerz.TransactionResponseValidator;
+import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.entity.user.User;

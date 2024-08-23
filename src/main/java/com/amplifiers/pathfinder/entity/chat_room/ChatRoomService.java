@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.ChatRoom;
+package com.amplifiers.pathfinder.entity.chat_room;
 
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;

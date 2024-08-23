@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.ChatMessage;
+package com.amplifiers.pathfinder.entity.chat_message;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

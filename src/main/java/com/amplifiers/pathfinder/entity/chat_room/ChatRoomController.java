@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.ChatRoom;
+package com.amplifiers.pathfinder.entity.chat_room;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

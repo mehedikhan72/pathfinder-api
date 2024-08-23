@@ -1,9 +1,9 @@
-package com.amplifiers.pathfinder.entity.sslcommerz.utility;
+package com.amplifiers.pathfinder.sslcommerz.utility;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.amplifiers.pathfinder.entity.sslcommerz.parametermappings.SSLCommerzInitResponse;
-import com.amplifiers.pathfinder.entity.sslcommerz.parametermappings.SSLCommerzValidatorResponse;
+import com.amplifiers.pathfinder.sslcommerz.parametermappings.SSLCommerzInitResponse;
+import com.amplifiers.pathfinder.sslcommerz.parametermappings.SSLCommerzValidatorResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.sslcommerz.utility;
+package com.amplifiers.pathfinder.sslcommerz.utility;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

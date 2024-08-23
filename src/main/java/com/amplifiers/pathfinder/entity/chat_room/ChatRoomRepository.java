@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.ChatRoom;
+package com.amplifiers.pathfinder.entity.chat_room;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

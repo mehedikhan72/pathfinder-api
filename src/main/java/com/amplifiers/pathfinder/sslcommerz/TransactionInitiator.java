@@ -1,8 +1,7 @@
-package com.amplifiers.pathfinder.entity.sslcommerz;
+package com.amplifiers.pathfinder.sslcommerz;
 
-import com.amplifiers.pathfinder.entity.sslcommerz.utility.ParameterBuilder;
+import com.amplifiers.pathfinder.sslcommerz.utility.ParameterBuilder;
 import com.amplifiers.pathfinder.utility.Variables.SslCommerzSettings;
-import org.springframework.boot.web.server.Ssl;
 
 import java.util.Map;
 
