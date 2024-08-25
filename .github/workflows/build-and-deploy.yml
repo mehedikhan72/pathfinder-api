@@ -58,12 +58,16 @@ jobs:
           script: |
             # Login to registry
             docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
-            # Stop running container
-            docker stop $(echo $IMAGE_NAME)
-            # Remove old container
-            docker rm $(echo $IMAGE_NAME)
+
+            # Stop and remove old container if it exists
+            if [ "$(docker ps -q -f name=$(echo $IMAGE_NAME))" ]; then
+              docker stop $(echo $IMAGE_NAME)
+              docker rm $(echo $IMAGE_NAME)
+            fi
+
             # Run a new container from a new image
             docker run -d \
-            --restart always \
-            --name $(echo $IMAGE_NAME) \
-            $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+              --restart always \
+              --name $(echo $IMAGE_NAME) \
+              -p 8080:8080 \
+              $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
