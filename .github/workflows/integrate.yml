@@ -21,9 +21,6 @@ jobs:
       - name: Build with Maven(Skipping checkstyle and tests)
         run: mvn clean install -DskipTests -Dcheckstyle.skip
 
-#      - name: Run Checkstyle
-#        run: mvn checkstyle:check
-
       - name: Run Tests
         run: mvn clean test -Dcheckstyle.skip
 
