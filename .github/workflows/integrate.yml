@@ -25,7 +25,7 @@ jobs:
 #        run: mvn checkstyle:check
 
       - name: Run Tests
-        run: mvn test
+        run: mvn clean test -Dcheckstyle.skip
 
   checkstyle:
     runs-on: ubuntu-latest
