@@ -3,9 +3,8 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-.env.development
+.env.secrets
 .env
-.env.production
 
 ### STS ###
 .apt_generated
