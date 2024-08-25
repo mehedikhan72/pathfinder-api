@@ -1,4 +1,4 @@
 rm .env
-cp .env.development .env
-#docker-compose down
-docker-compose up --build
+cp .env.prototype .env
+
+mvn -e spring-boot:run -DskipTests -Dcheckstyle.skip=true -Dspring-boot.run.profiles=dev

@@ -1,25 +1,8 @@
+# Common configurations (shared between all profiles)
 spring:
-  datasource:
-    # local dev without docker.
-    #    url: jdbc:postgresql://localhost:5432/pathfinder
-    #    username: postgres
-    #    password: postgres
-
-    # docker-compose
-    #    url: ${SPRING_DATASOURCE_URL}
-    #    username: ${SPRING_DATASOURCE_USERNAME}
-    #    password: ${SPRING_DATASOURCE_PASSWORD}
-
-    # digitalocean prod env
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
-
     show-sql: true
     properties:
       hibernate:
@@ -46,6 +29,33 @@ logging:
         web: DEBUG
       hibernate: ERROR
 
+# Profile-specific configurations
+---
+# Development profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pathfinder
+    username: postgres
+    password: postgres
+
 recombee:
   private-token: ${RECOMBEE_PRIVATE_TOKEN}
   database-id: ${RECOMBEE_DATABASE_ID}
+
+---
+# Production profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+recombee:
+  private-token: "todo"
+  database-id: "todo"
