@@ -11,6 +11,7 @@ on:
       version:
         description: 'Image version'
         required: true
+        default: 'latest'
 
 env:
   REGISTRY: "registry.digitalocean.com/pathphindr"
@@ -22,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Build container image
         run: docker build -t $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
