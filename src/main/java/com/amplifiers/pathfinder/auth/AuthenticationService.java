@@ -4,6 +4,7 @@ import com.amplifiers.pathfinder.config.JwtService;
 import com.amplifiers.pathfinder.entity.token.Token;
 import com.amplifiers.pathfinder.entity.token.TokenRepository;
 import com.amplifiers.pathfinder.entity.token.TokenType;
+import com.amplifiers.pathfinder.entity.user.Role;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.AuthenticationException;
@@ -42,7 +43,7 @@ public class AuthenticationService {
         // check if user with email already exists
         var existing_user = repository.findByEmail(request.getEmail());
 
-        if(!existing_user.isEmpty()) {
+        if (!existing_user.isEmpty()) {
             throw new AuthenticationException("User with this email already exists. Try another one.");
         }
 
@@ -51,7 +52,7 @@ public class AuthenticationService {
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(Role.USER)
                 .build();
         var savedUser = repository.save(user);
         var accessToken = jwtService.generateToken(user);
@@ -72,7 +73,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         removeAllExpiredTokens();
-        if(request.getEmail() == null || request.getPassword() == null)
+        if (request.getEmail() == null || request.getPassword() == null)
             throw new AuthenticationException("Email and password are required.");
 
         var user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));

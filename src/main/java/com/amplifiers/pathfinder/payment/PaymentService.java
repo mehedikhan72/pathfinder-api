@@ -12,6 +12,7 @@ import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.amplifiers.pathfinder.utility.Variables.ApiSettings;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class PaymentService {
     }
 
     public Map<String, String> constructPostData(Float total, String tranxId, String cusName, String cusEmail, String gigTitle) {
-        String baseUrl = "http://localhost:8080/";//Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
+        String baseUrl = ApiSettings.apiBaseUrl;//Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
         String successUrl = baseUrl + "api/v1/public/enrollment/payment-success";
         String failUrl = baseUrl + "api/v1/public/enrollment/payment-fail";
         String cancelUrl = baseUrl + "api/v1/public/enrollment/payment-cancel";
