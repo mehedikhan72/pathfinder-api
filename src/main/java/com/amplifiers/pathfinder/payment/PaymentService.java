@@ -110,7 +110,7 @@ public class PaymentService {
 
             Enrollment enrollment = transaction.get().getEnrollment();
 
-//            enrollment.setPaid(true);
+            enrollment.setPaid(true);
             enrollment.setBuyerConfirmed(true);
             enrollment.setStartedAt(OffsetDateTime.now());
 
