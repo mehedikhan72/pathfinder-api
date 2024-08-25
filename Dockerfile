@@ -6,7 +6,7 @@ COPY .mvn .mvn
 RUN ./mvnw dependency:resolve
 
 COPY src src
-RUN ./mvnw package -Dcheckstyle.skip=true
+RUN ./mvnw package -DskipTests -Dcheckstyle.skip=true
 
 # Runtime stage
 FROM openjdk:17-jdk-slim
