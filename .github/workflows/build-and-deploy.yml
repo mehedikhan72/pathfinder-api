@@ -18,6 +18,14 @@ env:
 
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup Docker
+        run: |
+          docker system prune -af
+          docker volume prune -f
+
   build_and_push:
     runs-on: ubuntu-latest
     steps:
