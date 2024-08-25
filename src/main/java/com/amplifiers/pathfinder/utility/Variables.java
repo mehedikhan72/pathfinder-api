@@ -5,6 +5,10 @@ public class Variables {
         public static final String clientBaseUrl = "http://localhost:5173/";
     }
 
+    public static class ApiSettings {
+        public static final String apiBaseUrl = "http://localhost:8080/";
+    }
+
     public static class PaginationSettings {
         public static final Integer NUM_GIGS_PER_PAGE = 2;
         public static final Integer NUM_ENROLLMENTS_PER_PAGE = 2;
