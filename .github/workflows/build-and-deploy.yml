@@ -46,15 +46,15 @@ jobs:
       - name: Remove all old images
         run: if [ ! -z "$(doctl registry repository list | grep "$(echo $IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $IMAGE_NAME) $(doctl registry repository list-tags $(echo $IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
 
-      - name: Remove Garbage
-        run: doctl registry garbage-collection start pathphindr --force
-
-      - name: Wait for Garbage Collection to Complete
-        run: |
-          while [ "$(doctl registry garbage-collection list | grep active)" ]; do
-            echo "Garbage collection in progress, waiting..."
-            sleep 30  # Wait for 30 seconds before checking again
-          done
+#      - name: Remove Garbage
+#        run: doctl registry garbage-collection start pathphindr --force
+#
+#      - name: Wait for Garbage Collection to Complete
+#        run: |
+#          while [ "$(doctl registry garbage-collection list | grep active)" ]; do
+#            echo "Garbage collection in progress, waiting..."
+#            sleep 30  # Wait for 30 seconds before checking again
+#          done
 
       - name: Push image to DigitalOcean Container Registry
         run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
