@@ -30,9 +30,9 @@ public class TagService {
         return tagRepository.findByName(name);
     }
 
-    public List<Tag> findByQuery(String query) {
+    public List<String> findByQuery(String query) {
         if (query == null)
-            return tagRepository.findAll();
-        return tagRepository.findByQuery(query);
+            return tagRepository.findAll().stream().map(Tag::getName).toList();
+        return tagRepository.findByQuery(query).stream().map(Tag::getName).toList();
     }
 }

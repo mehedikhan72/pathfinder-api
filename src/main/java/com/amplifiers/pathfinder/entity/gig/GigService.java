@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.gig;
 
+import com.amplifiers.pathfinder.entity.gig.GigRepository.Specs;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
@@ -14,12 +15,14 @@ import com.amplifiers.pathfinder.entity.video.VideoService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.recommendation.RecommendationService;
+import com.amplifiers.pathfinder.utility.Category;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import com.amplifiers.pathfinder.utility.Variables.PaginationSettings;
 import com.recombee.api_client.bindings.RecommendationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class GigService {
@@ -74,7 +76,6 @@ public class GigService {
                 .offerText(request.getOfferText())
                 .category(request.getCategory())
                 .rating(0.0f)
-                .totalOrders(0)
                 .accepted(false)
                 .seller(user)
                 .tags(tags)
@@ -394,8 +395,37 @@ public class GigService {
         return repository.findByCategory(pageable, category);
     }
 
-    public Page<Gig> findByQuery(Pageable pageable, String query) {
-        return repository.findByQuery(pageable, query);
+    public Page<GigCardDTO> findByQuery(
+            Pageable pageable,
+            String query,
+            Float ratingAbove,
+            Float budget,
+            Category category,
+            List<String> tagStrings
+            ) {
+
+        Specification<Gig> specification = Specs.isLike(query).and(Specs.isRatingAbove(ratingAbove));
+
+        if (budget != null) {
+            specification = specification.and(Specs.isPriceUnder(budget));
+        }
+
+        if (category != null) {
+            specification = specification.and(Specs.inCategory(category));
+        }
+
+        if (tagStrings != null && !tagStrings.isEmpty()) {
+            List<Tag> tags = tagStrings.stream()
+                    .map(t->tagService.findByName(t)
+                            .orElseThrow(()-> new ResourceNotFoundException("Tag doesn't exist")))
+                    .toList();
+
+            specification = specification.and(Specs.hasTags(tags));
+        }
+
+        var gigs = repository.findAll(specification, pageable);
+
+        return gigs.map(g -> createGigCardDTO(g, true));
     }
 
 
