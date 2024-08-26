@@ -4,15 +4,15 @@ import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
 import com.amplifiers.pathfinder.entity.notification.NotificationType;
-import com.amplifiers.pathfinder.entity.sslcommerz.SSLCommerz;
-import com.amplifiers.pathfinder.entity.sslcommerz.TransactionResponseValidator;
+import com.amplifiers.pathfinder.sslcommerz.SSLCommerz;
+import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
-import com.amplifiers.pathfinder.recommendation.RecommendationService;
 import com.amplifiers.pathfinder.utility.Variables;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.amplifiers.pathfinder.utility.Variables.ApiSettings;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -27,7 +27,6 @@ public class PaymentService {
     private final TransactionResponseValidator transactionResponseValidator;
     private final NotificationService notificationService;
     private final EnrollmentRepository enrollmentRepository;
-    private final RecommendationService recommendationService;
 
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
@@ -52,7 +51,7 @@ public class PaymentService {
     }
 
     public Map<String, String> constructPostData(Float total, String tranxId, String cusName, String cusEmail, String gigTitle) {
-        String baseUrl = "http://localhost:8080/";//Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
+        String baseUrl = ApiSettings.apiBaseUrl;//Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
         String successUrl = baseUrl + "api/v1/public/enrollment/payment-success";
         String failUrl = baseUrl + "api/v1/public/enrollment/payment-fail";
         String cancelUrl = baseUrl + "api/v1/public/enrollment/payment-cancel";

@@ -23,110 +23,110 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
+@Table(name = "_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
 public class User implements UserDetails {
 
-  @Id
-  @GeneratedValue
-  private Integer id;
+    @Id
+    @GeneratedValue
+    private Integer id;
 
-  @NotBlank(message = "First name is required.")
-  private String firstName;
+    @NotBlank(message = "First name is required.")
+    private String firstName;
 
-  @NotBlank(message = "Last name is required.")
-  private String lastName;
+    @NotBlank(message = "Last name is required.")
+    private String lastName;
 
-  @NotBlank(message = "Email is required")
-  @Email(message = "Invalid email.")
-  private String email;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email.")
+    private String email;
 
-  @JsonIgnore
-  @NotBlank(message = "Password is required.")
-  private String password;
+    @JsonIgnore
+    @NotBlank(message = "Password is required.")
+    private String password;
 
-  @NotNull(message = "Role is required.")
-  @Enumerated(EnumType.STRING)
-  private Role role;
+    @NotNull(message = "Role is required.")
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-  @OneToOne
-  @JoinColumn(name = "profile_image")
-  private Image profileImage;
+    @OneToOne
+    @JoinColumn(name = "profile_image")
+    private Image profileImage;
 
-  // @OneToMany(mappedBy = "user")
-  // private List<Token> tokens;
-  //
-  // @OneToMany(mappedBy = "user")
-  // private List<Gig> gigs;
-  //
-  // @OneToMany(mappedBy = "buyer")
-  // private List<Enrollment> enrollments;
+    // @OneToMany(mappedBy = "user")
+    // private List<Token> tokens;
+    //
+    // @OneToMany(mappedBy = "user")
+    // private List<Gig> gigs;
+    //
+    // @OneToMany(mappedBy = "buyer")
+    // private List<Enrollment> enrollments;
 
-  //// Extra Profile Data
-  @JsonIgnore
-  @ManyToMany
-  @JoinTable(name = "user_tag", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-  private Set<Tag> tags;
+    //// Extra Profile Data
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "user_tag", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set<Tag> tags;
 
-  @JsonIgnore
-  private Integer age;
+    @JsonIgnore
+    private Integer age;
 
-  @JsonIgnore
-  @Column(columnDefinition = "text")
-  private String description;
+    @JsonIgnore
+    @Column(columnDefinition = "text")
+    private String description;
 
-  @JsonIgnore
-  @ElementCollection(targetClass = Achievement.class)
-  @CollectionTable(name = "educations", joinColumns = @JoinColumn(name = "user_id"))
-  @Column(name = "educations")
-  private List<Achievement> educations;
+    @JsonIgnore
+    @ElementCollection(targetClass = Achievement.class)
+    @CollectionTable(name = "educations", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "educations")
+    private List<Achievement> educations;
 
-  @JsonIgnore
-  @ElementCollection(targetClass = Achievement.class)
-  @CollectionTable(name = "qualifications", joinColumns = @JoinColumn(name = "user_id"))
-  @Column(name = "qualifications")
-  private List<Achievement> qualifications;
+    @JsonIgnore
+    @ElementCollection(targetClass = Achievement.class)
+    @CollectionTable(name = "qualifications", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "qualifications")
+    private List<Achievement> qualifications;
 
-  @JsonIgnore
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return role.getAuthorities();
-  }
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return role.getAuthorities();
+    }
 
-  public String getFullName() {
-    return firstName + " " + lastName;
-  }
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 
-  @Override
-  public String getPassword() {
-    return password;
-  }
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
-  @Override
-  public String getUsername() {
-    return email;
-  }
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
-  @JsonIgnore
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-  @JsonIgnore
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-  @JsonIgnore
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-  @JsonIgnore
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
+    @JsonIgnore
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

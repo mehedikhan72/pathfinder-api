@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.sslcommerz.parametermappings;
+package com.amplifiers.pathfinder.sslcommerz.parametermappings;
 
 public class SSLCommerzValidatorResponse {
     public String status;

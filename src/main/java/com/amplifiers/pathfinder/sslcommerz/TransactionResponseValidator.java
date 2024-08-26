@@ -1,6 +1,5 @@
-package com.amplifiers.pathfinder.entity.sslcommerz;
+package com.amplifiers.pathfinder.sslcommerz;
 import com.amplifiers.pathfinder.utility.Variables.SslCommerzSettings;
-import org.springframework.boot.web.server.Ssl;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

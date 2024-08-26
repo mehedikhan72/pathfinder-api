@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.ChatMessage;
+package com.amplifiers.pathfinder.entity.chat_message;
 
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import com.amplifiers.pathfinder.utility.Variables;

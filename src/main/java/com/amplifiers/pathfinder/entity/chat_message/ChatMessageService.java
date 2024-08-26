@@ -1,8 +1,8 @@
-package com.amplifiers.pathfinder.entity.ChatMessage;
+package com.amplifiers.pathfinder.entity.chat_message;
 
-import com.amplifiers.pathfinder.entity.ChatRoom.ChatRoom;
-import com.amplifiers.pathfinder.entity.ChatRoom.ChatRoomRepository;
-import com.amplifiers.pathfinder.entity.ChatRoom.ChatRoomService;
+import com.amplifiers.pathfinder.entity.chat_room.ChatRoom;
+import com.amplifiers.pathfinder.entity.chat_room.ChatRoomRepository;
+import com.amplifiers.pathfinder.entity.chat_room.ChatRoomService;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;

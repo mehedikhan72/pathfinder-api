@@ -1,4 +1,4 @@
-package com.amplifiers.pathfinder.entity.ChatMessage;
+package com.amplifiers.pathfinder.entity.chat_message;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)

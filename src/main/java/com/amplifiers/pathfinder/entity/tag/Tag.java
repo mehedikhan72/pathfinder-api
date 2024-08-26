@@ -19,7 +19,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-
 public class Tag {
     @Id
     @GeneratedValue
