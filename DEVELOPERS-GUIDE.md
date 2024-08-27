@@ -32,13 +32,20 @@ POSTGRES_DB=pathfinder
 After you have cloned the repository, navigate to the project directory and run the following command:
 
 ```
-./start-dev.sh
+./first-boot.sh
 ```
 
 This script copies the necessary environment variables from '.env.prototype'
 into a new '.env' file and starts the development server.
 
 #### Voila! The development server should be running at [localhost:8080](http://localhost:8080).
+
+After you've started the server once, you can run the following command to start the server in the future:
+
+```
+./start-dev.sh
+```
+This script uses the existing '.env' file to start the server.
 
 ## API documentation
 

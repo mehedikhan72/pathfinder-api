@@ -5,6 +5,7 @@ import com.recombee.api_client.RecombeeClient;
 import com.recombee.api_client.api_requests.*;
 import com.recombee.api_client.bindings.RecommendationResponse;
 import com.recombee.api_client.util.Region;
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,9 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class RecommendationService {
 
-//    Dotenv dotenv = Dotenv.configure().load();
-//    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
-//    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
+    Dotenv dotenv = Dotenv.configure().load();
+    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
+    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
 
 //    @Value("${recombee.database-id}")
 //    private String databaseId;
@@ -26,8 +27,8 @@ public class RecommendationService {
 
     // fuck it. let's just do it like that.
 
-    private final String privateToken = "1234";
-    private final String databaseId = "1234";
+//    private final String privateToken = "1234";
+//    private final String databaseId = "1234";
 
     RecombeeClient client = new RecombeeClient(
             databaseId,
