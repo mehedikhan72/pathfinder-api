@@ -1,5 +1,7 @@
 package com.amplifiers.pathfinder.entity.report;
 
+import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
+import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.user.Role;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
@@ -18,6 +20,7 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     private final UserUtility userUtility;
+    private final EnrollmentRepository enrollmentRepository;
 
     public Report createReport(ReportCreateRequest reportCreateRequest) {
 
@@ -25,11 +28,15 @@ public class ReportService {
         User reportedUser = userRepository.findById(reportCreateRequest.getReportedUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        Enrollment enrollment = enrollmentRepository.findById(reportCreateRequest.getEnrollmentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
+
         var report = Report.builder()
                 .text(reportCreateRequest.getText())
                 .reporter(reporter)
                 .reportedUser(reportedUser)
                 .createdAt(OffsetDateTime.now())
+                .enrollment(enrollment)
                 .resolved(false)
                 .resolvedBy(null)
                 .resolvedAt(null)

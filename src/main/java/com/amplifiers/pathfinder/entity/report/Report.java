@@ -1,5 +1,6 @@
 package com.amplifiers.pathfinder.entity.report;
 
+import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,10 @@ public class Report {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reportedUserId")
     private User reportedUser;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "enrollmentId")
+    private Enrollment enrollment;
 
     private boolean resolved;
     private String resolvedBy;

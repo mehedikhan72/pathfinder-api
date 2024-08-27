@@ -63,4 +63,12 @@ public class SessionController {
     ) {
         return ResponseEntity.ok(service.findRunningSessionByEnrollmentId(enrollmentId));
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/all/enrollment/{enrollmentId}")
+    public ResponseEntity<?> findAllByEnrollmentId(
+            @PathVariable Integer enrollmentId
+    ) {
+        return ResponseEntity.ok(service.findAllByEnrollmentId(enrollmentId));
+    }
 }

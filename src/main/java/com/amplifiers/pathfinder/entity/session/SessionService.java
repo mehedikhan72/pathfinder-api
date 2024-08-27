@@ -5,7 +5,6 @@ import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
 import com.amplifiers.pathfinder.entity.notification.NotificationType;
 import com.amplifiers.pathfinder.entity.user.User;
-import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.UnauthorizedException;
 import com.amplifiers.pathfinder.exception.ValidationException;
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,7 +22,6 @@ import java.util.Optional;
 public class SessionService {
     private final SessionRepository sessionRepository;
     private final EnrollmentRepository enrollmentRepository;
-    private final UserRepository userRepository;
     private final UserUtility userUtility;
     private final NotificationService notificationService;
 
@@ -154,7 +153,7 @@ public class SessionService {
         Enrollment enrollment = session.getEnrollment();
         enrollment.setNumSessionsCompleted(enrollment.getNumSessionsCompleted() + 1);
 
-        if(Objects.equals(enrollment.getNumSessions(), enrollment.getNumSessionsCompleted())) {
+        if (Objects.equals(enrollment.getNumSessions(), enrollment.getNumSessionsCompleted())) {
             enrollment.setCompletedAt(java.time.OffsetDateTime.now());
         }
         enrollmentRepository.save(enrollment);
@@ -205,7 +204,24 @@ public class SessionService {
         return "Session cancelled.";
     }
 
+    public boolean userPartOfEnrollment(Integer userId, Integer enrollmentId) {
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+        return Objects.equals(enrollment.getBuyer().getId(), userId) || Objects.equals(enrollment.getGig().getSeller().getId(), userId);
+    }
+
     public Optional<Session> findRunningSessionByEnrollmentId(Integer EnrollmentId) {
-        return sessionRepository.findRunningSessionByEnrollmentId(EnrollmentId);
+        User user = userUtility.getCurrentUser();
+        if(userPartOfEnrollment(user.getId(), EnrollmentId)) {
+            return sessionRepository.findRunningSessionByEnrollmentId(EnrollmentId);
+        }
+        throw new UnauthorizedException("You are not part of this enrollment.");
+    }
+
+    public List<Session> findAllByEnrollmentId(Integer enrollmentId) {
+        User user = userUtility.getCurrentUser();
+        if(userPartOfEnrollment(user.getId(), enrollmentId)) {
+            return sessionRepository.findAllByEnrollmentId(enrollmentId);
+        }
+        throw new UnauthorizedException("You are not part of this enrollment.");
     }
 }

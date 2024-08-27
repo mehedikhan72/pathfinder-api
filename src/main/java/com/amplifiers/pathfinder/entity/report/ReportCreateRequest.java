@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ReportCreateRequest {
     private String text;
     private Integer reportedUserId;
+    private Integer enrollmentId;
 }
