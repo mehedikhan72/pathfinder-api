@@ -11,10 +11,11 @@ import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,12 +58,14 @@ public class ReviewService {
         return repository.save(review);
     }
 
-    public List<Review> findAllByGigId(Integer gigId) {
+    public Page<ReviewCardDTO> findAllCardsByGigId(Pageable pageable, Integer gigId) {
         if (!gigRepository.existsById(gigId)) {
             throw new ResourceNotFoundException("Gig does not exist");
         }
 
-        return repository.findAllByGigId(gigId);
+        var reviews = repository.findAllByGigId(pageable, gigId);
+
+        return reviews.map(ReviewService::createReviewCardDTO);
     }
 
     private void validateReviewPermission(Integer gigId, Integer reviewId) {
@@ -134,13 +137,9 @@ public class ReviewService {
     public static ReviewCardDTO createReviewCardDTO(Review review) {
         return createReviewCardDTO(review, true);
     }
-    public List<ReviewCardDTO> getReviewCardsBySellerId(Integer sellerId) {
-        List<Review> reviews = repository.findAllReviewsBySellerId(sellerId);
+    public Page<ReviewCardDTO> getReviewCardsBySellerId(Pageable pageable, Integer sellerId) {
+        Page<Review> reviews = repository.findAllReviewsBySellerId(pageable, sellerId);
 
-        List<ReviewCardDTO> reviewCardDTOS = reviews.stream().map(r -> createReviewCardDTO(r)).toList();
-
-        return reviewCardDTOS;
+        return reviews.map(ReviewService::createReviewCardDTO);
     }
-
-
 }

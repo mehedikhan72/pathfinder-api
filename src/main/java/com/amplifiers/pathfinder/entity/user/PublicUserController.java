@@ -1,24 +1,26 @@
 package com.amplifiers.pathfinder.entity.user;
 
-import com.amplifiers.pathfinder.cloudstorage.CloudStorageService;
-import com.amplifiers.pathfinder.entity.image.Image;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static com.amplifiers.pathfinder.utility.Variables.PaginationSettings.NUM_REVIEWS_PER_PAGE;
 
 @RestController
 @RequestMapping("/api/v1/public/users")
 @RequiredArgsConstructor
 public class PublicUserController {
     private final UserService service;
+
     @GetMapping("/{id}/profile")
     public ResponseEntity<UserProfileDTO> getUserProfileData(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getUserProfileData(id));
     }
+
     @GetMapping("/{id}/profile-image")
     public ResponseEntity<?> getUser(@PathVariable Integer id) {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(service.getProfileImageDataByUserId(id));
@@ -35,7 +37,12 @@ public class PublicUserController {
     }
 
     @GetMapping("/{id}/reviews/card")
-    public ResponseEntity<?> getReviewCards(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.getReviewCards(id));
+    public ResponseEntity<?> getReviewCards(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "sort", defaultValue = "createdAt") String sort,
+            @RequestParam(name = "order", defaultValue = "DESC") Sort.Direction order,
+            @PathVariable Integer id) {
+        Pageable pageable = PageRequest.of(page, NUM_REVIEWS_PER_PAGE, Sort.by(order, sort));
+        return ResponseEntity.ok(service.getReviewCards(pageable, id));
     }
 }

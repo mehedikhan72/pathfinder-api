@@ -10,9 +10,10 @@ public class Variables {
     }
 
     public static class PaginationSettings {
-        public static final Integer NUM_GIGS_PER_PAGE = 2;
+        public static final Integer NUM_GIGS_PER_PAGE = 10;
         public static final Integer NUM_ENROLLMENTS_PER_PAGE = 2;
         public static final Integer NUM_NOTIFICATIONS_PER_PAGE = 2;
+        public static final Integer NUM_REVIEWS_PER_PAGE = 5;
         public static final Integer NUM_MESSAGES_PER_PAGE = 10;
         public static final Integer NUM_RECOMMENDED_GIGS = 5;
         public static final Integer NUM_REPORTS_PER_PAGE = 20;

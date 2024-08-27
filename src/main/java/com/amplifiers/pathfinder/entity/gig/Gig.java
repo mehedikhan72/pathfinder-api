@@ -9,18 +9,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -30,24 +30,43 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "gig")
 public class Gig {
+
     @Id
     @GeneratedValue
     private Integer id;
 
     @NotBlank(message = "Title is required.")
     private String title;
+
     @NotBlank(message = "Description is required.")
     @Column(columnDefinition = "TEXT")
     private String description;
+
     @NotBlank(message = "Category is required.")
     private String category;
+
     @NotNull(message = "Price is required.")
     private Float price;
+
     @NotBlank(message = "Offer text is required.")
     private String offerText;
 
-    private float rating;
+    @Formula(
+        """
+        (select avg(r.rating) from review r where r.gig_id = id)
+        """
+    )
+    @Basic(fetch = FetchType.LAZY)
+    private Float rating;
+
+    @Formula(
+        """
+        (select count(*) from enrollment e where e.gig_id = id and e.paid)
+        """
+    )
+    //    @Basic(fetch = FetchType.LAZY)
     private Integer totalOrders;
+
     private boolean accepted;
 
     // @JsonIgnore
@@ -57,7 +76,7 @@ public class Gig {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User seller;
 
-//    @JsonIgnore
+    //    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "gig_tag", joinColumns = @JoinColumn(name = "gigId"), inverseJoinColumns = @JoinColumn(name = "tagId"))
     private Set<Tag> tags;
@@ -70,9 +89,9 @@ public class Gig {
 
     // @OneToMany(mappedBy = "gig")
     // private Set<Enrollment> enrollments;
-//
-//    @CreatedDate
-//    @Column(nullable = false, updatable = false)
+    //
+    //    @CreatedDate
+    //    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @OneToOne
@@ -82,8 +101,7 @@ public class Gig {
     @OneToOne
     @JoinColumn(name = "gigVideo")
     private Video gigVideo;
-
     // a number of gigs will be featured every once in a while. there will be rolling substitution.
     // TODO: improve featured idea later.
-//    private boolean featured;
+    //    private boolean featured;
 }
