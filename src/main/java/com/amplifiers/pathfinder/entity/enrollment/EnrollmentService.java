@@ -83,6 +83,9 @@ public class EnrollmentService {
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
 
+        gig.setScore(gig.getScore() + 5);
+        gigRepository.save(gig);
+
         // Sending notification to receiver
         String notificationTxt = savedEnrollment.getGig().getSeller().getFullName()
                 + " has offered you a new enrollment.";

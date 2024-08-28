@@ -2,17 +2,19 @@ package com.amplifiers.pathfinder.payment;
 
 import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
+import com.amplifiers.pathfinder.entity.gig.Gig;
+import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
 import com.amplifiers.pathfinder.entity.notification.NotificationType;
-import com.amplifiers.pathfinder.sslcommerz.SSLCommerz;
-import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.sslcommerz.SSLCommerz;
+import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.utility.Variables;
+import com.amplifiers.pathfinder.utility.Variables.ApiSettings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.amplifiers.pathfinder.utility.Variables.ApiSettings;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ public class PaymentService {
     private final TransactionResponseValidator transactionResponseValidator;
     private final NotificationService notificationService;
     private final EnrollmentRepository enrollmentRepository;
+    private final GigRepository gigRepository;
 
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
@@ -97,11 +100,11 @@ public class PaymentService {
             return false;
         }
 
-        if(paymentValidationSuccessful) {
+        if (paymentValidationSuccessful) {
             System.out.println("Payment successful.");
 
             Optional<Transaction> transaction = transactionRepository.findByTranxId(tranxId);
-            if(transaction.isEmpty()) {
+            if (transaction.isEmpty()) {
                 throw new ResourceNotFoundException("No transaction found with the transaction ID.");
             }
 
@@ -115,6 +118,10 @@ public class PaymentService {
             enrollment.setStartedAt(OffsetDateTime.now());
 
             enrollmentRepository.save(enrollment);
+
+            Gig gig = enrollment.getGig();
+            gig.setScore(gig.getScore() + 10);
+            gigRepository.save(gig);
 
             // Sending notification
             String notificationTxt = enrollment.getBuyer().getFullName()

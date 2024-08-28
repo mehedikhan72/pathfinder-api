@@ -39,7 +39,7 @@ public class PublicGigController {
     }
 
     @GetMapping("/seller/{userId}")
-    public ResponseEntity<?> findGigsByseller(@PathVariable Integer userId) {
+    public ResponseEntity<?> findGigsBySeller(@PathVariable Integer userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return ResponseEntity.ok(service.getGigCardsBySeller(user));
     }
@@ -72,7 +72,7 @@ public class PublicGigController {
         @RequestParam(name = "budget", required = false) Float budget,
         @RequestParam(name = "category", required = false) String category,
         @RequestParam(name = "tags", required = false) List<String> tags,
-        @RequestParam(name = "sort", defaultValue = "totalOrders") String sort,
+        @RequestParam(name = "sort", defaultValue = "score") String sort,
         @RequestParam(name = "order", defaultValue = "DESC") Sort.Direction order
     ) {
         Pageable pageable = PageRequest.of(page, numGigsPerPage, Sort.by(order, sort));

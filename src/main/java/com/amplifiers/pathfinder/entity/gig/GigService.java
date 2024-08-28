@@ -1,7 +1,7 @@
 package com.amplifiers.pathfinder.entity.gig;
 
-import com.amplifiers.pathfinder.entity.gig.GigRepository.Specs;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
+import com.amplifiers.pathfinder.entity.gig.GigRepository.Specs;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
 import com.amplifiers.pathfinder.entity.review.ReviewRepository;
@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class GigService {
@@ -81,6 +82,7 @@ public class GigService {
                 .tags(tags)
                 .faqs(request.getFaqs())
                 .createdAt(OffsetDateTime.now())
+                .score(0)
                 .build();
 
         Gig savedGig = repository.save(gig);
@@ -110,6 +112,8 @@ public class GigService {
             }
         }
 
+        gig.setScore(gig.getScore() + 1);
+        repository.save(gig);
         return createGigPageDTO(gig);
     }
 
@@ -129,6 +133,8 @@ public class GigService {
         if (!Objects.equals(currentUser.getId(), gig.getId())) {
             recommendationService.addDetailView(currentUser.getId(), gig.getId());
             System.out.println("added detail view");
+            gig.setScore(gig.getScore() + 1);
+            repository.save(gig);
         }
 
         return createGigPageDTO(gig);
@@ -402,7 +408,7 @@ public class GigService {
             Float budget,
             Category category,
             List<String> tagStrings
-            ) {
+    ) {
 
         Specification<Gig> specification = Specs.isLike(query).and(Specs.isRatingAbove(ratingAbove));
 
@@ -416,8 +422,8 @@ public class GigService {
 
         if (tagStrings != null && !tagStrings.isEmpty()) {
             List<Tag> tags = tagStrings.stream()
-                    .map(t->tagService.findByName(t)
-                            .orElseThrow(()-> new ResourceNotFoundException("Tag doesn't exist")))
+                    .map(t -> tagService.findByName(t)
+                            .orElseThrow(() -> new ResourceNotFoundException("Tag doesn't exist")))
                     .toList();
 
             specification = specification.and(Specs.hasTags(tags));
