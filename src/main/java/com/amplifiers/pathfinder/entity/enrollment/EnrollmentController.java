@@ -24,6 +24,14 @@ public class EnrollmentController {
         return ResponseEntity.ok(service.createEnrollment(request, gigId));
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/get/{id}")
+    public ResponseEntity<?> getEnrollment(
+            @PathVariable Integer id
+    ) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
     @PutMapping("buyer-confirms/{enrollmentId}")
     public String buyerConfirmsEnrollment(
             @PathVariable Integer enrollmentId

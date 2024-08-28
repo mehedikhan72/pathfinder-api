@@ -1,6 +1,5 @@
 package com.amplifiers.pathfinder.entity.enrollment;
 
-import com.amplifiers.pathfinder.payment.PaymentService;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
@@ -10,11 +9,13 @@ import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.UnauthorizedException;
 import com.amplifiers.pathfinder.exception.ValidationException;
+import com.amplifiers.pathfinder.payment.PaymentService;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -101,7 +102,7 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the buyer can confirm an enrollment.");
         }
 
-        if(enrollment.isPaid() && enrollment.isBuyerConfirmed() && enrollment.getStartedAt() != null){
+        if (enrollment.isPaid() && enrollment.isBuyerConfirmed() && enrollment.getStartedAt() != null) {
             throw new ValidationException("You have already paid and confirmed this enrollment.");
         }
 
@@ -173,5 +174,15 @@ public class EnrollmentService {
 
         OffsetDateTime now = OffsetDateTime.now();
         return now.isAfter(enrollment.getDeadline());
+    }
+
+    public Enrollment findById(Integer id) {
+        User user = userUtility.getCurrentUser();
+
+        // make sure the user is either the buyer or the seller as this is intended for the enrollment details view.
+        return enrollmentRepository.findById(id)
+                .filter(enrollment -> Objects.equals(user.getId(), enrollment.getBuyer().getId())
+                        || Objects.equals(user.getId(), enrollment.getGig().getSeller().getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
     }
 }
