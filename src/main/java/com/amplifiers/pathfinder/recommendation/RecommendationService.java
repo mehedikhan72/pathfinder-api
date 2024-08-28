@@ -83,10 +83,14 @@ public class RecommendationService {
                 if (userId == -1) {
                     // popular gigs for anonymous users
                     return client.send(new RecommendItemsToUser("dummyUser123", numItems)
-                            .setScenario(scenario));
+                            .setScenario(scenario)
+                            .setCascadeCreate(true)
+                    );
                 } else {
                     return client.send(new RecommendItemsToUser(userId.toString(), numItems)
-                            .setScenario(scenario));
+                            .setScenario(scenario)
+                            .setCascadeCreate(true)
+                    );
                 }
 
             } else {
@@ -105,9 +109,13 @@ public class RecommendationService {
             if (scenario != null) {
                 // for similar items.
                 return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems)
-                        .setScenario(scenario));
+                        .setScenario(scenario)
+                        .setCascadeCreate(true)
+                );
             } else {
-                return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems));
+                return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems)
+                        .setCascadeCreate(true)
+                );
             }
         } catch (Exception e) {
             e.printStackTrace();
