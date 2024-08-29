@@ -96,7 +96,7 @@ public class PrivateGigController {
     @GetMapping("/recommendations")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getRecommendationsForUser() {
-        return ResponseEntity.ok(service.getRecommendationsForUser(""));
+        return ResponseEntity.ok(service.getRecommendationsForUser(null));
     }
 
     @GetMapping("/recommendations/popular-gigs")
