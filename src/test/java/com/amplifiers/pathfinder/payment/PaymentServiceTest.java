@@ -3,11 +3,12 @@ package com.amplifiers.pathfinder.payment;
 import com.amplifiers.pathfinder.entity.enrollment.Enrollment;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.gig.Gig;
+import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.entity.notification.NotificationService;
-import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.entity.user.User;
+import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,8 @@ class PaymentServiceTest {
     private NotificationService notificationService;
     @Mock
     private EnrollmentRepository enrollmentRepository;
+    @Mock
+    private GigRepository gigRepository;
 
 
     private PaymentService paymentService;
@@ -41,7 +44,7 @@ class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(transactionRepository, transactionResponseValidator, notificationService, enrollmentRepository);
+        paymentService = new PaymentService(transactionRepository, transactionResponseValidator, notificationService, enrollmentRepository, gigRepository);
 
         User buyer = new User();
         buyer.setFirstName("John");

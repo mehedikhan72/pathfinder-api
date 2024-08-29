@@ -1,9 +1,13 @@
 package com.amplifiers.pathfinder.config;
 
 import com.amplifiers.pathfinder.auth.CustomAuthenticationEntryPoint;
+import com.amplifiers.pathfinder.exception.GlobalExceptionHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +21,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.amplifiers.pathfinder.entity.user.Permission.*;
 import static com.amplifiers.pathfinder.entity.user.Role.ADMIN;
@@ -47,13 +53,13 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final LogoutService logoutService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
+    private final GlobalExceptionHandler globalExceptionHandler;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));
@@ -65,7 +71,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors((cors)->cors.configurationSource(corsConfigurationSource()))
+                .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
@@ -88,7 +94,17 @@ public class SecurityConfiguration {
                 )
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
-                                .defaultAuthenticationEntryPointFor(customAuthenticationEntryPoint, request -> true)
+                                .authenticationEntryPoint(customAuthenticationEntryPoint) // 401 Unauthorized
+                                .accessDeniedHandler((request, response, accessDeniedException) -> { // 403 Forbidden
+                                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                                    Map<String, Object> body = new HashMap<>();
+                                    body.put("status_code", HttpStatus.FORBIDDEN.value());
+                                    body.put("error", "Forbidden");
+                                    body.put("message", "Access denied. You do not have permission to access this resource.");
+                                    body.put("path", request.getServletPath());
+                                    new ObjectMapper().writeValue(response.getOutputStream(), body);
+                                })
                 );
         return http.build();
     }

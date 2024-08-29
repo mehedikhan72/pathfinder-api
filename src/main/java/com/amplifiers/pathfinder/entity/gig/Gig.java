@@ -9,9 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +16,11 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -52,17 +52,17 @@ public class Gig {
     private String offerText;
 
     @Formula(
-        """
-        (select avg(r.rating) from review r where r.gig_id = id)
-        """
+            """
+                    (select avg(r.rating) from review r where r.gig_id = id)
+                    """
     )
     @Basic(fetch = FetchType.LAZY)
     private Float rating;
 
     @Formula(
-        """
-        (select count(*) from enrollment e where e.gig_id = id and e.paid)
-        """
+            """
+                    (select count(*) from enrollment e where e.gig_id = id and e.paid)
+                    """
     )
     //    @Basic(fetch = FetchType.LAZY)
     private Integer totalOrders;
@@ -70,7 +70,7 @@ public class Gig {
     private boolean accepted;
 
     // @JsonIgnore
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -104,4 +104,6 @@ public class Gig {
     // a number of gigs will be featured every once in a while. there will be rolling substitution.
     // TODO: improve featured idea later.
     //    private boolean featured;
+
+    private Integer score = 0;
 }
