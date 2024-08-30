@@ -54,6 +54,7 @@ public class PrivateGigController {
             return ResponseEntity.status(400).body(E.getMessage());
         }
     }
+
     @PostMapping("/{gigId}/gig-video")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> setGigVideo(@PathVariable Integer gigId, @RequestParam("file") MultipartFile file) {
@@ -99,6 +100,12 @@ public class PrivateGigController {
         return ResponseEntity.ok(service.getRecommendationsForUser(null));
     }
 
+    @GetMapping("/recommendations/homepage")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> getRecommendationsForHomePage() {
+        return ResponseEntity.ok(service.getRecommendationsForUser("homepage"));
+    }
+
     @GetMapping("/recommendations/popular-gigs")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getPopularGigsForUser() {
@@ -132,5 +139,13 @@ public class PrivateGigController {
             @PathVariable String recommId
     ) {
         return ResponseEntity.ok(service.getNextRecommendationsForUser(recommId));
+    }
+
+    @PutMapping("/pause-unpause-gig/{gigId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<?> pauseUnpauseGig(
+            @PathVariable Integer gigId
+    ) {
+        return ResponseEntity.ok(service.pauseUnpauseGig(gigId));
     }
 }

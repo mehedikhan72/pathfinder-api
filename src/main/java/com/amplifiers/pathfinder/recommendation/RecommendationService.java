@@ -46,9 +46,19 @@ public class RecommendationService {
                                 put("sellerId", gig.getSeller().getId());
                                 put("description", gig.getDescription());
                                 put("tags", gig.getTags());
+                                put("accepted", gig.isAccepted());
+                                put("paused", gig.isPaused());
                             }}
                     ).setCascadeCreate(true)
             );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateItem(Integer itemId, HashMap<String, Object> values) {
+        try {
+            client.send(new SetItemValues(itemId.toString(), values));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -85,17 +95,21 @@ public class RecommendationService {
                     return client.send(new RecommendItemsToUser("dummyUser123", numItems)
                             .setScenario(scenario)
                             .setCascadeCreate(true)
+                            .setFilter("'accepted' == true AND 'paused' == false")
                     );
                 } else {
                     return client.send(new RecommendItemsToUser(userId.toString(), numItems)
                             .setScenario(scenario)
                             .setCascadeCreate(true)
+                            .setFilter("'accepted' == true AND 'paused' == false")
                     );
                 }
 
             } else {
                 // basic recommendation
-                return client.send(new RecommendItemsToUser(userId.toString(), numItems));
+                return client.send(new RecommendItemsToUser(userId.toString(), numItems)
+                        .setFilter("'accepted' == true AND 'paused' == false")
+                );
             }
 
         } catch (Exception e) {
@@ -111,10 +125,12 @@ public class RecommendationService {
                 return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems)
                         .setScenario(scenario)
                         .setCascadeCreate(true)
+                        .setFilter("'accepted' == true AND 'paused' == false")
                 );
             } else {
                 return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems)
                         .setCascadeCreate(true)
+                        .setFilter("'accepted' == true AND 'paused' == false")
                 );
             }
         } catch (Exception e) {
@@ -127,6 +143,7 @@ public class RecommendationService {
         try {
             return client.send(new SearchItems(userId.toString(), query, numItems)
                     .setCascadeCreate(true)
+                    .setFilter("'accepted' == true AND 'paused' == false")
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,8 +153,7 @@ public class RecommendationService {
 
     public RecommendationResponse getNextRecommendationsForUser(String recommId, Integer numItems) {
         try {
-            RecommendationResponse result = client.send(new RecommendNextItems(recommId, numItems));
-            return result;
+            return client.send(new RecommendNextItems(recommId, numItems));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -55,7 +55,6 @@ public class GigService {
         if (request.getFaqs().size() < 3) {
             throw new ValidationException("At least three faqs required.");
         }
-
     }
 
     public Gig createGig(GigCreateRequest request) {
@@ -77,16 +76,17 @@ public class GigService {
                 .offerText(request.getOfferText())
                 .category(request.getCategory())
                 .rating(0.0f)
-                .accepted(false)
                 .seller(user)
                 .tags(tags)
                 .faqs(request.getFaqs())
                 .createdAt(OffsetDateTime.now())
                 .score(0)
+                .accepted(false)
+                .paused(false)
                 .build();
 
         Gig savedGig = repository.save(gig);
-        recommendationService.sendGigValues(savedGig);
+        recommendationService.sendGigValues(gig);
         return savedGig;
     }
 
@@ -353,6 +353,10 @@ public class GigService {
     }
 
     public Object getReturnDataForRecommendation(RecommendationResponse recommended) {
+        if (recommended == null) {
+            return new HashMap<>();
+        }
+
         String recommId = recommended.getRecommId();
         String[] recomms = recommended.getIds();
 
@@ -432,6 +436,25 @@ public class GigService {
         var gigs = repository.findAll(specification, pageable);
 
         return gigs.map(g -> createGigCardDTO(g, true));
+    }
+
+    public Gig pauseUnpauseGig(Integer gigId) {
+        Gig gig = repository.findById(gigId)
+                .orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
+
+        if (!isGigOfUser(gig)) {
+            throw new ValidationException("You do not own this gig");
+        }
+
+        gig.setPaused(!gig.isPaused());
+        Gig savedGig = repository.save(gig);
+
+        // updates the paused field in recombee database.
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("paused", savedGig.isPaused());
+        recommendationService.updateItem(gigId, values);
+
+        return savedGig;
     }
 
 

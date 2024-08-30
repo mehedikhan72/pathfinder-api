@@ -68,6 +68,7 @@ public class Gig {
     private Integer totalOrders;
 
     private boolean accepted;
+    private boolean paused;
 
     // @JsonIgnore
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
