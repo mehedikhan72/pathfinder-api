@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/platform-management")
 @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
 @RequiredArgsConstructor
-public class ManagerController {
-    private final ManagerService managerService;
+public class ManagementController {
+    private final ManagementService managementService;
 
     @PutMapping("/accept-gig/{gigId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> acceptGig(
             @PathVariable Integer gigId
     ) {
-        return ResponseEntity.ok(managerService.acceptGig(gigId));
+        return ResponseEntity.ok(managementService.acceptGig(gigId));
     }
 }

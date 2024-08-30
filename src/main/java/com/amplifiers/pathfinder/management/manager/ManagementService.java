@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
-public class ManagerService {
+public class ManagementService {
     private final GigRepository gigRepository;
     private final RecommendationService recommendationService;
 
