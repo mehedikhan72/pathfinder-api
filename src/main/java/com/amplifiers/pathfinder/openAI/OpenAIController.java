@@ -21,7 +21,6 @@ public class OpenAIController {
 
     @GetMapping("/guideline")
     public ResponseEntity<?> getSearchSuggestionResponse(@RequestParam(name = "query") String query) {
-        System.out.println(query);
         return ResponseEntity.ok(openAIService.suggestion(query));
     }
 }
