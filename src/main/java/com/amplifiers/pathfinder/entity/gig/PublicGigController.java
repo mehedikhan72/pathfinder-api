@@ -41,7 +41,7 @@ public class PublicGigController {
     @GetMapping("/seller/{userId}")
     public ResponseEntity<?> findGigsBySeller(@PathVariable Integer userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return ResponseEntity.ok(service.getGigCardsBySeller(user));
+        return ResponseEntity.ok(service.getPublicGigCardsBySeller(user));
     }
 
     @GetMapping("/{id}/reviews")
