@@ -1,5 +1,7 @@
 package com.amplifiers.pathfinder.entity.user;
 
+import static com.amplifiers.pathfinder.utility.Variables.PaginationSettings.NUM_REVIEWS_PER_PAGE;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -8,12 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.amplifiers.pathfinder.utility.Variables.PaginationSettings.NUM_REVIEWS_PER_PAGE;
-
 @RestController
 @RequestMapping("/api/v1/public/users")
 @RequiredArgsConstructor
 public class PublicUserController {
+
     private final UserService service;
 
     @GetMapping("/{id}/profile")
@@ -28,20 +29,21 @@ public class PublicUserController {
 
     @GetMapping("/{id}/gigs")
     public ResponseEntity<?> getGigs(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.getGigs(id));
+        return ResponseEntity.ok(service.getPublicGigs(id));
     }
 
     @GetMapping("/{id}/gigs/card")
     public ResponseEntity<?> getGigCards(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.getGigCards(id));
+        return ResponseEntity.ok(service.getPublicGigCards(id));
     }
 
     @GetMapping("/{id}/reviews/card")
     public ResponseEntity<?> getReviewCards(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "sort", defaultValue = "createdAt") String sort,
-            @RequestParam(name = "order", defaultValue = "DESC") Sort.Direction order,
-            @PathVariable Integer id) {
+        @RequestParam(name = "page", defaultValue = "0") Integer page,
+        @RequestParam(name = "sort", defaultValue = "createdAt") String sort,
+        @RequestParam(name = "order", defaultValue = "DESC") Sort.Direction order,
+        @PathVariable Integer id
+    ) {
         Pageable pageable = PageRequest.of(page, NUM_REVIEWS_PER_PAGE, Sort.by(order, sort));
         return ResponseEntity.ok(service.getReviewCards(pageable, id));
     }

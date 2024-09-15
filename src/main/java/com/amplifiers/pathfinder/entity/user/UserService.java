@@ -3,6 +3,7 @@ package com.amplifiers.pathfinder.entity.user;
 import com.amplifiers.pathfinder.entity.enrollment.EnrollmentRepository;
 import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigCardDTO;
+import com.amplifiers.pathfinder.entity.gig.GigManageDTO;
 import com.amplifiers.pathfinder.entity.gig.GigService;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
@@ -14,6 +15,11 @@ import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
 import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +28,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.security.Principal;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,6 @@ public class UserService {
     private final ImageService imageService;
 
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
-
         var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 
         // check if the current password is correct
@@ -91,31 +90,32 @@ public class UserService {
         }
 
         if (request.getEducations() != null) {
-            request.getEducations().forEach(e -> {
-                if (e.title.isBlank())
-                    throw new ValidationException("Education field cannot be blank");
-            });
+            request
+                .getEducations()
+                .forEach(e -> {
+                    if (e.title.isBlank()) throw new ValidationException("Education field cannot be blank");
+                });
             user.setEducations(request.getEducations());
         }
 
         if (request.getQualifications() != null) {
-            request.getQualifications().forEach(e -> {
-                if (e.title.isBlank())
-                    throw new ValidationException("Qualification field cannot be blank");
-            });
+            request
+                .getQualifications()
+                .forEach(e -> {
+                    if (e.title.isBlank()) throw new ValidationException("Qualification field cannot be blank");
+                });
             user.setQualifications(request.getQualifications());
         }
 
         if (request.getInterests() != null) {
-            request.getInterests().forEach(
-                    name -> {
-                        System.out.println(tagService.findByName(name));
-                        tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name)));
-                    });
+            request
+                .getInterests()
+                .forEach(name -> {
+                    System.out.println(tagService.findByName(name));
+                    tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name)));
+                });
 
-            Set<Tag> tags = request.getInterests().stream()
-                    .map(name -> tagService.findByName(name).get())
-                    .collect(Collectors.toSet());
+            Set<Tag> tags = request.getInterests().stream().map(name -> tagService.findByName(name).get()).collect(Collectors.toSet());
 
             user.setTags(tags);
         }
@@ -146,8 +146,7 @@ public class UserService {
             imageService.deleteImageById(prevProfileImage.getId());
         }
 
-        return "Successfully " + (prevProfileImage != null ? "updated" : "set") + " the profile image of "
-                + user.getUsername();
+        return "Successfully " + (prevProfileImage != null ? "updated" : "set") + " the profile image of " + user.getUsername();
     }
 
     @Transactional
@@ -156,16 +155,16 @@ public class UserService {
 
         Set<String> interests = user.getTags().stream().map(Tag::getName).collect(Collectors.toSet());
 
-        Set<String> teachTags = gigService.getGigsBySeller(user).stream()
-                .map(Gig::getTags)
-                .flatMap(Set::stream)
-                .map(Tag::getName)
-                .collect(Collectors.toSet());
+        Set<String> teachTags = gigService
+            .getGigsBySeller(user)
+            .stream()
+            .map(Gig::getTags)
+            .flatMap(Set::stream)
+            .map(Tag::getName)
+            .collect(Collectors.toSet());
 
         List<Float> ratingList = reviewRepository.findAllRatingsBySellerId(id);
-        Float rating = (ratingList.size() > 0) ? ((ratingList
-                .stream()
-                .reduce((float) 0, Float::sum)) / ratingList.size()) : null;
+        Float rating = (ratingList.size() > 0) ? ((ratingList.stream().reduce((float) 0, Float::sum)) / ratingList.size()) : null;
 
         Integer ratedByCount = ratingList.size();
 
@@ -174,23 +173,23 @@ public class UserService {
         Integer totalCompletedEnrollments = enrollmentRepository.countCompletedBySellerId(id);
 
         return UserProfileDTO.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .role(user.getRole())
-                .age(user.getAge())
-                .description(user.getDescription())
-                .teachTags(teachTags)
-                .interests(interests)
-                .rating(rating)
-                .ratedByCount(ratedByCount)
-                .totalStudents(totalStudents)
-                .totalCompletedEnrollments(totalCompletedEnrollments)
-                .educations(user.getEducations())
-                .qualifications(user.getQualifications())
-                .build();
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .username(user.getUsername())
+            .role(user.getRole())
+            .age(user.getAge())
+            .description(user.getDescription())
+            .teachTags(teachTags)
+            .interests(interests)
+            .rating(rating)
+            .ratedByCount(ratedByCount)
+            .totalStudents(totalStudents)
+            .totalCompletedEnrollments(totalCompletedEnrollments)
+            .educations(user.getEducations())
+            .qualifications(user.getQualifications())
+            .build();
     }
 
     public byte[] getProfileImageDataByUserId(Integer id) {
@@ -209,10 +208,22 @@ public class UserService {
         return gigService.getGigsBySeller(seller);
     }
 
-    public List<GigCardDTO> getGigCards(Integer id) {
+    public List<Gig> getPublicGigs(Integer id) {
         User seller = repository.getReferenceById(id);
 
-        return gigService.getGigCardsBySeller(seller);
+        return gigService.getPublicGigsBySeller(seller);
+    }
+
+    public List<GigCardDTO> getPublicGigCards(Integer id) {
+        User seller = repository.getReferenceById(id);
+
+        return gigService.getPublicGigCardsBySeller(seller);
+    }
+
+    public List<GigManageDTO> getGigManageDTOs(Integer id) {
+        User seller = repository.getReferenceById(id);
+
+        return gigService.getGigManageDTOsBySeller(seller);
     }
 
     public Page<ReviewCardDTO> getReviewCards(Pageable pageable, Integer id) {

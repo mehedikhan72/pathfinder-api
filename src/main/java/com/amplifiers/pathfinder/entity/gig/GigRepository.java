@@ -19,9 +19,15 @@ public interface GigRepository extends JpaRepository<Gig, Integer>, JpaSpecifica
 
     List<Gig> findGigsBySeller(User seller);
 
-    Page<Gig> findByCategory(Pageable pageable, String category);
+    List<Gig> findGigsBySellerAndAcceptedTrueAndPausedFalse(User seller);
+
+    Page<Gig> findByCategoryAndAcceptedTrueAndPausedFalse(Pageable pageable, String category);
 
     interface Specs {
+        static Specification<Gig> isAcceptedAndNotPaused() {
+            return ((root, query, builder) -> builder.and(builder.isTrue(root.get("accepted")), builder.isFalse(root.get("paused"))));
+        }
+
         static Specification<Gig> isLike(String keyword) {
             String finalKeyword = keyword.toLowerCase();
             return (root, query, builder) -> {
