@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -73,6 +74,13 @@ public class User implements UserDetails {
     @JsonIgnore
     @Column(columnDefinition = "text")
     private String description;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean emailVerified;
+    @Column(columnDefinition = "boolean default 'null'")
+    private String emailVerificationToken;
+    @Column(columnDefinition = "timestamp default null")
+    private OffsetDateTime lastVerificationEmailSentAt;
 
     @JsonIgnore
     @ElementCollection(targetClass = Achievement.class)
