@@ -59,6 +59,22 @@ public class AuthenticationService {
         revokeAllUserAccessTokens(user);
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
+
+        // the email is likely verified atm, so welcoming user.
+        try {
+            emailService.sendEmail(
+                    user,
+                    "Welcome to pathPhindr",
+                    "Hi " + user.getFullName() + ",\n\n" +
+                            "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
+                            "Complete your profile and start exploring.\n\n" +
+                            "Best,\n" +
+                            "Team pathPhindr\n"
+            );
+        } catch (Exception e) {
+            System.out.println("Error sending email: " + e.getMessage());
+        }
+
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -133,23 +149,6 @@ public class AuthenticationService {
 
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
-
-//        return "account_created";
-        // add this ass message, with proper line breaks.- Hi, Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you. Log in, complete your profile, and start exploring. If you need any help, just reach out! Best, Team pathPhindr
-
-//        try {
-//            emailService.sendEmail(
-//                    savedUser,
-//                    "Welcome to pathPhindr",
-//                    "Hi " + savedUser.getFullName() + ",\n\n" +
-//                            "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
-//                            "Complete your profile and start exploring.\n\n" +
-//                            "Best,\n" +
-//                            "Team pathPhindr\n"
-//            );
-//        } catch (Exception e) {
-//            System.out.println("Error sending email: " + e.getMessage());
-//        }
 
         // verification prompt.
         return AuthenticationResponse.builder()

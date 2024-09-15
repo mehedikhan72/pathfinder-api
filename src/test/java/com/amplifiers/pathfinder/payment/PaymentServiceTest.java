@@ -9,6 +9,8 @@ import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
+import com.amplifiers.pathfinder.utility.EmailService;
+import jakarta.validation.constraints.Email;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,8 @@ class PaymentServiceTest {
     private EnrollmentRepository enrollmentRepository;
     @Mock
     private GigRepository gigRepository;
+    @Mock
+    private EmailService emailService;
 
 
     private PaymentService paymentService;
@@ -44,7 +48,7 @@ class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(transactionRepository, transactionResponseValidator, notificationService, enrollmentRepository, gigRepository);
+        paymentService = new PaymentService(transactionRepository, transactionResponseValidator, notificationService, enrollmentRepository, gigRepository, emailService);
 
         User buyer = new User();
         buyer.setFirstName("John");

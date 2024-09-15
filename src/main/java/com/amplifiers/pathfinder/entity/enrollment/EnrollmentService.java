@@ -10,6 +10,7 @@ import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.UnauthorizedException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.payment.PaymentService;
+import com.amplifiers.pathfinder.utility.EmailService;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ public class EnrollmentService {
     private final UserUtility userUtility;
     private final NotificationService notificationService;
     private final PaymentService paymentService;
+    private final EmailService emailService;
 
     // TODO: update later - there can be only one concurrent enrollment between a buyer and seller. the
     // TODO: seller won't be able to initiate any new offers to the same buyer.
@@ -91,6 +93,19 @@ public class EnrollmentService {
                 + " has offered you a new enrollment.";
         String linkSuffix = "interaction/user/" + savedEnrollment.getGig().getSeller().getId();
         notificationService.sendNotification(notificationTxt, savedEnrollment.getBuyer(), NotificationType.ENROLLMENT, linkSuffix);
+
+        // sending email to buyer
+        try {
+            emailService.sendEmail(savedEnrollment.getBuyer(),
+                    "New Enrollment Offer",
+                    "You have received a new enrollment offer from " + savedEnrollment.getGig().getSeller().getFullName() + ".\n" +
+                            "Please visit the website to view the offer and confirm it.\n\n" +
+                            "Best,\n" +
+                            "Team pathPhindr\n");
+        } catch (Exception e) {
+            throw new ValidationException("Email could not be sent. Please try again.");
+        }
+
         return savedEnrollment;
     }
 
