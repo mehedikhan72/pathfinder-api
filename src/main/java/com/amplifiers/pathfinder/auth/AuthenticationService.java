@@ -14,6 +14,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -23,17 +24,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
     private final UserRepository repository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
 
     public AuthenticationResponse register(RegisterRequest request) {
         if (request.getPassword().length() < 8) {
@@ -48,12 +47,12 @@ public class AuthenticationService {
         }
 
         var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .role(Role.USER)
+            .build();
         var savedUser = repository.save(user);
         var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -61,22 +60,25 @@ public class AuthenticationService {
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
         return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .id(savedUser.getId())
-                .firstName(savedUser.getFirstName())
-                .lastName(savedUser.getLastName())
-                .email(savedUser.getEmail())
-                .role(user.getRole())
-                .build();
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .id(savedUser.getId())
+            .firstName(savedUser.getFirstName())
+            .lastName(savedUser.getLastName())
+            .email(savedUser.getEmail())
+            .role(user.getRole())
+            .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         removeAllExpiredTokens();
-        if (request.getEmail() == null || request.getPassword() == null)
-            throw new AuthenticationException("Email and password are required.");
+        if (request.getEmail() == null || request.getPassword() == null) throw new AuthenticationException(
+            "Email and password are required."
+        );
 
-        var user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        var user = repository
+            .findByEmail(request.getEmail())
+            .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -93,23 +95,18 @@ public class AuthenticationService {
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .role(user.getRole())
+            .build();
     }
 
     private void saveUserToken(User user, String jwtToken, TokenType tokenType) {
-        var token = Token.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(tokenType)
-                .revoked(false)
-                .build();
+        var token = Token.builder().user(user).token(jwtToken).tokenType(tokenType).revoked(false).build();
 
         try {
             tokenRepository.save(token);
@@ -121,8 +118,7 @@ public class AuthenticationService {
 
     private void revokeAllUserAccessTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidAccessTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
-            return;
+        if (validUserTokens.isEmpty()) return;
         validUserTokens.forEach(token -> {
             token.setRevoked(true);
         });
@@ -131,8 +127,7 @@ public class AuthenticationService {
 
     private void removeAllExpiredTokens() {
         var tokens = tokenRepository.findAll();
-        if (tokens.isEmpty())
-            return;
+        if (tokens.isEmpty()) return;
         tokens.forEach(token -> {
             try {
                 if (jwtService.isTokenExpired(token.getToken())) {
@@ -145,22 +140,28 @@ public class AuthenticationService {
         });
     }
 
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-//        removeAllExpiredTokens();
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //        removeAllExpiredTokens();
         final String refreshToken = getCookieRefreshToken(request);
-        final String userEmail;
+        String userEmail = null;
 
         if (refreshToken == null) {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return;
         }
 
-        userEmail = jwtService.extractUsername(refreshToken);
+        try {
+            userEmail = jwtService.extractUsername(refreshToken);
+        } catch (Exception E) {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return;
+        }
+
         if (userEmail != null) {
-            var user = this.repository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+            var user =
+                this.repository.findByEmail(userEmail).orElseThrow(() ->
+                        new ResourceNotFoundException("No user found with this email. Please try again.")
+                    );
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
 
@@ -169,14 +170,14 @@ public class AuthenticationService {
 
                 saveUserToken(user, accessToken, TokenType.ACCESS);
                 var authResponse = AuthenticationResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .id(user.getId())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .build();
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .id(user.getId())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .email(user.getEmail())
+                    .role(user.getRole())
+                    .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }

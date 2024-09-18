@@ -34,15 +34,17 @@ public class OpenAIService {
         var futureChat = openAI.chatCompletions().create(chatRequest);
         var chatResponse = futureChat.join();
 
-        System.out.println(chatResponse.firstContent());
-
         return chatResponse.firstContent();
     }
 
     public String chat(String message) {
         var chatRequest = ChatRequest.builder()
             .model("llama3-8b-8192")
-            .message(ChatMessage.SystemMessage.of("You are a simple chat assistant for a website. You will give brief concise replies."))
+            .message(
+                ChatMessage.SystemMessage.of(
+                    "You are a simple chat assistant for a website. You will give brief concise replies. Generate a response within a maximum 300 tokens."
+                )
+            )
             .message(ChatMessage.UserMessage.of(message))
             .temperature(0.0)
             .maxTokens(300)
@@ -50,8 +52,6 @@ public class OpenAIService {
 
         var futureChat = openAI.chatCompletions().create(chatRequest);
         var chatResponse = futureChat.join();
-
-        System.out.println(chatResponse.firstContent());
 
         return chatResponse.firstContent();
     }
