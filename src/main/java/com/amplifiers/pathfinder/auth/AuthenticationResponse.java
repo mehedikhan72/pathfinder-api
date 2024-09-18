@@ -28,4 +28,6 @@ public class AuthenticationResponse {
   private String email;
   @JsonProperty("role")
   private Role role;
+  @JsonProperty
+  private boolean emailVerified;
 }

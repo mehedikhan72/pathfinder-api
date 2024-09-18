@@ -9,6 +9,8 @@ import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import com.amplifiers.pathfinder.exception.AuthenticationException;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.utility.EmailService;
+import com.amplifiers.pathfinder.utility.Variables.ClientSettings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
@@ -33,6 +35,89 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+
+    public AuthenticationResponse verifyEmail(String token) {
+        Optional<User> userOptional = repository.findByEmailVerificationToken(token);
+        if (userOptional.isEmpty()) {
+            return AuthenticationResponse.builder()
+                    .emailVerified(false)
+                    .build();
+        }
+
+        User user = userOptional.get();
+        user.setEmailVerified(true);
+        user.setEmailVerificationToken(null); // stops multiple requests after successful verification.
+        repository.save(user);
+
+        var accessToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+        revokeAllUserAccessTokens(user);
+        saveUserToken(user, accessToken, TokenType.ACCESS);
+        saveUserToken(user, refreshToken, TokenType.REFRESH);
+
+        // the email is likely verified atm, so welcoming user.
+        try {
+            emailService.sendEmail(
+                    user,
+                    "Welcome to pathPhindr",
+                    "Hi " + user.getFullName() + ",\n\n" +
+                            "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
+                            "Complete your profile and start exploring.\n\n" +
+                            "Best,\n" +
+                            "Team pathPhindr\n"
+            );
+        } catch (Exception e) {
+            System.out.println("Error sending email: " + e.getMessage());
+        }
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .emailVerified(true)
+                .build();
+    }
+
+    public boolean isEmailVerified(String email) {
+        User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        return user.isEmailVerified();
+    }
+
+    public String sendVerifyEmailRequest(String email) {
+        User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        // rate limiting - 1 email per 10 minutes.
+        if (user.getLastVerificationEmailSentAt() != null) {
+            if (user.getLastVerificationEmailSentAt().plusMinutes(10).isAfter(java.time.OffsetDateTime.now())) {
+                return "rate_limited";
+            }
+        }
+        String verificationToken = user.getEmailVerificationToken();
+
+        String clientLink = ClientSettings.clientBaseUrl + "verify-email?token=" + verificationToken;
+
+        try {
+            emailService.sendEmail(user,
+                    "Email Verification",
+                    "Hi " + user.getFullName() + ",\n\n" +
+                            "Please click the link below to verify your email address.\n" +
+                            clientLink + "\n\n" +
+                            "Best,\n" +
+                            "Team pathPhindr\n"
+            );
+            user.setLastVerificationEmailSentAt(java.time.OffsetDateTime.now());
+            repository.save(user);
+        } catch (Exception e) {
+            System.out.println("Error sending email: " + e.getMessage());
+            return "error_sending_email";
+        }
+        return "email_sent";
+    }
+
 
     public AuthenticationResponse register(RegisterRequest request) {
         if (request.getPassword().length() < 8) {
@@ -42,32 +127,29 @@ public class AuthenticationService {
         // check if user with email already exists
         var existing_user = repository.findByEmail(request.getEmail());
 
-        if (!existing_user.isEmpty()) {
+        if (existing_user.isPresent()) {
             throw new AuthenticationException("User with this email already exists. Try another one.");
         }
 
         var user = User.builder()
-            .firstName(request.getFirstName())
-            .lastName(request.getLastName())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(Role.USER)
-            .build();
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .emailVerificationToken(UUID.randomUUID().toString())
+                .build();
         var savedUser = repository.save(user);
         var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
 
         saveUserToken(user, accessToken, TokenType.ACCESS);
         saveUserToken(user, refreshToken, TokenType.REFRESH);
+
+        // verification prompt.
         return AuthenticationResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .id(savedUser.getId())
-            .firstName(savedUser.getFirstName())
-            .lastName(savedUser.getLastName())
-            .email(savedUser.getEmail())
-            .role(user.getRole())
-            .build();
+                .email(savedUser.getEmail())
+                .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -88,6 +170,13 @@ public class AuthenticationService {
             throw new AuthenticationException("Authentication failed. Please try again.");
         }
 
+        if (!user.isEmailVerified()) {
+            return AuthenticationResponse.builder()
+                    .email(user.getEmail())
+                    .emailVerified(false)
+                    .build();
+        }
+
         var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserAccessTokens(user);
@@ -95,14 +184,15 @@ public class AuthenticationService {
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthenticationResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .id(user.getId())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .email(user.getEmail())
-            .role(user.getRole())
-            .build();
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .emailVerified(true)
+                .build();
     }
 
     private void saveUserToken(User user, String jwtToken, TokenType tokenType) {

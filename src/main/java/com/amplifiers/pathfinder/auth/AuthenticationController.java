@@ -41,9 +41,9 @@ public class AuthenticationController {
             @RequestBody RegisterRequest request,
             HttpServletResponse response
     ) {
-        AuthenticationResponse authenticationResponse = service.register(request);
-        attachRefreshTokenCookie(authenticationResponse, response);
-        return ResponseEntity.ok(authenticationResponse);
+        AuthenticationResponse message = service.register(request);
+        // attachRefreshTokenCookie(authenticationResponse, response);
+        return ResponseEntity.ok(message);
     }
 
     @PostMapping("/authenticate")
@@ -62,5 +62,29 @@ public class AuthenticationController {
             HttpServletResponse response
     ) throws IOException {
         service.refreshToken(request, response);
+    }
+
+    @PostMapping("/send-verify-email-request/{email}")
+    public ResponseEntity<String> sendVerifyEmailRequest(
+            @PathVariable String email
+    ) {
+        String message = service.sendVerifyEmailRequest(email);
+        return ResponseEntity.ok(message);
+    }
+
+    @PutMapping("/verify-email/{token}")
+    public ResponseEntity<AuthenticationResponse> verifyEmail(
+            @PathVariable String token
+    ) {
+        AuthenticationResponse message = service.verifyEmail(token);
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/is-email-verified/{email}")
+    public ResponseEntity<Boolean> isEmailVerified(
+            @PathVariable String email
+    ) {
+        boolean isEmailVerified = service.isEmailVerified(email);
+        return ResponseEntity.ok(isEmailVerified);
     }
 }

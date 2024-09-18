@@ -9,8 +9,10 @@ import com.amplifiers.pathfinder.entity.notification.NotificationType;
 import com.amplifiers.pathfinder.entity.transaction.Transaction;
 import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
+import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.sslcommerz.SSLCommerz;
 import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
+import com.amplifiers.pathfinder.utility.EmailService;
 import com.amplifiers.pathfinder.utility.Variables;
 import com.amplifiers.pathfinder.utility.Variables.ApiSettings;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class PaymentService {
     private final NotificationService notificationService;
     private final EnrollmentRepository enrollmentRepository;
     private final GigRepository gigRepository;
+    private final EmailService emailService;
 
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
@@ -128,6 +131,31 @@ public class PaymentService {
                     + " has accepted your enrollment offer.";
             String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
             notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
+
+            // updating seller n buyer thru email.
+            try {
+                emailService.sendEmail(enrollment.getBuyer(),
+                        "Enrollment Confirmed",
+                        "You have successfully confirmed the enrollment for the gig " + enrollment.getGig().getTitle() + ".\n" +
+                                "Amount paid - " + enrollment.getPrice() + ".\n" +
+                                "Transaction id - " + tranxId + ".\n\n" +
+                                "Best,\n" +
+                                "Team pathPhindr\n");
+            } catch (Exception e) {
+                throw new ValidationException("Email could not be sent. Please try again.");
+            }
+
+            try {
+                emailService.sendEmail(enrollment.getGig().getSeller(),
+                        "New Confirmed Enrollment",
+                        "You have a new enrollment confirmed for the gig " + enrollment.getGig().getTitle() + ".\n" +
+                                "Amount received - " + enrollment.getPrice() + ".\n" +
+                                "Transaction id - " + tranxId + ".\n\n" +
+                                "Best,\n" +
+                                "Team pathPhindr\n");
+            } catch (Exception e) {
+                throw new ValidationException("Email could not be sent. Please try again.");
+            }
 
             return true;
         } else {
