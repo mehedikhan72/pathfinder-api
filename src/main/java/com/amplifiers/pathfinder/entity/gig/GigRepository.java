@@ -65,4 +65,6 @@ public interface GigRepository extends JpaRepository<Gig, Integer>, JpaSpecifica
             };
         }
     }
+
+    Page<Gig> findByAccepted(boolean accepted, Pageable pageable);
 }
