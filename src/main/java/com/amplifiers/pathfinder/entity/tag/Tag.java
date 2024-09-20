@@ -43,13 +43,13 @@ public class Tag {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
 
-        if (!(o instanceof Tag))
+        if (!(o instanceof Tag other)) {
             return false;
-
-        Tag other = (Tag) o;
+        }
 
         return name.equals(other.getName());
     }
@@ -58,5 +58,4 @@ public class Tag {
     public int hashCode() {
         return Objects.hashCode(name);
     }
-
 }

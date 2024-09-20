@@ -25,8 +25,11 @@ public class ReviewService {
     private final EnrollmentRepository enrollmentRepository;
     private final UserUtility userUtility;
 
+    private final Integer minReview = 0;
+    private final Integer maxReview = 5;
+
     private void validateReviewRequest(ReviewRequest reviewRequest) {
-        if (reviewRequest.getRating() < 0 || reviewRequest.getRating() > 5) {
+        if (reviewRequest.getRating() < minReview || reviewRequest.getRating() > maxReview) {
             throw new ValidationException("Rating must be between 0 and 5");
         }
     }
@@ -102,12 +105,15 @@ public class ReviewService {
 
         Review review = repository.getReferenceById(reviewId);
 
-        if (reviewRequest.getTitle() != null)
+        if (reviewRequest.getTitle() != null) {
             review.setTitle(reviewRequest.getTitle());
-        if (reviewRequest.getText() != null)
+        }
+        if (reviewRequest.getText() != null) {
             review.setText(reviewRequest.getText());
-        if (reviewRequest.getRating() != null)
+        }
+        if (reviewRequest.getRating() != null) {
             review.setRating(reviewRequest.getRating());
+        }
 
         return repository.save(review);
     }
@@ -137,6 +143,7 @@ public class ReviewService {
     public static ReviewCardDTO createReviewCardDTO(Review review) {
         return createReviewCardDTO(review, true);
     }
+
     public Page<ReviewCardDTO> getReviewCardsBySellerId(Pageable pageable, Integer sellerId) {
         Page<Review> reviews = repository.findAllReviewsBySellerId(pageable, sellerId);
 

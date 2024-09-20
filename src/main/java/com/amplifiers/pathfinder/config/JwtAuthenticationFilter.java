@@ -25,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
   private final TokenRepository tokenRepository;
+  private final Integer tokenBeginsAtIndex = 7;
 
   @Override
   protected void doFilterInternal(
@@ -40,11 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String authHeader = request.getHeader("Authorization");
     final String jwt;
     final String userEmail;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);
       return;
     }
-    jwt = authHeader.substring(7);
+    jwt = authHeader.substring(tokenBeginsAtIndex);
     userEmail = jwtService.extractUsername(jwt);
     if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);

@@ -211,10 +211,9 @@
                     <failOnViolation>true</failOnViolation>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <logViolationsToConsole>true</logViolationsToConsole>
-                    <format>html</format>
-                    <excludes>
-                        com/omernaci/checkstyleexample/CheckstyleExampleApplication.java
-                    </excludes>
+                    <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
+                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
+                    <excludes>**/target/**, com/amplifiers/pathfinder/sslcommerz/**, com/amplifiers/pathfinder/entity/student_assessment/StudentAssessmentRepository.java</excludes>
                 </configuration>
                 <dependencies>
                     <dependency>

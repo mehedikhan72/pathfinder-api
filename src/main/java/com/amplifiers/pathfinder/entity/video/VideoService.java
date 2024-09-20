@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VideoService {
     private final VideoRepository repository;
-    private final Integer MAX_FILE_SIZE = 100 * 1024 * 1024;
+    private final Integer maxFileSize = 100 * 1024 * 1024;
     private final List<String> allowedExts = Arrays.asList("mp4", "webm");
 
     public Video saveVideo(MultipartFile file) throws IOException {
@@ -27,7 +27,7 @@ public class VideoService {
             throw new ValidationException("Invalid video file. Please upload .mp4 or .webm file.");
         }
 
-        if (file.getBytes().length > MAX_FILE_SIZE) {
+        if (file.getBytes().length > maxFileSize) {
             throw new ValidationException("Video file size can be max 100MB.");
         }
 
@@ -53,15 +53,15 @@ public class VideoService {
 
         PresignedUrlInfo presignedUrlInfo = CloudStorageService.createPresignedGetUrl(video.getFilename());
 
-        video.setPresignedUrl(presignedUrlInfo.presignedUrl.toExternalForm());
-        video.setPresignedUrlExpire(presignedUrlInfo.expires);
+        video.setPresignedUrl(presignedUrlInfo.getPresignedUrl().toExternalForm());
+        video.setPresignedUrlExpire(presignedUrlInfo.getExpires());
 
         System.out.println("Generated new presigned url for video : " + video.getFilename());
-        System.out.println(presignedUrlInfo.presignedUrl);
+        System.out.println(presignedUrlInfo.getPresignedUrl());
 
         repository.save(video);
     }
-    public void deleteVideo(Integer id){
+    public void deleteVideo(Integer id) {
         Video video = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Video with id " + id + " doesn't exist"));
 

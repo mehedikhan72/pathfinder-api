@@ -40,6 +40,8 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final Integer cannotSendEmailAgainWithinMinutes = 10;
+    private final Integer minimumPasswordLength = 8;
 
     public AuthenticationResponse verifyEmail(String token) {
         Optional<User> userOptional = repository.findByEmailVerificationToken(token);
@@ -65,11 +67,11 @@ public class AuthenticationService {
             emailService.sendEmail(
                     user,
                     "Welcome to pathPhindr",
-                    "Hi " + user.getFullName() + ",\n\n" +
-                            "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
-                            "Complete your profile and start exploring.\n\n" +
-                            "Best,\n" +
-                            "Team pathPhindr\n"
+                    "Hi " + user.getFullName() + ",\n\n"
+                            + "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n"
+                            + "Complete your profile and start exploring.\n\n"
+                            + "Best,\n"
+                            + "Team pathPhindr\n"
             );
         } catch (Exception e) {
             System.out.println("Error sending email: " + e.getMessage());
@@ -96,22 +98,22 @@ public class AuthenticationService {
         User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
         // rate limiting - 1 email per 10 minutes.
         if (user.getLastVerificationEmailSentAt() != null) {
-            if (user.getLastVerificationEmailSentAt().plusMinutes(10).isAfter(java.time.OffsetDateTime.now())) {
+            if (user.getLastVerificationEmailSentAt().plusMinutes(cannotSendEmailAgainWithinMinutes).isAfter(java.time.OffsetDateTime.now())) {
                 return "rate_limited";
             }
         }
         String verificationToken = user.getEmailVerificationToken();
 
-        String clientLink = ClientSettings.clientBaseUrl + "verify-email?token=" + verificationToken;
+        String clientLink = ClientSettings.CLIENT_BASE_URL + "verify-email?token=" + verificationToken;
 
         try {
             emailService.sendEmail(user,
                     "Email Verification",
-                    "Hi " + user.getFullName() + ",\n\n" +
-                            "Please click the link below to verify your email address.\n" +
-                            clientLink + "\n\n" +
-                            "Best,\n" +
-                            "Team pathPhindr\n"
+                    "Hi " + user.getFullName() + ",\n\n"
+                            + "Please click the link below to verify your email address.\n"
+                            + clientLink + "\n\n"
+                            + "Best,\n"
+                            + "Team pathPhindr\n"
             );
             user.setLastVerificationEmailSentAt(java.time.OffsetDateTime.now());
             repository.save(user);
@@ -124,14 +126,14 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) {
-        if (request.getPassword().length() < 8) {
-            throw new AuthenticationException("Password must be at least 8 characters long.");
+        if (request.getPassword().length() < minimumPasswordLength) {
+            throw new AuthenticationException("Password must be at least " + minimumPasswordLength + " characters long.");
         }
 
         // check if user with email already exists
-        var existing_user = repository.findByEmail(request.getEmail());
+        var existingUser = repository.findByEmail(request.getEmail());
 
-        if (existing_user.isPresent()) {
+        if (existingUser.isPresent()) {
             throw new AuthenticationException("User with this email already exists. Try another one.");
         }
 
@@ -158,10 +160,12 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         removeAllExpiredTokens();
-        if (request.getEmail() == null || request.getPassword() == null)
+        if (request.getEmail() == null || request.getPassword() == null) {
             throw new AuthenticationException("Email and password are required.");
+        }
 
-        var user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        var user = repository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -214,8 +218,9 @@ public class AuthenticationService {
 
     private void revokeAllUserAccessTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidAccessTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
+        if (validUserTokens.isEmpty()) {
             return;
+        }
         validUserTokens.forEach(token -> {
             token.setRevoked(true);
         });
@@ -224,8 +229,9 @@ public class AuthenticationService {
 
     private void removeAllExpiredTokens() {
         var tokens = tokenRepository.findAll();
-        if (tokens.isEmpty())
+        if (tokens.isEmpty()) {
             return;
+        }
         tokens.forEach(token -> {
             try {
                 if (jwtService.isTokenExpired(token.getToken())) {
@@ -253,7 +259,8 @@ public class AuthenticationService {
 
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = this.repository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+            var user = this.repository.findByEmail(userEmail)
+                    .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
 

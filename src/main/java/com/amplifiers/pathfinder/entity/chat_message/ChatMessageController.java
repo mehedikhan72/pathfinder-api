@@ -22,7 +22,7 @@ public class ChatMessageController {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
     private final UserRepository userRepository;
-    Integer numMessagesPerPage = Variables.PaginationSettings.NUM_MESSAGES_PER_PAGE;
+    private final Integer numMessagesPerPage = Variables.PaginationSettings.NUM_MESSAGES_PER_PAGE;
 
     @MessageMapping("/chat")
     public void processMessage(

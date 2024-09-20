@@ -4,12 +4,15 @@ import com.amplifiers.pathfinder.entity.user.User;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
-    String apiKey = "2c9117ed3960408e855767a23c6e3563-2b755df8-02d6f02b";
-    String domain = "mg.pathphindr.com";
+
+    private final Dotenv dotenv = Dotenv.configure().load();
+    private final String apiKey = dotenv.get("MAILGUN_API_KEY");
+    private final String domain = dotenv.get("MAILGUN_DOMAIN");
 
     public void sendEmail(User user, String subject, String message) throws UnirestException {
 

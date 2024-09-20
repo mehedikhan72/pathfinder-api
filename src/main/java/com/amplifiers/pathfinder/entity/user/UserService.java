@@ -15,11 +15,6 @@ import com.amplifiers.pathfinder.entity.tag.TagCreateRequest;
 import com.amplifiers.pathfinder.entity.tag.TagService;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +23,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,29 +92,33 @@ public class UserService {
 
         if (request.getEducations() != null) {
             request
-                .getEducations()
-                .forEach(e -> {
-                    if (e.title.isBlank()) throw new ValidationException("Education field cannot be blank");
-                });
+                    .getEducations()
+                    .forEach(e -> {
+                        if (e.getTitle().isBlank()) {
+                            throw new ValidationException("Education field cannot be blank");
+                        }
+                    });
             user.setEducations(request.getEducations());
         }
 
         if (request.getQualifications() != null) {
             request
-                .getQualifications()
-                .forEach(e -> {
-                    if (e.title.isBlank()) throw new ValidationException("Qualification field cannot be blank");
-                });
+                    .getQualifications()
+                    .forEach(e -> {
+                        if (e.getTitle().isBlank()) {
+                            throw new ValidationException("Qualification field cannot be blank");
+                        }
+                    });
             user.setQualifications(request.getQualifications());
         }
 
         if (request.getInterests() != null) {
             request
-                .getInterests()
-                .forEach(name -> {
-                    System.out.println(tagService.findByName(name));
-                    tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name)));
-                });
+                    .getInterests()
+                    .forEach(name -> {
+                        System.out.println(tagService.findByName(name));
+                        tagService.findByName(name).orElseGet(() -> tagService.createTag(new TagCreateRequest(name)));
+                    });
 
             Set<Tag> tags = request.getInterests().stream().map(name -> tagService.findByName(name).get()).collect(Collectors.toSet());
 
@@ -156,12 +161,12 @@ public class UserService {
         Set<String> interests = user.getTags().stream().map(Tag::getName).collect(Collectors.toSet());
 
         Set<String> teachTags = gigService
-            .getGigsBySeller(user)
-            .stream()
-            .map(Gig::getTags)
-            .flatMap(Set::stream)
-            .map(Tag::getName)
-            .collect(Collectors.toSet());
+                .getGigsBySeller(user)
+                .stream()
+                .map(Gig::getTags)
+                .flatMap(Set::stream)
+                .map(Tag::getName)
+                .collect(Collectors.toSet());
 
         List<Float> ratingList = reviewRepository.findAllRatingsBySellerId(id);
         Float rating = (ratingList.size() > 0) ? ((ratingList.stream().reduce((float) 0, Float::sum)) / ratingList.size()) : null;
@@ -173,23 +178,23 @@ public class UserService {
         Integer totalCompletedEnrollments = enrollmentRepository.countCompletedBySellerId(id);
 
         return UserProfileDTO.builder()
-            .id(user.getId())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .email(user.getEmail())
-            .username(user.getUsername())
-            .role(user.getRole())
-            .age(user.getAge())
-            .description(user.getDescription())
-            .teachTags(teachTags)
-            .interests(interests)
-            .rating(rating)
-            .ratedByCount(ratedByCount)
-            .totalStudents(totalStudents)
-            .totalCompletedEnrollments(totalCompletedEnrollments)
-            .educations(user.getEducations())
-            .qualifications(user.getQualifications())
-            .build();
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .role(user.getRole())
+                .age(user.getAge())
+                .description(user.getDescription())
+                .teachTags(teachTags)
+                .interests(interests)
+                .rating(rating)
+                .ratedByCount(ratedByCount)
+                .totalStudents(totalStudents)
+                .totalCompletedEnrollments(totalCompletedEnrollments)
+                .educations(user.getEducations())
+                .qualifications(user.getQualifications())
+                .build();
     }
 
     public byte[] getProfileImageDataByUserId(Integer id) {

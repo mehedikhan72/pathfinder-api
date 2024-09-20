@@ -13,11 +13,11 @@ public class RecommendationController {
     @PostMapping("/add-purchase-view")
     @ResponseStatus(HttpStatus.OK)
     public void addPurchaseView(
-            @PathVariable Integer GigId,
-            @PathVariable Integer UserId,
+            @PathVariable Integer gigId,
+            @PathVariable Integer userId,
             @RequestParam String recommId
     ) {
-        recommendationService.addPurchaseView(GigId, UserId, recommId);
+        recommendationService.addPurchaseView(gigId, userId, recommId);
     }
 
 }

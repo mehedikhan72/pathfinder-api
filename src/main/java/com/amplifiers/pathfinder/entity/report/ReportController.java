@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
-    int numReportsPerPage = PaginationSettings.NUM_REPORTS_PER_PAGE;
+    private final Integer numReportsPerPage = PaginationSettings.NUM_REPORTS_PER_PAGE;
 
     @GetMapping("/unresolved/all")
     public ResponseEntity<?> findAllUnresolvedReports(

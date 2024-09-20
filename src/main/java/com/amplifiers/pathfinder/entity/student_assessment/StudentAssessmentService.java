@@ -27,7 +27,11 @@ public class StudentAssessmentService {
             throw new UnauthorizedException("Only the seller can create a student assessment");
         }
 
-        var studentAssessment = StudentAssessment.builder().session(session).understandingRating(request.getUnderstandingRating()).responseRating(request.getResponseRating()).feedback(request.getFeedback()).build();
+        var studentAssessment = StudentAssessment.builder()
+                .session(session)
+                .understandingRating(request.getUnderstandingRating())
+                .responseRating(request.getResponseRating())
+                .feedback(request.getFeedback()).build();
 
         return studentAssessmentRepository.save(studentAssessment);
     }

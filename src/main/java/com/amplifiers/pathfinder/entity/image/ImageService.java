@@ -25,8 +25,12 @@ import java.util.UUID;
 public class ImageService {
     private final ImageRepository repository;
 
-    private final Integer MAX_FILE_SIZE = 500 * 1024;
+    private final Integer maxFileSize = 500 * 1024;
     private final List<String> allowedExts = Arrays.asList("jpg", "jpeg", "gif", "png", "bmp", "wbmp");
+    private final Integer compressionDimension1 = 2000;
+    private final Integer compressionDimension2 = 2000;
+    private final Integer countInitializer = 1;
+    private final float qualityReductionFactor = 0.1f;
 
     public byte[] compressImage(MultipartFile file) throws IOException {
         BufferedImage pngImg = ImageIO.read(file.getInputStream());
@@ -39,7 +43,7 @@ public class ImageService {
         // Resizing
         // System.out.println("Original Size : " + file.getBytes().length);
         BufferedImage compressedImage = Thumbnails.of(img)
-                .size(2000, 2000)
+                .size(compressionDimension1, compressionDimension2)
                 .keepAspectRatio(true)
                 .asBufferedImage();
 
@@ -49,12 +53,12 @@ public class ImageService {
         // System.out.println("Size after resizing : " + finalImageData.length);
 
         // Pass to reduce size
-        int count = 1;
-        while (finalImageData.length > MAX_FILE_SIZE) {
+        int count = countInitializer;
+        while (finalImageData.length > maxFileSize) {
             compressedImage = Thumbnails.of(compressedImage)
-                    .size(2000, 2000)
+                    .size(compressionDimension1, compressionDimension2)
                     .keepAspectRatio(true)
-                    .outputQuality(1 - .1 * count)
+                    .outputQuality(1 - qualityReductionFactor * count)
                     .asBufferedImage();
             ImageIO.write(compressedImage, "jpg", finalImageBAOS);
 

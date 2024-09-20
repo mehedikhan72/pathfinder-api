@@ -27,19 +27,19 @@ public class Token {
 
   @Id
   @GeneratedValue
-  public Integer id;
+  private Integer id;
 
   @Column(unique = true)
-  public String token;
+  private String token;
 
   @Enumerated(EnumType.STRING)
-  public TokenType tokenType;
+  private TokenType tokenType;
 
-  public boolean revoked;
+  private boolean revoked;
 
   @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "userId")
-  public User user;
+  private User user;
 }

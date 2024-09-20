@@ -59,7 +59,8 @@ public class SessionService {
 
         Session savedSession = sessionRepository.save(session);
         // Send notification
-        String notificationTxt = session.getEnrollment().getGig().getSeller().getFullName() + " has scheduled a session for you. It's waiting for your confirmation.";
+        String notificationTxt = session.getEnrollment().getGig().getSeller().getFullName()
+                + " has scheduled a session for you. It's waiting for your confirmation.";
         String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
         notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
 
@@ -110,7 +111,7 @@ public class SessionService {
     public Session updateSession(SessionCreateRequest request, Integer sessionId) {
         Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found."));
 
-        // TODO: for now, let's allow only the seller to update the session
+        // for now, let's allow only the seller to update the session
 
         var seller = session.getEnrollment().getGig().getSeller();
         var user = userUtility.getCurrentUser();
@@ -209,17 +210,17 @@ public class SessionService {
         return Objects.equals(enrollment.getBuyer().getId(), userId) || Objects.equals(enrollment.getGig().getSeller().getId(), userId);
     }
 
-    public Optional<Session> findRunningSessionByEnrollmentId(Integer EnrollmentId) {
+    public Optional<Session> findRunningSessionByEnrollmentId(Integer enrollmentId) {
         User user = userUtility.getCurrentUser();
-        if(userPartOfEnrollment(user.getId(), EnrollmentId)) {
-            return sessionRepository.findRunningSessionByEnrollmentId(EnrollmentId);
+        if (userPartOfEnrollment(user.getId(), enrollmentId)) {
+            return sessionRepository.findRunningSessionByEnrollmentId(enrollmentId);
         }
         throw new UnauthorizedException("You are not part of this enrollment.");
     }
 
     public List<Session> findAllByEnrollmentId(Integer enrollmentId) {
         User user = userUtility.getCurrentUser();
-        if(userPartOfEnrollment(user.getId(), enrollmentId)) {
+        if (userPartOfEnrollment(user.getId(), enrollmentId)) {
             return sessionRepository.findAllByEnrollmentId(enrollmentId);
         }
         throw new UnauthorizedException("You are not part of this enrollment.");

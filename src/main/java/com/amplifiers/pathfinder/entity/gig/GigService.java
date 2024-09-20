@@ -19,9 +19,6 @@ import com.amplifiers.pathfinder.utility.Category;
 import com.amplifiers.pathfinder.utility.UserUtility;
 import com.amplifiers.pathfinder.utility.Variables.PaginationSettings;
 import com.recombee.api_client.bindings.RecommendationResponse;
-import java.time.OffsetDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +26,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,13 +48,16 @@ public class GigService {
     private final JdbcTemplate jdbcTemplate;
     private final RecommendationService recommendationService;
 
+    private final Integer minimumTagsRequired = 3;
+    private final Integer minimumFaqsRequired = 1;
+
     public void gigCreateRequestValidation(GigCreateRequest request) {
-        if (request.getTags().size() < 3) {
-            throw new ValidationException("At least three tags required.");
+        if (request.getTags().size() < minimumTagsRequired) {
+            throw new ValidationException("At least " + minimumTagsRequired + " tags required.");
         }
 
-        if (request.getFaqs().size() < 3) {
-            throw new ValidationException("At least three faqs required.");
+        if (request.getFaqs().size() < minimumFaqsRequired) {
+            throw new ValidationException("At least " + minimumFaqsRequired + " faqs required.");
         }
     }
 
@@ -67,20 +71,20 @@ public class GigService {
         Set<Tag> tags = request.getTags().stream().map(name -> tagService.findByName(name).get()).collect(Collectors.toSet());
 
         var gig = Gig.builder()
-            .title(request.getTitle())
-            .description(request.getDescription())
-            .price(request.getPrice())
-            .offerText(request.getOfferText())
-            .category(request.getCategory())
-            .rating(0.0f)
-            .seller(user)
-            .tags(tags)
-            .faqs(request.getFaqs())
-            .createdAt(OffsetDateTime.now())
-            .score(0)
-            .accepted(false)
-            .paused(false)
-            .build();
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .offerText(request.getOfferText())
+                .category(request.getCategory())
+                .rating(0.0f)
+                .seller(user)
+                .tags(tags)
+                .faqs(request.getFaqs())
+                .createdAt(OffsetDateTime.now())
+                .score(0)
+                .accepted(false)
+                .paused(false)
+                .build();
 
         Gig savedGig = repository.save(gig);
         recommendationService.sendGigValues(gig);
@@ -108,9 +112,9 @@ public class GigService {
 
         if (video != null) {
             if (
-                video.getPresignedUrl() == null ||
-                video.getPresignedUrlExpire() == null ||
-                OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())
+                    video.getPresignedUrl() == null
+                            || video.getPresignedUrlExpire() == null
+                            || OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())
             ) {
                 videoService.createVideoPresignedUrl(video);
             }
@@ -133,9 +137,9 @@ public class GigService {
 
         if (video != null) {
             if (
-                video.getPresignedUrl() == null ||
-                video.getPresignedUrlExpire() == null ||
-                OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())
+                    video.getPresignedUrl() == null
+                            || video.getPresignedUrlExpire() == null
+                            || OffsetDateTime.now().isAfter(video.getPresignedUrlExpire())
             ) {
                 videoService.createVideoPresignedUrl(video);
             }
@@ -250,38 +254,38 @@ public class GigService {
         float rating = ratingList.size() > 0 ? (ratingList.stream().reduce((float) 0, Float::sum)) / ratingList.size() : 0;
 
         return GigPageDTO.builder()
-            .id(gig.getId())
-            .title(gig.getTitle())
-            .category(gig.getCategory())
-            .description(gig.getDescription())
-            .offerText(gig.getOfferText())
-            .price(gig.getPrice())
-            .gigCoverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
-            .gigVideo(gig.getGigVideo() != null ? gig.getGigVideo().getPresignedUrl() : null)
-            .tags(gig.getTags().stream().map(Tag::getName).toList())
-            .faqs(gig.getFaqs())
-            .rating(rating)
-            .totalReviews(ratingList.size())
-            .totalCompleted(enrollmentRepository.countByGigAndCompletedAtNotNull(gig))
-            .totalOrders(enrollmentRepository.countByGig(gig))
-            .accepted(gig.isAccepted())
-            .seller(
-                UserShortDTO.builder()
-                    .id(gig.getSeller().getId())
-                    .firstName(gig.getSeller().getFirstName())
-                    .lastName(gig.getSeller().getLastName())
-                    .build()
-            )
-            .createdAt(gig.getCreatedAt())
-            .build();
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .category(gig.getCategory())
+                .description(gig.getDescription())
+                .offerText(gig.getOfferText())
+                .price(gig.getPrice())
+                .gigCoverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .gigVideo(gig.getGigVideo() != null ? gig.getGigVideo().getPresignedUrl() : null)
+                .tags(gig.getTags().stream().map(Tag::getName).toList())
+                .faqs(gig.getFaqs())
+                .rating(rating)
+                .totalReviews(ratingList.size())
+                .totalCompleted(enrollmentRepository.countByGigAndCompletedAtNotNull(gig))
+                .totalOrders(enrollmentRepository.countByGig(gig))
+                .accepted(gig.isAccepted())
+                .seller(
+                        UserShortDTO.builder()
+                                .id(gig.getSeller().getId())
+                                .firstName(gig.getSeller().getFirstName())
+                                .lastName(gig.getSeller().getLastName())
+                                .build()
+                )
+                .createdAt(gig.getCreatedAt())
+                .build();
     }
 
     public static GigShortDTO createGigShortDTO(Gig gig) {
         return GigShortDTO.builder()
-            .id(gig.getId())
-            .title(gig.getTitle())
-            .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
-            .build();
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .build();
     }
 
     public GigCardDTO createGigCardDTO(Gig gig, boolean includeUser) {
@@ -292,20 +296,20 @@ public class GigService {
         int ratedByCount = ratingList.size();
 
         var gigCardDTOBuilder = GigCardDTO.builder()
-            .id(gig.getId())
-            .title(gig.getTitle())
-            .price(gig.getPrice())
-            .rating(rating)
-            .ratedByCount(ratedByCount)
-            .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
-            .tags(gig.getTags().stream().map(Tag::getName).collect(Collectors.toSet()));
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .price(gig.getPrice())
+                .rating(rating)
+                .ratedByCount(ratedByCount)
+                .coverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .tags(gig.getTags().stream().map(Tag::getName).collect(Collectors.toSet()));
 
         if (includeUser) {
             UserShortDTO userShortDTO = UserShortDTO.builder()
-                .id(gig.getSeller().getId())
-                .firstName(gig.getSeller().getFirstName())
-                .lastName(gig.getSeller().getLastName())
-                .build();
+                    .id(gig.getSeller().getId())
+                    .firstName(gig.getSeller().getFirstName())
+                    .lastName(gig.getSeller().getLastName())
+                    .build();
 
             gigCardDTOBuilder = gigCardDTOBuilder.user(userShortDTO);
         }
@@ -328,17 +332,17 @@ public class GigService {
         Integer total = enrollmentRepository.countByGig(gig);
 
         var gigManageDTOBuilder = GigManageDTO.builder()
-            .id(gig.getId())
-            .title(gig.getTitle())
-            .gigCoverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
-            .price(gig.getPrice())
-            .accepted(gig.isAccepted())
-            .paused(gig.isPaused())
-            .score(gig.getScore())
-            .ongoing(total - completed)
-            .completed(completed)
-            .earning(enrollmentRepository.findEarningByGig(gig).orElse((float) 0))
-            .rating(gig.getRating() != null ? gig.getRating() : 0);
+                .id(gig.getId())
+                .title(gig.getTitle())
+                .gigCoverImage(gig.getGigCoverImage() != null ? gig.getGigCoverImage().getFilename() : null)
+                .price(gig.getPrice())
+                .accepted(gig.isAccepted())
+                .paused(gig.isPaused())
+                .score(gig.getScore())
+                .ongoing(total - completed)
+                .completed(completed)
+                .earning(enrollmentRepository.findEarningByGig(gig).orElse((float) 0))
+                .rating(gig.getRating() != null ? gig.getRating() : 0);
 
         return gigManageDTOBuilder.build();
     }
@@ -355,9 +359,9 @@ public class GigService {
     public Object getRecommendationsForUser(String scenario) {
         User user = userUtility.getCurrentUser();
         RecommendationResponse recommended = recommendationService.getRecommendationsForUser(
-            user.getId(),
-            PaginationSettings.NUM_RECOMMENDED_GIGS,
-            scenario
+                user.getId(),
+                PaginationSettings.NUM_RECOMMENDED_GIGS,
+                scenario
         );
 
         return getReturnDataForRecommendation(recommended);
@@ -367,9 +371,9 @@ public class GigService {
         // for globally popular gigs.
         // -1 means no user. handled in recommendation service.
         RecommendationResponse recommended = recommendationService.getRecommendationsForUser(
-            -1,
-            PaginationSettings.NUM_RECOMMENDED_GIGS,
-            scenario
+                -1,
+                PaginationSettings.NUM_RECOMMENDED_GIGS,
+                scenario
         );
 
         return getReturnDataForRecommendation(recommended);
@@ -378,10 +382,10 @@ public class GigService {
     public Object getRecommendationsForItem(Integer gigId, String scenario) {
         User user = userUtility.getCurrentUser();
         RecommendationResponse recommended = recommendationService.getRecommendationsForItem(
-            gigId,
-            user.getId(),
-            PaginationSettings.NUM_RECOMMENDED_GIGS,
-            scenario
+                gigId,
+                user.getId(),
+                PaginationSettings.NUM_RECOMMENDED_GIGS,
+                scenario
         );
 
         return getReturnDataForRecommendation(recommended);
@@ -389,8 +393,8 @@ public class GigService {
 
     public Object getNextRecommendationsForUser(String recommId) {
         RecommendationResponse recommended = recommendationService.getNextRecommendationsForUser(
-            recommId,
-            PaginationSettings.NUM_RECOMMENDED_GIGS
+                recommId,
+                PaginationSettings.NUM_RECOMMENDED_GIGS
         );
         return getReturnDataForRecommendation(recommended);
     }
@@ -427,17 +431,17 @@ public class GigService {
     // the title/description/category/tag contain the search term.
 
     // we will get the results based on scores of the gigs with the touch of a bit of randomness so people can
-    // explore unpopular gigs often. i.e. 20% randomness. // TODO: improve this fetching algorithm.
+    // explore unpopular gigs often. i.e. 20% randomness. // improve this fetching algorithm.
 
-    // TODO: implement a scoring algorithm.
-    // TODO: update all gig fetch functions to incorporate scoring.
+    // implement a scoring algorithm.
+    // update all gig fetch functions to incorporate scoring.
 
     //    public List<Gig> getSimilarGigs() {
-    //        // TODO
+    //
     //    }
 
     //    public List getCategoryAndTagsForKeyword() {
-    //        // TODO: return whether it's a category or tag. so we can call the corresponding function.
+    //        // return whether it's a category or tag. so we can call the corresponding function.
     //        // ie. findByCategory() or findByQuery().
     //    }
 
@@ -446,12 +450,12 @@ public class GigService {
     }
 
     public Page<GigCardDTO> findByQuery(
-        Pageable pageable,
-        String query,
-        Float ratingAbove,
-        Float budget,
-        Category category,
-        List<String> tagStrings
+            Pageable pageable,
+            String query,
+            Float ratingAbove,
+            Float budget,
+            Category category,
+            List<String> tagStrings
     ) {
         Specification<Gig> specification = Specs.isLike(query).and(Specs.isRatingAbove(ratingAbove)).and(Specs.isAcceptedAndNotPaused());
 
@@ -465,9 +469,9 @@ public class GigService {
 
         if (tagStrings != null && !tagStrings.isEmpty()) {
             List<Tag> tags = tagStrings
-                .stream()
-                .map(t -> tagService.findByName(t).orElseThrow(() -> new ResourceNotFoundException("Tag doesn't exist")))
-                .toList();
+                    .stream()
+                    .map(t -> tagService.findByName(t).orElseThrow(() -> new ResourceNotFoundException("Tag doesn't exist")))
+                    .toList();
 
             specification = specification.and(Specs.hasTags(tags));
         }
@@ -495,15 +499,15 @@ public class GigService {
         return savedGig;
     }
     //    public List<Gig> findByTag(String tag) {
-    //        // TODO
+    //        //
     //    }
 
     //    public List<Gig> getFeaturedGigs() {
-    //        // TODO
+    //        //
     //    }
     //
     //    // For explore new talents feature.
     //    public List<Gig> getNewGigs() {
-    //        // TODO
+    //        //
     //    }
 }

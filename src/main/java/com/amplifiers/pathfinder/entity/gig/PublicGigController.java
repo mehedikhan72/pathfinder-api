@@ -25,7 +25,7 @@ public class PublicGigController {
     private final GigService service;
     private final ReviewService reviewService;
     private final UserRepository userRepository;
-    Integer numGigsPerPage = Variables.PaginationSettings.NUM_GIGS_PER_PAGE;
+    private Integer numGigsPerPage = Variables.PaginationSettings.NUM_GIGS_PER_PAGE;
 
     @GetMapping("/all")
     public ResponseEntity<?> findAllGigs(@RequestParam(name = "page", defaultValue = "0") Integer page) {

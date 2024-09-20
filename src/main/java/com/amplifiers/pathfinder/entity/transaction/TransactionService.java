@@ -5,6 +5,7 @@ import com.amplifiers.pathfinder.utility.UserUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -16,7 +17,7 @@ public class TransactionService {
     public Optional<Transaction> findByTranxId(String tranxId) {
         Optional<Transaction> transaction = repository.findByTranxId(tranxId);
 
-        if(transaction.isEmpty()) {
+        if (transaction.isEmpty()) {
             return Optional.empty();
         }
 
@@ -24,7 +25,7 @@ public class TransactionService {
         User currentUser = userUtility.getCurrentUser();
         User buyer = transaction.get().getEnrollment().getBuyer();
 
-        if(currentUser.getId() != buyer.getId()) {
+        if (!Objects.equals(currentUser.getId(), buyer.getId())) {
             return Optional.empty();
         }
 

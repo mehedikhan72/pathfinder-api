@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ManagementController {
     private final ManagementService managementService;
+    private final Integer gigsPerPage = 20;
 
     @GetMapping("/gigs/unaccepted")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getUnacceptedGigs(
             @RequestParam(name = "page", defaultValue = "0") Integer page
     ) {
-        Pageable pageable = PageRequest.of(page, 20);
+        Pageable pageable = PageRequest.of(page, gigsPerPage);
         return ResponseEntity.ok(managementService.getUnaccpetedGigs(pageable));
     }
 

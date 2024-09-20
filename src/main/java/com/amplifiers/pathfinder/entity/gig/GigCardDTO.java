@@ -9,12 +9,12 @@ import java.util.Set;
 @Data
 @Builder
 public class GigCardDTO {
-    Integer id;
-    String title;
-    Set<String> tags;
-    float price;
-    float rating;
-    int ratedByCount;
-    String coverImage;
-    UserShortDTO user;
+    private Integer id;
+    private String title;
+    private Set<String> tags;
+    private float price;
+    private float rating;
+    private int ratedByCount;
+    private String coverImage;
+    private UserShortDTO user;
 }

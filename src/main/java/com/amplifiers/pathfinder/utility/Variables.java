@@ -2,11 +2,11 @@ package com.amplifiers.pathfinder.utility;
 
 public class Variables {
     public static class ClientSettings {
-        public static final String clientBaseUrl = "http://localhost:5173/";
+        public static final String CLIENT_BASE_URL = "http://localhost:5173/";
     }
 
     public static class ApiSettings {
-        public static final String apiBaseUrl = "http://localhost:8080/";
+        public static final String API_BASE_URL = "http://localhost:8080/";
     }
 
     public static class PaginationSettings {

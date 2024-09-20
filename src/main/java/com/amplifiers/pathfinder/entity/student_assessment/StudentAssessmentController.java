@@ -1,6 +1,5 @@
 package com.amplifiers.pathfinder.entity.student_assessment;
 
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

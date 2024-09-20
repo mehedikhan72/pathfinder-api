@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class PrivateGigController {
     private final GigService service;
     private final ReviewService reviewService;
+    private final Integer badRequestResponseCode = 400;
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,7 +52,7 @@ public class PrivateGigController {
             return ResponseEntity.ok(service.setCoverImage(gigId, file));
         } catch (Exception E) {
             E.printStackTrace();
-            return ResponseEntity.status(400).body(E.getMessage());
+            return ResponseEntity.status(badRequestResponseCode).body(E.getMessage());
         }
     }
 
@@ -62,7 +63,7 @@ public class PrivateGigController {
             return ResponseEntity.ok(service.setGigVideo(gigId, file));
         } catch (Exception E) {
             E.printStackTrace();
-            return ResponseEntity.status(400).body(E.getMessage());
+            return ResponseEntity.status(badRequestResponseCode).body(E.getMessage());
         }
     }
 

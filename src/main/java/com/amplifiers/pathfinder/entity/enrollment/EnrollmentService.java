@@ -31,6 +31,7 @@ public class EnrollmentService {
     private final NotificationService notificationService;
     private final PaymentService paymentService;
     private final EmailService emailService;
+    private final Integer scoreIncreaseOnEnrollmentCreation = 5;
 
     // TODO: update later - there can be only one concurrent enrollment between a buyer and seller. the
     // TODO: seller won't be able to initiate any new offers to the same buyer.
@@ -46,8 +47,9 @@ public class EnrollmentService {
             throw new UnauthorizedException("Only the seller can create an enrollment.");
         }
 
-        if (request.getBuyerId() == null)
+        if (request.getBuyerId() == null) {
             throw new ValidationException("Buyer ID is required.");
+        }
 
         // since only one incomplete enrollment can exist at a time.
         Optional<Enrollment> existingEnrollment = findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, request.getBuyerId());
@@ -85,7 +87,7 @@ public class EnrollmentService {
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
 
-        gig.setScore(gig.getScore() + 5);
+        gig.setScore(gig.getScore() + scoreIncreaseOnEnrollmentCreation);
         gigRepository.save(gig);
 
         // Sending notification to receiver
@@ -98,10 +100,11 @@ public class EnrollmentService {
         try {
             emailService.sendEmail(savedEnrollment.getBuyer(),
                     "New Enrollment Offer",
-                    "You have received a new enrollment offer from " + savedEnrollment.getGig().getSeller().getFullName() + ".\n" +
-                            "Please visit the website to view the offer and confirm it.\n\n" +
-                            "Best,\n" +
-                            "Team pathPhindr\n");
+                    "You have received a new enrollment offer from " + savedEnrollment.getGig().getSeller().getFullName()
+                            + ".\n"
+                            + "Please visit the website to view the offer and confirm it.\n\n"
+                            + "Best,\n"
+                            + "Team pathPhindr\n");
         } catch (Exception e) {
             throw new ValidationException("Email could not be sent. Please try again.");
         }
