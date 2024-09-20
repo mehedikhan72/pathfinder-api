@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -77,7 +78,8 @@ public class User implements UserDetails {
 
     @Column(columnDefinition = "boolean default false")
     private boolean emailVerified;
-    @Column(columnDefinition = "boolean default 'null'")
+
+    @ColumnDefault("null")
     private String emailVerificationToken;
     @Column(columnDefinition = "timestamp default null")
     private OffsetDateTime lastVerificationEmailSentAt;

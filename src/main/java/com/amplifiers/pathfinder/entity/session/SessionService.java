@@ -153,7 +153,7 @@ public class SessionService {
         Enrollment enrollment = session.getEnrollment();
         enrollment.setNumSessionsCompleted(enrollment.getNumSessionsCompleted() + 1);
 
-        if (Objects.equals(enrollment.getNumSessions(), enrollment.getNumSessionsCompleted())) {
+        if (enrollment.getNumSessions() <= enrollment.getNumSessionsCompleted()) {
             enrollment.setCompletedAt(java.time.OffsetDateTime.now());
         }
         enrollmentRepository.save(enrollment);

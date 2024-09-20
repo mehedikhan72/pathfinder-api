@@ -52,8 +52,8 @@ public class GigService {
             throw new ValidationException("At least three tags required.");
         }
 
-        if (request.getFaqs().size() < 3) {
-            throw new ValidationException("At least three faqs required.");
+        if (request.getFaqs().size() < 1) {
+            throw new ValidationException("At least one faq required.");
         }
     }
 
