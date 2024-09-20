@@ -15,7 +15,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class RecommendationService {
 
-    Dotenv dotenv = Dotenv.configure().load();
+    private final Dotenv dotenv = Dotenv.configure().load();
     private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
     private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
 
@@ -30,7 +30,7 @@ public class RecommendationService {
 //    private final String privateToken = "1234";
 //    private final String databaseId = "1234";
 
-    RecombeeClient client = new RecombeeClient(
+    private final RecombeeClient client = new RecombeeClient(
             databaseId,
             privateToken
     ).setRegion(Region.EU_WEST);
@@ -64,10 +64,10 @@ public class RecommendationService {
         }
     }
 
-    public void addDetailView(Integer UserId, Integer gigId) {
+    public void addDetailView(Integer userId, Integer gigId) {
         try {
             System.out.println("private token - " + privateToken);
-            client.send(new AddDetailView(UserId.toString(), gigId.toString())
+            client.send(new AddDetailView(userId.toString(), gigId.toString())
                     .setCascadeCreate(true)
             );
         } catch (Exception e) {
@@ -76,9 +76,9 @@ public class RecommendationService {
         }
     }
 
-    public void addPurchaseView(Integer GigId, Integer UserId, String recommId) {
+    public void addPurchaseView(Integer gigId, Integer userId, String recommId) {
         try {
-            client.send(new AddPurchase(UserId.toString(), GigId.toString())
+            client.send(new AddPurchase(userId.toString(), gigId.toString())
                     .setCascadeCreate(true)
                     .setRecommId(recommId)
             );
@@ -118,17 +118,17 @@ public class RecommendationService {
         }
     }
 
-    public RecommendationResponse getRecommendationsForItem(Integer ItemId, Integer UserId, Integer numItems, String scenario) {
+    public RecommendationResponse getRecommendationsForItem(Integer itemId, Integer userId, Integer numItems, String scenario) {
         try {
             if (scenario != null) {
                 // for similar items.
-                return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems)
+                return client.send(new RecommendItemsToItem(itemId.toString(), userId.toString(), numItems)
                         .setScenario(scenario)
                         .setCascadeCreate(true)
                         .setFilter("'accepted' == true AND 'paused' == false")
                 );
             } else {
-                return client.send(new RecommendItemsToItem(ItemId.toString(), UserId.toString(), numItems)
+                return client.send(new RecommendItemsToItem(itemId.toString(), userId.toString(), numItems)
                         .setCascadeCreate(true)
                         .setFilter("'accepted' == true AND 'paused' == false")
                 );

@@ -23,9 +23,9 @@ public class PaymentController {
 
         String redirectUrl;
         if (paymentValidationSuccessful) {
-            redirectUrl = ClientSettings.clientBaseUrl + "payment/success?transactionId=" + payload.get("tran_id");
+            redirectUrl = ClientSettings.CLIENT_BASE_URL + "payment/success?transactionId=" + payload.get("tran_id");
         } else {
-            redirectUrl = ClientSettings.clientBaseUrl + "payment/fail?transactionId=" + payload.get("tran_id");
+            redirectUrl = ClientSettings.CLIENT_BASE_URL + "payment/fail?transactionId=" + payload.get("tran_id");
         }
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(redirectUrl))
@@ -37,7 +37,7 @@ public class PaymentController {
             @RequestParam Map<String, String> payload) {
         service.paymentCancel(payload);
         System.out.println("cancel url hit, payload - " + payload);
-        String redirectUrl = ClientSettings.clientBaseUrl + "payment/cancel?transactionId=" + payload.get("tran_id");
+        String redirectUrl = ClientSettings.CLIENT_BASE_URL + "payment/cancel?transactionId=" + payload.get("tran_id");
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(redirectUrl))
                 .build();
@@ -48,7 +48,7 @@ public class PaymentController {
             @RequestParam Map<String, String> payload) {
         service.paymentFail(payload);
         System.out.println("fail url hit, payload - " + payload);
-        String redirectUrl = ClientSettings.clientBaseUrl + "payment/fail?transactionId=" + payload.get("tran_id");
+        String redirectUrl = ClientSettings.CLIENT_BASE_URL + "payment/fail?transactionId=" + payload.get("tran_id");
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(redirectUrl))
                 .build();

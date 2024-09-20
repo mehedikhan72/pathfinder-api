@@ -14,7 +14,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     @GetMapping("/all/{userId}")
-    public ResponseEntity<?> getAllContacts (
+    public ResponseEntity<?> getAllContacts(
             @PathVariable Integer userId
     ) {
         return ResponseEntity.ok(chatRoomService.getAllContacts(userId));

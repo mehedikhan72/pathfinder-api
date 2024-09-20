@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/notifications")
 public class NotificationController {
     private final NotificationService notificationService;
-    Integer numNotificationsPerPage = Variables.PaginationSettings.NUM_NOTIFICATIONS_PER_PAGE;
+    private final Integer numNotificationsPerPage = Variables.PaginationSettings.NUM_NOTIFICATIONS_PER_PAGE;
 
     @GetMapping("/get")
     public ResponseEntity<?> getNotifications(

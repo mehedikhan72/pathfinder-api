@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ImageController {
     private final ImageService service;
+    private final Integer badRequestResponseCode = 400;
 
     @GetMapping("/{filename}")
     public ResponseEntity<?> serveImage(@PathVariable("filename") String filename) {
@@ -21,7 +22,7 @@ public class ImageController {
                     .body(CloudStorageService.getFile(image.getFilename()));
         } catch (Exception E) {
             E.printStackTrace();
-            return ResponseEntity.status(400).body(E.getMessage());
+            return ResponseEntity.status(badRequestResponseCode).body(E.getMessage());
         }
     }
 

@@ -34,6 +34,8 @@ public class PaymentService {
     private final GigRepository gigRepository;
     private final EmailService emailService;
 
+    private final Integer gigScoreIncrease = 10;
+
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
 
@@ -48,8 +50,18 @@ public class PaymentService {
 
         transactionRepository.save(transaction);
 
-        Map<String, String> postData = constructPostData(enrollment.getPrice(), tranxId, enrollment.getBuyer().getFullName(), enrollment.getBuyer().getEmail(), enrollment.getGig().getTitle());
-        SSLCommerz sslCommerz = new SSLCommerz(Variables.SslCommerzSettings.SSLCOMMERZ_STORE_ID, Variables.SslCommerzSettings.SSLCOMMERZ_STORE_PASSWORD, Variables.SslCommerzSettings.STORE_TEST_MODE);
+        Map<String, String> postData = constructPostData(
+                enrollment.getPrice(),
+                tranxId,
+                enrollment.getBuyer().getFullName(),
+                enrollment.getBuyer().getEmail(),
+                enrollment.getGig().getTitle()
+        );
+        SSLCommerz sslCommerz = new SSLCommerz(
+                Variables.SslCommerzSettings.SSLCOMMERZ_STORE_ID,
+                Variables.SslCommerzSettings.SSLCOMMERZ_STORE_PASSWORD,
+                Variables.SslCommerzSettings.STORE_TEST_MODE
+        );
         String url = sslCommerz.initiateTransaction(postData, false);
         System.out.println("url - " + url);
 
@@ -57,7 +69,7 @@ public class PaymentService {
     }
 
     public Map<String, String> constructPostData(Float total, String tranxId, String cusName, String cusEmail, String gigTitle) {
-        String baseUrl = ApiSettings.apiBaseUrl;//Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
+        String baseUrl = ApiSettings.API_BASE_URL; //Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
         String successUrl = baseUrl + "api/v1/public/enrollment/payment-success";
         String failUrl = baseUrl + "api/v1/public/enrollment/payment-fail";
         String cancelUrl = baseUrl + "api/v1/public/enrollment/payment-cancel";
@@ -123,7 +135,7 @@ public class PaymentService {
             enrollmentRepository.save(enrollment);
 
             Gig gig = enrollment.getGig();
-            gig.setScore(gig.getScore() + 10);
+            gig.setScore(gig.getScore() + gigScoreIncrease);
             gigRepository.save(gig);
 
             // Sending notification
@@ -136,11 +148,11 @@ public class PaymentService {
             try {
                 emailService.sendEmail(enrollment.getBuyer(),
                         "Enrollment Confirmed",
-                        "You have successfully confirmed the enrollment for the gig " + enrollment.getGig().getTitle() + ".\n" +
-                                "Amount paid - " + enrollment.getPrice() + ".\n" +
-                                "Transaction id - " + tranxId + ".\n\n" +
-                                "Best,\n" +
-                                "Team pathPhindr\n");
+                        "You have successfully confirmed the enrollment for the gig " + enrollment.getGig().getTitle() + ".\n"
+                                + "Amount paid - " + enrollment.getPrice() + ".\n"
+                                + "Transaction id - " + tranxId + ".\n\n"
+                                + "Best,\n"
+                                + "Team pathPhindr\n");
             } catch (Exception e) {
                 throw new ValidationException("Email could not be sent. Please try again.");
             }
@@ -148,11 +160,11 @@ public class PaymentService {
             try {
                 emailService.sendEmail(enrollment.getGig().getSeller(),
                         "New Confirmed Enrollment",
-                        "You have a new enrollment confirmed for the gig " + enrollment.getGig().getTitle() + ".\n" +
-                                "Amount received - " + enrollment.getPrice() + ".\n" +
-                                "Transaction id - " + tranxId + ".\n\n" +
-                                "Best,\n" +
-                                "Team pathPhindr\n");
+                        "You have a new enrollment confirmed for the gig " + enrollment.getGig().getTitle() + ".\n"
+                                + "Amount received - " + enrollment.getPrice() + ".\n"
+                                + "Transaction id - " + tranxId + ".\n\n"
+                                + "Best,\n"
+                                + "Team pathPhindr\n");
             } catch (Exception e) {
                 throw new ValidationException("Email could not be sent. Please try again.");
             }

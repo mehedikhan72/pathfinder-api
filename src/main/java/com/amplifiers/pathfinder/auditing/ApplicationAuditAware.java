@@ -15,9 +15,9 @@ public class ApplicationAuditAware implements AuditorAware<Integer> {
                 SecurityContextHolder
                         .getContext()
                         .getAuthentication();
-        if (authentication == null ||
-            !authentication.isAuthenticated() ||
-                authentication instanceof AnonymousAuthenticationToken
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken
         ) {
             return Optional.empty();
         }

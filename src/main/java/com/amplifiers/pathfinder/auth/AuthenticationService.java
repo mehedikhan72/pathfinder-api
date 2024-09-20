@@ -38,11 +38,15 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final Integer cannotSendEmailAgainWithinMinutes = 10;
+    private final Integer minimumPasswordLength = 8;
 
     public AuthenticationResponse verifyEmail(String token) {
         Optional<User> userOptional = repository.findByEmailVerificationToken(token);
         if (userOptional.isEmpty()) {
-            return AuthenticationResponse.builder().emailVerified(false).build();
+            return AuthenticationResponse.builder()
+                    .emailVerified(false)
+                    .build();
         }
 
         User user = userOptional.get();
@@ -59,65 +63,55 @@ public class AuthenticationService {
         // the email is likely verified atm, so welcoming user.
         try {
             emailService.sendEmail(
-                user,
-                "Welcome to pathPhindr",
-                "Hi " +
-                user.getFullName() +
-                ",\n\n" +
-                "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
-                "Complete your profile and start exploring.\n\n" +
-                "Best,\n" +
-                "Team pathPhindr\n"
+                    user,
+                    "Welcome to pathPhindr",
+                    "Hi " + user.getFullName() + ",\n\n"
+                            + "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n"
+                            + "Complete your profile and start exploring.\n\n"
+                            + "Best,\n"
+                            + "Team pathPhindr\n"
             );
         } catch (Exception e) {
             System.out.println("Error sending email: " + e.getMessage());
         }
 
         return AuthenticationResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .id(user.getId())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .email(user.getEmail())
-            .role(user.getRole())
-            .emailVerified(true)
-            .build();
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .emailVerified(true)
+                .build();
     }
 
     public boolean isEmailVerified(String email) {
-        User user = repository
-            .findByEmail(email)
-            .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
         return user.isEmailVerified();
     }
 
     public String sendVerifyEmailRequest(String email) {
-        User user = repository
-            .findByEmail(email)
-            .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
         // rate limiting - 1 email per 10 minutes.
         if (user.getLastVerificationEmailSentAt() != null) {
-            if (user.getLastVerificationEmailSentAt().plusMinutes(10).isAfter(java.time.OffsetDateTime.now())) {
+            if (user.getLastVerificationEmailSentAt().plusMinutes(cannotSendEmailAgainWithinMinutes).isAfter(java.time.OffsetDateTime.now())) {
                 return "rate_limited";
             }
         }
         String verificationToken = user.getEmailVerificationToken();
 
-        String clientLink = ClientSettings.clientBaseUrl + "verify-email?token=" + verificationToken;
+        String clientLink = ClientSettings.CLIENT_BASE_URL + "verify-email?token=" + verificationToken;
 
         try {
-            emailService.sendEmail(
-                user,
-                "Email Verification",
-                "Hi " +
-                user.getFullName() +
-                ",\n\n" +
-                "Please click the link below to verify your email address.\n" +
-                clientLink +
-                "\n\n" +
-                "Best,\n" +
-                "Team pathPhindr\n"
+            emailService.sendEmail(user,
+                    "Email Verification",
+                    "Hi " + user.getFullName() + ",\n\n"
+                            + "Please click the link below to verify your email address.\n"
+                            + clientLink + "\n\n"
+                            + "Best,\n"
+                            + "Team pathPhindr\n"
             );
             user.setLastVerificationEmailSentAt(java.time.OffsetDateTime.now());
             repository.save(user);
@@ -128,26 +122,27 @@ public class AuthenticationService {
         return "email_sent";
     }
 
+
     public AuthenticationResponse register(RegisterRequest request) {
-        if (request.getPassword().length() < 8) {
-            throw new AuthenticationException("Password must be at least 8 characters long.");
+        if (request.getPassword().length() < minimumPasswordLength) {
+            throw new AuthenticationException("Password must be at least " + minimumPasswordLength + " characters long.");
         }
 
         // check if user with email already exists
-        var existing_user = repository.findByEmail(request.getEmail());
+        var existingUser = repository.findByEmail(request.getEmail());
 
-        if (existing_user.isPresent()) {
+        if (existingUser.isPresent()) {
             throw new AuthenticationException("User with this email already exists. Try another one.");
         }
 
         var user = User.builder()
-            .firstName(request.getFirstName())
-            .lastName(request.getLastName())
-            .email(request.getEmail())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .role(Role.USER)
-            .emailVerificationToken(UUID.randomUUID().toString())
-            .build();
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .emailVerificationToken(UUID.randomUUID().toString())
+                .build();
         var savedUser = repository.save(user);
         var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -156,18 +151,19 @@ public class AuthenticationService {
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         // verification prompt.
-        return AuthenticationResponse.builder().email(savedUser.getEmail()).build();
+        return AuthenticationResponse.builder()
+                .email(savedUser.getEmail())
+                .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         removeAllExpiredTokens();
-        if (request.getEmail() == null || request.getPassword() == null) throw new AuthenticationException(
-            "Email and password are required."
-        );
+        if (request.getEmail() == null || request.getPassword() == null) {
+            throw new AuthenticationException("Email and password are required.");
+        }
 
-        var user = repository
-            .findByEmail(request.getEmail())
-            .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        var user = repository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -178,7 +174,10 @@ public class AuthenticationService {
         }
 
         if (!user.isEmailVerified()) {
-            return AuthenticationResponse.builder().email(user.getEmail()).emailVerified(false).build();
+            return AuthenticationResponse.builder()
+                    .email(user.getEmail())
+                    .emailVerified(false)
+                    .build();
         }
 
         var accessToken = jwtService.generateToken(user);
@@ -188,19 +187,24 @@ public class AuthenticationService {
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthenticationResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .id(user.getId())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .email(user.getEmail())
-            .role(user.getRole())
-            .emailVerified(true)
-            .build();
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .emailVerified(true)
+                .build();
     }
 
     private void saveUserToken(User user, String jwtToken, TokenType tokenType) {
-        var token = Token.builder().user(user).token(jwtToken).tokenType(tokenType).revoked(false).build();
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(tokenType)
+                .revoked(false)
+                .build();
 
         try {
             tokenRepository.save(token);
@@ -212,7 +216,9 @@ public class AuthenticationService {
 
     private void revokeAllUserAccessTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidAccessTokenByUser(user.getId());
-        if (validUserTokens.isEmpty()) return;
+        if (validUserTokens.isEmpty()) {
+            return;
+        }
         validUserTokens.forEach(token -> {
             token.setRevoked(true);
         });
@@ -221,7 +227,9 @@ public class AuthenticationService {
 
     private void removeAllExpiredTokens() {
         var tokens = tokenRepository.findAll();
-        if (tokens.isEmpty()) return;
+        if (tokens.isEmpty()) {
+            return;
+        }
         tokens.forEach(token -> {
             try {
                 if (jwtService.isTokenExpired(token.getToken())) {
@@ -234,8 +242,11 @@ public class AuthenticationService {
         });
     }
 
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //        removeAllExpiredTokens();
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+//        removeAllExpiredTokens();
         final String refreshToken = getCookieRefreshToken(request);
         String userEmail = null;
 
@@ -252,10 +263,7 @@ public class AuthenticationService {
         }
 
         if (userEmail != null) {
-            var user =
-                this.repository.findByEmail(userEmail).orElseThrow(() ->
-                        new ResourceNotFoundException("No user found with this email. Please try again.")
-                    );
+            var user = this.repository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
 
@@ -264,14 +272,14 @@ public class AuthenticationService {
 
                 saveUserToken(user, accessToken, TokenType.ACCESS);
                 var authResponse = AuthenticationResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .id(user.getId())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .email(user.getEmail())
-                    .role(user.getRole())
-                    .build();
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .id(user.getId())
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .email(user.getEmail())
+                        .role(user.getRole())
+                        .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }

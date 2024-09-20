@@ -22,11 +22,14 @@ public class LogoutService implements LogoutHandler {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final Integer notFoundResponseCode = 404;
 
     private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidAccessTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
+        if (validUserTokens.isEmpty()) {
             return;
+        }
+
         validUserTokens.forEach(token -> {
             token.setRevoked(true);
         });
@@ -50,7 +53,7 @@ public class LogoutService implements LogoutHandler {
         final String userEmail;
 
         if (refreshToken == null) {
-            response.setStatus(404);
+            response.setStatus(notFoundResponseCode);
             return;
         }
 

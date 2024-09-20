@@ -1,12 +1,10 @@
 package com.amplifiers.pathfinder.entity.user;
 
-import com.amplifiers.pathfinder.entity.tag.Tag;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,7 +16,6 @@ import java.util.List;
 public class ProfileEditRequest {
     private String firstName;
     private String lastName;
-
     private String description;
     private Integer age;
     private List<Achievement> educations;

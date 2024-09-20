@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NotificationCreateRequest {
-    public String text;
-    public User receiver;
+    private String text;
+    private User receiver;
 
     @Enumerated(EnumType.STRING)
-    public NotificationType type;
-    public String linkSuffix;
+    private NotificationType type;
+    private String linkSuffix;
 }

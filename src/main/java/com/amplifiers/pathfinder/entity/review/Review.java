@@ -13,7 +13,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.OffsetDateTime;
@@ -35,7 +34,7 @@ public class Review {
     @NotEmpty(message = "A title is required.")
     private String title;
 
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     @NotEmpty(message = "Please write your review.")
     private String text;
 

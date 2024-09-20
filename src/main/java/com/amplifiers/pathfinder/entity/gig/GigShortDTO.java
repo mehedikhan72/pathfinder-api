@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class GigShortDTO {
-    Integer id;
-    String title;
-    String coverImage;
+    private Integer id;
+    private String title;
+    private String coverImage;
 }

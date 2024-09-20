@@ -1,7 +1,6 @@
 package com.amplifiers.pathfinder.cloudstorage;
 
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -22,16 +21,17 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 @Component
 public class CloudStorageService {
 
-    private static final S3AsyncClient s3AsyncClient;
-    private static final String bucketName = "pathfinder-bucket";
-    private static final String accessKey = "003b877a457d48f0000000003";
-    private static final String secretKey = "K003v/skEFnbcQwhpzHfl8kfw79tcr8";
+    private static final S3AsyncClient S3_ASYNC_CLIENT;
+    private static final String BUCKET_NAME = "pathfinder-bucket";
+    private static final String ACCESS_KEY = "003b877a457d48f0000000003";
+    private static final String SECRET_KEY = "K003v/skEFnbcQwhpzHfl8kfw79tcr8";
     private static final String END_POINT = "https://s3.eu-central-003.backblazeb2.com";
+    private static final int URL_EXPIRATION_DURATION_MINUTES = 10;
 
     static {
-        AwsSessionCredentials awsCreds = AwsSessionCredentials.create(accessKey, secretKey, "");
+        AwsSessionCredentials awsCreds = AwsSessionCredentials.create(ACCESS_KEY, SECRET_KEY, "");
 
-        s3AsyncClient = S3AsyncClient.builder()
+        S3_ASYNC_CLIENT = S3AsyncClient.builder()
             .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
             .endpointOverride(URI.create(END_POINT))
             .region(Region.of("eu-central-003"))
@@ -40,9 +40,9 @@ public class CloudStorageService {
 
     public static void uploadFile(byte[] fileData, String keyName) {
         try {
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(keyName).build();
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(BUCKET_NAME).key(keyName).build();
 
-            s3AsyncClient.putObject(putObjectRequest, AsyncRequestBody.fromBytes(fileData));
+            S3_ASYNC_CLIENT.putObject(putObjectRequest, AsyncRequestBody.fromBytes(fileData));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,9 +50,9 @@ public class CloudStorageService {
 
     public static byte[] getFile(String keyName) {
         try {
-            GetObjectRequest objectRequest = GetObjectRequest.builder().key(keyName).bucket(bucketName).build();
+            GetObjectRequest objectRequest = GetObjectRequest.builder().key(keyName).bucket(BUCKET_NAME).build();
 
-            return s3AsyncClient.getObject(objectRequest, AsyncResponseTransformer.toBytes()).thenApply(ResponseBytes::asByteArray).join();
+            return S3_ASYNC_CLIENT.getObject(objectRequest, AsyncResponseTransformer.toBytes()).thenApply(ResponseBytes::asByteArray).join();
         } catch (S3Exception e) {
             System.err.println(e.awsErrorDetails().errorMessage());
         }
@@ -62,17 +62,16 @@ public class CloudStorageService {
     public static PresignedUrlInfo createPresignedGetUrl(String keyName) {
         try (
             S3Presigner presigner = S3Presigner.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(AwsSessionCredentials.create(accessKey, secretKey, "")))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsSessionCredentials.create(ACCESS_KEY, SECRET_KEY, "")))
                 .endpointOverride(URI.create(END_POINT))
                 .region(Region.of("eu-central-003"))
                 .build()
         ) {
-            GetObjectRequest objectRequest = GetObjectRequest.builder().bucket(bucketName).key(keyName).build();
+            GetObjectRequest objectRequest = GetObjectRequest.builder().bucket(BUCKET_NAME).key(keyName).build();
 
-            Integer duration = 10;
-            OffsetDateTime expires = OffsetDateTime.now().plusMinutes(10);
+            OffsetDateTime expires = OffsetDateTime.now().plusMinutes(URL_EXPIRATION_DURATION_MINUTES);
             GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(duration)) // The URL will expire in 10 minutes.
+                .signatureDuration(Duration.ofMinutes(URL_EXPIRATION_DURATION_MINUTES)) // The URL will expire in 10 minutes.
                 .getObjectRequest(objectRequest)
                 .build();
 
@@ -87,8 +86,8 @@ public class CloudStorageService {
 
     public static void deleteFile(String keyName) {
         try {
-            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(keyName).build();
-            s3AsyncClient.deleteObject(deleteObjectRequest);
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(BUCKET_NAME).key(keyName).build();
+            S3_ASYNC_CLIENT.deleteObject(deleteObjectRequest);
         } catch (S3Exception e) {
             System.err.println(e.awsErrorDetails().errorMessage());
         }
@@ -98,7 +97,7 @@ public class CloudStorageService {
         try {
             ListObjectsRequest listObjects = ListObjectsRequest.builder().bucket(bucketNameClear).build();
 
-            CompletableFuture<ListObjectsResponse> future = s3AsyncClient.listObjects(listObjects);
+            CompletableFuture<ListObjectsResponse> future = S3_ASYNC_CLIENT.listObjects(listObjects);
 
             future.thenAccept(res -> {
                 List<S3Object> objects = res.contents();
@@ -107,7 +106,7 @@ public class CloudStorageService {
                         .bucket(bucketNameClear)
                         .key(myValue.key())
                         .build();
-                    s3AsyncClient.deleteObject(deleteObjectRequest);
+                    S3_ASYNC_CLIENT.deleteObject(deleteObjectRequest);
                 }
             });
         } catch (S3Exception e) {

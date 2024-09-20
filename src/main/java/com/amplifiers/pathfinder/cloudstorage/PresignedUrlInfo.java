@@ -1,12 +1,14 @@
 package com.amplifiers.pathfinder.cloudstorage;
 
 import lombok.Builder;
+import lombok.Data;
 
 import java.net.URL;
 import java.time.OffsetDateTime;
 
 @Builder
+@Data
 public class PresignedUrlInfo {
-    public URL presignedUrl;
-    public OffsetDateTime expires;
+    private URL presignedUrl;
+    private OffsetDateTime expires;
 }

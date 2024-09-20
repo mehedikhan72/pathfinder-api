@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.OffsetDateTime;
@@ -29,11 +28,11 @@ public class Video {
     @Transient
     private String filename;
 
-    @Column(columnDefinition="text")
+    @Column(columnDefinition = "text")
     private String presignedUrl;
     private OffsetDateTime presignedUrlExpire;
     @PostLoad
-    private void onLoad(){
+    private void onLoad() {
         this.filename = this.basename + "." + this.format;
     }
 }

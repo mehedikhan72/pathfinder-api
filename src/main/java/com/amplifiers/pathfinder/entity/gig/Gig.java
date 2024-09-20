@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -107,8 +106,8 @@ public class Gig {
     private Video gigVideo;
 
     // a number of gigs will be featured every once in a while. there will be rolling substitution.
-    // TODO: improve featured idea later.
-    //    private boolean featured;
+    // improve featured idea later.
+    // private boolean featured;
 
     @Builder.Default
     private Integer score = 0;

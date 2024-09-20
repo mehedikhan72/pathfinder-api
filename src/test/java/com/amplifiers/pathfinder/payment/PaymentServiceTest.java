@@ -10,7 +10,6 @@ import com.amplifiers.pathfinder.entity.transaction.TransactionRepository;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.utility.EmailService;
-import jakarta.validation.constraints.Email;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,9 +45,18 @@ class PaymentServiceTest {
     private Enrollment enrollment;
     private Transaction transaction;
 
+    private final float randomPrice = 100.0f;
+
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(transactionRepository, transactionResponseValidator, notificationService, enrollmentRepository, gigRepository, emailService);
+        paymentService = new PaymentService(
+                transactionRepository,
+                transactionResponseValidator,
+                notificationService,
+                enrollmentRepository,
+                gigRepository,
+                emailService
+        );
 
         User buyer = new User();
         buyer.setFirstName("John");
@@ -63,11 +71,11 @@ class PaymentServiceTest {
         Gig gig = new Gig();
         gig.setTitle("Test Gig");
         gig.setSeller(seller);
-        gig.setPrice(100.0f);
+        gig.setPrice(randomPrice);
 
         enrollment = new Enrollment();
         enrollment.setGig(gig);
-        enrollment.setPrice(100.0f);
+        enrollment.setPrice(randomPrice);
         enrollment.setBuyer(buyer);
         enrollment.setPaid(false);
         enrollment.setBuyerConfirmed(false);
@@ -76,7 +84,7 @@ class PaymentServiceTest {
         transaction = new Transaction();
         transaction.setTranxId("123456");
         transaction.setEnrollment(enrollment);
-        transaction.setAmount(100.0f);
+        transaction.setAmount(randomPrice);
         transaction.setPaidAt(null);
         transaction.setPaymentConfirmed(false);
     }

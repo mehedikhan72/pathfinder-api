@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class EnrollmentController {
     private final EnrollmentService service;
-    Integer numEnrollmentsPerPage = Variables.PaginationSettings.NUM_ENROLLMENTS_PER_PAGE;
+    private final Integer numEnrollmentsPerPage = Variables.PaginationSettings.NUM_ENROLLMENTS_PER_PAGE;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create/{gigId}")
@@ -49,7 +49,7 @@ public class EnrollmentController {
 
     @GetMapping("/gig/{gigId}")
     public ResponseEntity<?> findAllByGigId(
-            @RequestParam(name="page", defaultValue = "0") Integer page,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @PathVariable Integer gigId
     ) {
         Pageable pageable = PageRequest.of(page, numEnrollmentsPerPage);
@@ -59,7 +59,7 @@ public class EnrollmentController {
     // A user can see all enrollments they have made
     @GetMapping("/buyer/{buyer_id}")
     public ResponseEntity<?> findAllByBuyerId(
-            @RequestParam(name="page", defaultValue = "0") Integer page,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @PathVariable Integer buyerId
     ) {
         Pageable pageable = PageRequest.of(page, numEnrollmentsPerPage);

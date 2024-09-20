@@ -44,7 +44,9 @@ public interface GigRepository extends JpaRepository<Gig, Integer>, JpaSpecifica
 
         static Specification<Gig> isRatingAbove(Float ratingAbove) {
             return (root, query, builder) -> {
-                if (ratingAbove == 0) return null;
+                if (ratingAbove == 0) {
+                    return null;
+                }
                 return builder.greaterThanOrEqualTo(root.get("rating"), ratingAbove);
             };
         }
@@ -65,4 +67,6 @@ public interface GigRepository extends JpaRepository<Gig, Integer>, JpaSpecifica
             };
         }
     }
+
+    Page<Gig> findByAccepted(boolean accepted, Pageable pageable);
 }

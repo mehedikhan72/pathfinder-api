@@ -4,6 +4,8 @@ import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.gig.GigRepository;
 import com.amplifiers.pathfinder.recommendation.RecommendationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 
@@ -14,6 +16,10 @@ import java.util.HashMap;
 public class ManagementService {
     private final GigRepository gigRepository;
     private final RecommendationService recommendationService;
+
+    public Page<Gig> getUnaccpetedGigs(Pageable pageable) {
+        return gigRepository.findByAccepted(false, pageable);
+    }
 
     public String acceptGig(Integer gigId) {
         Gig gig = gigRepository.findById(gigId)
