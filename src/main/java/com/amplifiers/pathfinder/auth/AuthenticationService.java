@@ -17,6 +17,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -40,9 +42,7 @@ public class AuthenticationService {
     public AuthenticationResponse verifyEmail(String token) {
         Optional<User> userOptional = repository.findByEmailVerificationToken(token);
         if (userOptional.isEmpty()) {
-            return AuthenticationResponse.builder()
-                    .emailVerified(false)
-                    .build();
+            return AuthenticationResponse.builder().emailVerified(false).build();
         }
 
         User user = userOptional.get();
@@ -59,37 +59,43 @@ public class AuthenticationService {
         // the email is likely verified atm, so welcoming user.
         try {
             emailService.sendEmail(
-                    user,
-                    "Welcome to pathPhindr",
-                    "Hi " + user.getFullName() + ",\n\n" +
-                            "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
-                            "Complete your profile and start exploring.\n\n" +
-                            "Best,\n" +
-                            "Team pathPhindr\n"
+                user,
+                "Welcome to pathPhindr",
+                "Hi " +
+                user.getFullName() +
+                ",\n\n" +
+                "Welcome aboard! Whether you’re here to find a mentor or offer your expertise, we’re excited to have you.\n" +
+                "Complete your profile and start exploring.\n\n" +
+                "Best,\n" +
+                "Team pathPhindr\n"
             );
         } catch (Exception e) {
             System.out.println("Error sending email: " + e.getMessage());
         }
 
         return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .emailVerified(true)
-                .build();
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .role(user.getRole())
+            .emailVerified(true)
+            .build();
     }
 
     public boolean isEmailVerified(String email) {
-        User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        User user = repository
+            .findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
         return user.isEmailVerified();
     }
 
     public String sendVerifyEmailRequest(String email) {
-        User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+        User user = repository
+            .findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
         // rate limiting - 1 email per 10 minutes.
         if (user.getLastVerificationEmailSentAt() != null) {
             if (user.getLastVerificationEmailSentAt().plusMinutes(10).isAfter(java.time.OffsetDateTime.now())) {
@@ -101,13 +107,17 @@ public class AuthenticationService {
         String clientLink = ClientSettings.clientBaseUrl + "verify-email?token=" + verificationToken;
 
         try {
-            emailService.sendEmail(user,
-                    "Email Verification",
-                    "Hi " + user.getFullName() + ",\n\n" +
-                            "Please click the link below to verify your email address.\n" +
-                            clientLink + "\n\n" +
-                            "Best,\n" +
-                            "Team pathPhindr\n"
+            emailService.sendEmail(
+                user,
+                "Email Verification",
+                "Hi " +
+                user.getFullName() +
+                ",\n\n" +
+                "Please click the link below to verify your email address.\n" +
+                clientLink +
+                "\n\n" +
+                "Best,\n" +
+                "Team pathPhindr\n"
             );
             user.setLastVerificationEmailSentAt(java.time.OffsetDateTime.now());
             repository.save(user);
@@ -117,7 +127,6 @@ public class AuthenticationService {
         }
         return "email_sent";
     }
-
 
     public AuthenticationResponse register(RegisterRequest request) {
         if (request.getPassword().length() < 8) {
@@ -132,13 +141,13 @@ public class AuthenticationService {
         }
 
         var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .emailVerificationToken(UUID.randomUUID().toString())
-                .build();
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .role(Role.USER)
+            .emailVerificationToken(UUID.randomUUID().toString())
+            .build();
         var savedUser = repository.save(user);
         var accessToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -147,9 +156,7 @@ public class AuthenticationService {
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         // verification prompt.
-        return AuthenticationResponse.builder()
-                .email(savedUser.getEmail())
-                .build();
+        return AuthenticationResponse.builder().email(savedUser.getEmail()).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -171,10 +178,7 @@ public class AuthenticationService {
         }
 
         if (!user.isEmailVerified()) {
-            return AuthenticationResponse.builder()
-                    .email(user.getEmail())
-                    .emailVerified(false)
-                    .build();
+            return AuthenticationResponse.builder().email(user.getEmail()).emailVerified(false).build();
         }
 
         var accessToken = jwtService.generateToken(user);
@@ -184,15 +188,15 @@ public class AuthenticationService {
         saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .emailVerified(true)
-                .build();
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .role(user.getRole())
+            .emailVerified(true)
+            .build();
     }
 
     private void saveUserToken(User user, String jwtToken, TokenType tokenType) {
