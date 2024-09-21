@@ -51,36 +51,14 @@ public class ZoomApiService {
             return map;
         } catch (Exception e) {
             //sout is used for demo purposes you could use @Slf4j
-            System.out.println(
-                String.format("Unable to get all meetings due to %s. Response code: %d", e.getMessage(), response.getStatusCode())
-            );
+            System.out.printf("Unable to get all meetings due to %s. Response code: %d%n", e.getMessage(), response.getStatusCode());
             e.printStackTrace();
         }
         return null;
     }
 
-    public ResponseEntity<String> getAllMeetings(User user) {
-        ResponseEntity<String> response = null;
-        try {
-            HttpHeaders authHeader = createBearerAuthHeader(zoomAuthenticationHelper.getAuthenticationToken(user));
-            HttpEntity<String> entity = new HttpEntity<>(authHeader);
-            response = restTemplate.exchange(getUserMeetingListUrl(), HttpMethod.GET, entity, String.class);
-
-            return response;
-        } catch (Exception e) {
-            //sout is used for demo purposes you could use @Slf4j
-            System.out.println(
-                String.format("Unable to get all meetings due to %s. Response code: %d", e.getMessage(), response.getStatusCode())
-            );
-            e.printStackTrace();
-        }
-        return response;
-    }
-
     public String getUserMeetingListUrl() {
-        StringBuilder sb = new StringBuilder(String.format(ZOOM_USER_BASE_URL, zoomApiUrl));
-        sb.append("/me/meetings");
-        return sb.toString();
+        return String.format(ZOOM_USER_BASE_URL, zoomApiUrl) + "/me/meetings";
     }
 
     public static HttpHeaders createBearerAuthHeader(String token) {

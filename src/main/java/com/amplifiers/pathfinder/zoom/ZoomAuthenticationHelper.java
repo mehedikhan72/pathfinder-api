@@ -3,6 +3,7 @@ package com.amplifiers.pathfinder.zoom;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.validation.constraints.NotNull;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -81,52 +82,45 @@ public class ZoomAuthenticationHelper {
             return true;
         }
         //Token has less than 20 minutes to expire
-        if (TimeUnit.MILLISECONDS.toMinutes(differenceInMillis) < 20) {
-            return true;
-        }
-
-        return false;
+        return TimeUnit.MILLISECONDS.toMinutes(differenceInMillis) < 20;
     }
 
-    private ZoomAuthResponse fetchToken(String authCode) throws Exception {
+    private ZoomAuthResponse fetchToken(String authCode) {
         String credentials = zoomClientId + ":" + zoomClientSecret;
-        String encodedCredentials = new String(Base64.getEncoder().encodeToString(credentials.getBytes()));
+        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add("Authorization", "Basic " + encodedCredentials);
         headers.add("Host", "zoom.us");
 
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("code", authCode);
         map.add("grant_type", "authorization_code");
         map.add("redirect_uri", "http://localhost:5173/zoom-auth");
 
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
-        String url = zoomIssuerUrl + "/token";
-
-        ZoomAuthResponse res = restTemplate.exchange(url, HttpMethod.POST, entity, ZoomAuthResponse.class).getBody();
-
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        res.setExpiresIn(res.getExpiresIn() * 1000 + now.getTimeInMillis());
-
-        return res;
+        return getZoomAuthResponse(headers, map);
     }
 
-    private ZoomAuthResponse refreshToken(ZoomAuthResponse zoomAuthResponse) throws Exception {
+    private ZoomAuthResponse refreshToken(ZoomAuthResponse zoomAuthResponse) {
         String credentials = zoomClientId + ":" + zoomClientSecret;
-        String encodedCredentials = new String(Base64.getEncoder().encodeToString(credentials.getBytes()));
+        String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add("Authorization", "Basic " + encodedCredentials);
         headers.add("Host", "zoom.us");
 
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("refresh_token", zoomAuthResponse.getRefreshToken());
         map.add("grant_type", "refresh_token");
 
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        return getZoomAuthResponse(headers, map);
+    }
+
+    @NotNull
+    private ZoomAuthResponse getZoomAuthResponse(HttpHeaders headers, MultiValueMap<String, String> map) {
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
         String url = zoomIssuerUrl + "/token";
 
         ZoomAuthResponse res = restTemplate.exchange(url, HttpMethod.POST, entity, ZoomAuthResponse.class).getBody();
