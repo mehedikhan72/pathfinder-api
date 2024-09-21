@@ -16,13 +16,13 @@ public class ZoomController {
 
     @GetMapping("/auth-check")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity userAuthCheck(Principal connectedUser) {
+    public ResponseEntity<?> userAuthCheck(Principal connectedUser) {
         return ResponseEntity.ok(userService.isZoomAuthorized(connectedUser));
     }
 
     @PostMapping("/auth-code")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity setUserAuthCode(@RequestBody String code, Principal connectedUser) {
+    public ResponseEntity<?> setUserAuthCode(@RequestBody String code, Principal connectedUser) {
         System.out.println(code);
         userService.setAuthorizationCode(code, connectedUser);
 

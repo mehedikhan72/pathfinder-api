@@ -53,10 +53,6 @@ recombee:
 
 zoom:
     oauth2:
-      client-id: ${ZOOM_CLIENT_ID}
-      client-secret: ${ZOOM_CLIENT_SECRET}
-      issuer: ${ZOOM_ISSUER}
-      account-id: ${ZOOM_ACCOUNT_ID}
       api-url: https://api.zoom.us
 
 ---

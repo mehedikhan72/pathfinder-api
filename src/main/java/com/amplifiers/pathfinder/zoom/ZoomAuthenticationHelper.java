@@ -2,21 +2,20 @@ package com.amplifiers.pathfinder.zoom;
 
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
-import com.amplifiers.pathfinder.entity.user.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -24,11 +23,11 @@ import org.springframework.web.client.RestTemplate;
 public class ZoomAuthenticationHelper {
 
     private final Dotenv dotenv = Dotenv.configure().load();
-    private String zoomClientId = dotenv.get("ZOOM_CLIENT_ID");
+    private final String zoomClientId = dotenv.get("ZOOM_CLIENT_ID");
 
-    private String zoomClientSecret = dotenv.get("ZOOM_CLIENT_SECRET");
+    private final String zoomClientSecret = dotenv.get("ZOOM_CLIENT_SECRET");
 
-    private String zoomIssuerUrl = dotenv.get("ZOOM_ISSUER");
+    private final String zoomIssuerUrl = dotenv.get("ZOOM_ISSUER");
 
     @Autowired
     RestTemplate restTemplate;
@@ -36,7 +35,7 @@ public class ZoomAuthenticationHelper {
     private final UserRepository userRepository;
 
     public String getAuthenticationToken(User user) throws Exception {
-        ZoomAuthResponse res = null;
+        ZoomAuthResponse res;
 
         if (user.getZoomAuthResponse() == null) {
             try {

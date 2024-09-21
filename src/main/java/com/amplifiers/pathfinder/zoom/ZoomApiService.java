@@ -2,7 +2,6 @@ package com.amplifiers.pathfinder.zoom;
 
 import com.amplifiers.pathfinder.entity.session.Session;
 import com.amplifiers.pathfinder.entity.user.User;
-import com.amplifiers.pathfinder.entity.user.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -28,7 +25,7 @@ public class ZoomApiService {
     @Value("${zoom.oauth2.api-url}")
     private String zoomApiUrl;
 
-    private static String BEARER_AUTHORIZATION = "Bearer %s";
+    private static final String BEARER_AUTHORIZATION = "Bearer %s";
 
     private static final String ZOOM_USER_BASE_URL = "%s/v2/users";
 
