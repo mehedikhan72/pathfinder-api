@@ -9,24 +9,34 @@ import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.UnauthorizedException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.amplifiers.pathfinder.zoom.ZoomApiService;
+import io.github.cdimascio.dotenv.Dotenv;
+import java.security.Principal;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Service
 @RequiredArgsConstructor
 public class SessionService {
+
     private final SessionRepository sessionRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final UserUtility userUtility;
     private final NotificationService notificationService;
+    private final ZoomApiService zoomApiService;
 
     public Session createSession(SessionCreateRequest request, Integer enrollmentId) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+        Enrollment enrollment = enrollmentRepository
+            .findById(enrollmentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
         // user validation: only the seller can create a session.
         var sellerId = enrollment.getGig().getSeller().getId();
@@ -49,18 +59,19 @@ public class SessionService {
         }
 
         var session = Session.builder()
-                .enrollment(enrollment)
-                .scheduledAt(request.getScheduledAt())
-                .sessionType(request.getSessionType())
-                .buyerConfirmed(false)
-                .completed(false)
-                .createdAt(OffsetDateTime.now())
-                .build();
+            .enrollment(enrollment)
+            .scheduledAt(request.getScheduledAt())
+            .sessionType(request.getSessionType())
+            .buyerConfirmed(false)
+            .completed(false)
+            .createdAt(OffsetDateTime.now())
+            .build();
 
         Session savedSession = sessionRepository.save(session);
         // Send notification
-        String notificationTxt = session.getEnrollment().getGig().getSeller().getFullName()
-                + " has scheduled a session for you. It's waiting for your confirmation.";
+        String notificationTxt =
+            session.getEnrollment().getGig().getSeller().getFullName() +
+            " has scheduled a session for you. It's waiting for your confirmation.";
         String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
         notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
 
@@ -83,7 +94,12 @@ public class SessionService {
         // Send notification
         String notificationTxt = session.getEnrollment().getBuyer().getFullName() + " has confirmed the session.";
         String linkSuffix = "interaction/user/" + session.getEnrollment().getBuyer().getId();
-        notificationService.sendNotification(notificationTxt, session.getEnrollment().getGig().getSeller(), NotificationType.SESSION, linkSuffix);
+        notificationService.sendNotification(
+            notificationTxt,
+            session.getEnrollment().getGig().getSeller(),
+            NotificationType.SESSION,
+            linkSuffix
+        );
 
         return sessionRepository.save(session);
     }
@@ -104,7 +120,12 @@ public class SessionService {
         // Send notification
         String notificationTxt = session.getEnrollment().getBuyer().getFullName() + " has declined the session.";
         String linkSuffix = "interaction/user/" + session.getEnrollment().getBuyer().getId();
-        notificationService.sendNotification(notificationTxt, session.getEnrollment().getGig().getSeller(), NotificationType.SESSION, linkSuffix);
+        notificationService.sendNotification(
+            notificationTxt,
+            session.getEnrollment().getGig().getSeller(),
+            NotificationType.SESSION,
+            linkSuffix
+        );
         return "deleted";
     }
 
@@ -206,7 +227,9 @@ public class SessionService {
     }
 
     public boolean userPartOfEnrollment(Integer userId, Integer enrollmentId) {
-        Enrollment enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+        Enrollment enrollment = enrollmentRepository
+            .findById(enrollmentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
         return Objects.equals(enrollment.getBuyer().getId(), userId) || Objects.equals(enrollment.getGig().getSeller().getId(), userId);
     }
 
@@ -224,5 +247,24 @@ public class SessionService {
             return sessionRepository.findAllByEnrollmentId(enrollmentId);
         }
         throw new UnauthorizedException("You are not part of this enrollment.");
+    }
+
+    public Object startZoomSession(Integer sessionId) {
+        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found."));
+
+        User user = session.getEnrollment().getGig().getSeller();
+
+        var map = zoomApiService.startMeeting(user, session);
+
+        session.setZoomJoinLink(map.get("join_url"));
+        sessionRepository.save(session);
+
+        return map;
+    }
+
+    public String joinZoomSession(Integer sessionId) {
+        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found."));
+
+        return session.getZoomJoinLink();
     }
 }

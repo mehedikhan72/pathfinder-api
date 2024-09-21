@@ -2,11 +2,16 @@ package com.amplifiers.pathfinder.entity.user;
 
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.tag.Tag;
+import com.amplifiers.pathfinder.zoom.ZoomAuthResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,17 +20,12 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
+@Table(name = "_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "email" }) })
 public class User implements UserDetails {
 
     @Id
@@ -81,8 +81,18 @@ public class User implements UserDetails {
 
     @ColumnDefault("null")
     private String emailVerificationToken;
+
     @Column(columnDefinition = "timestamp default null")
     private OffsetDateTime lastVerificationEmailSentAt;
+
+    @JsonIgnore
+    @ColumnDefault("null")
+    private String zoomAuthorizationCode;
+
+    @JsonIgnore
+    @Embedded
+    @ColumnDefault("null")
+    private ZoomAuthResponse zoomAuthResponse;
 
     @JsonIgnore
     @ElementCollection(targetClass = Achievement.class)

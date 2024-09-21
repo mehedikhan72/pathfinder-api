@@ -5,12 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -20,6 +19,7 @@ import java.time.OffsetDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "session")
 public class Session {
+
     @Id
     @GeneratedValue
     private Integer id;
@@ -33,6 +33,7 @@ public class Session {
 
     @NotNull(message = "Scheduled date is required.")
     private OffsetDateTime scheduledAt;
+
     private OffsetDateTime completedAt;
     private boolean completed;
 
@@ -41,7 +42,7 @@ public class Session {
     @NotBlank(message = "Session type is required.")
     private String sessionType;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollmentId")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -53,8 +54,11 @@ public class Session {
 
     @Enumerated(EnumType.STRING)
     private CancelledBy cancelledBy;
+
     private String cancellationReason;
     private OffsetDateTime cancelledAt;
 
+    @Column(columnDefinition = "text")
+    private String zoomJoinLink;
     // TODO: more data about session will be added here, later.
 }

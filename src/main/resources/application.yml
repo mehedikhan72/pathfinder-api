@@ -30,6 +30,7 @@ application:
 logging:
   level:
     org:
+      apache.http: debug
       springframework:
         web: DEBUG
       hibernate: ERROR
@@ -49,6 +50,14 @@ spring:
 recombee:
   private-token: ${RECOMBEE_PRIVATE_TOKEN}
   database-id: ${RECOMBEE_DATABASE_ID}
+
+zoom:
+    oauth2:
+      client-id: ${ZOOM_CLIENT_ID}
+      client-secret: ${ZOOM_CLIENT_SECRET}
+      issuer: ${ZOOM_ISSUER}
+      account-id: ${ZOOM_ACCOUNT_ID}
+      api-url: https://api.zoom.us
 
 ---
 # Production profile
