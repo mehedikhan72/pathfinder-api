@@ -52,8 +52,8 @@ recombee:
   database-id: ${RECOMBEE_DATABASE_ID}
 
 zoom:
-    oauth2:
-      api-url: https://api.zoom.us
+  oauth2:
+    api-url: https://api.zoom.us
 
 ---
 # Production profile
@@ -67,5 +67,17 @@ spring:
     password: ${DB_PASSWORD}
 
 recombee:
-  private-token: "todo"
-  database-id: "todo"
+  private-token: ${RECOMBEE_PRIVATE_TOKEN}
+  database-id: ${RECOMBEE_DATABASE_ID}
+
+zoom:
+  client-id: ${ZOOM_CLIENT_ID}
+  client-secret: ${ZOOM_CLIENT_SECRET}
+  issuer: ${ZOOM_ISSUER}
+
+mailgun:
+  api-key: ${MAILGUN_API_KEY}
+  domain: ${MAILGUN_DOMAIN}
+
+openai:
+  groq-api-key: ${GROQ_API_KEY}

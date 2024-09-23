@@ -12,9 +12,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OpenAIService {
 
-    // private final Dotenv dotenv = Dotenv.configure().load();
+//    private final Dotenv dotenv = Dotenv.configure().load();
+//    private final String apiKey = dotenv.get("GROQ_API_KEY");
 
-    @Value("${GROQ_API_KEY}")
+    @Value("${openai.groq-api-key}")
     private String apiKey;
 
     private final SimpleOpenAI openAI = SimpleOpenAI.builder()

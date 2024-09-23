@@ -15,10 +15,10 @@ public class EmailService {
 //    private final String apiKey = dotenv.get("MAILGUN_API_KEY");
 //    private final String domain = dotenv.get("MAILGUN_DOMAIN");
 
-    @Value("${MAILGUN_API_KEY}")
+    @Value("${mailgun.api-key}")
     private String apiKey;
 
-    @Value("${MAILGUN_DOMAIN}")
+    @Value("${mailgun.domain}")
     private String domain;
 
     public void sendEmail(User user, String subject, String message) throws UnirestException {

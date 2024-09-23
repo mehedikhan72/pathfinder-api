@@ -20,17 +20,17 @@ public class RecommendationService {
 //    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
 //    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
 
-    @Value("${RECOMBEE_PRIVATE_TOKEN}")
-    private String privateToken;
+//    @Value("${RECOMBEE_PRIVATE_TOKEN}")
+//    private String privateToken;
+//
+//    @Value("${RECOMBEE_DATABASE_ID}")
+//    private String databaseId;
 
-    @Value("${RECOMBEE_DATABASE_ID}")
+    @Value("${recombee.database-id}")
     private String databaseId;
 
-//    @Value("${recombee.database-id}")
-//    private String databaseId;
-//
-//    @Value("${recombee.private-token}")
-//    private String privateToken;
+    @Value("${recombee.private-token}")
+    private String privateToken;
 
     // fuck it. let's just do it like that.
 

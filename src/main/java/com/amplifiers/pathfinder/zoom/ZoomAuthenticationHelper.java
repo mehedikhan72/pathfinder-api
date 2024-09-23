@@ -31,13 +31,13 @@ public class ZoomAuthenticationHelper {
 //
 //    private final String zoomIssuerUrl = dotenv.get("ZOOM_ISSUER");
 
-    @Value("${ZOOM_CLIENT_ID}")
+    @Value("${zoom.client-id}")
     private final String zoomClientId;
 
-    @Value("${ZOOM_CLIENT_SECRET}")
+    @Value("${zoom.client-secret}")
     private final String zoomClientSecret;
 
-    @Value("${ZOOM_ISSUER}")
+    @Value("${zoom.issuer}")
     private final String zoomIssuerUrl;
 
     private final Integer tokenExpirationInMinutes = 20;

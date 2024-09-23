@@ -46,8 +46,8 @@ jobs:
       - name: Remove all old images
         run: if [ ! -z "$(doctl registry repository list | grep "$(echo $IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $IMAGE_NAME) $(doctl registry repository list-tags $(echo $IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
 
-#      - name: Remove Garbage
-#        run: doctl registry garbage-collection start pathphindr --force
+      #      - name: Remove Garbage
+      #        run: doctl registry garbage-collection start pathphindr --force
 
       - name: Push image to DigitalOcean Container Registry
         run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
@@ -92,4 +92,6 @@ jobs:
               -e MAILGUN_DOMAIN=${{ secrets.MAILGUN_DOMAIN }} \
               -e ZOOM_CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }} \
               -e ZOOM_CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }} \
+              -e ZOOM_ISSUER=${{ secrets.ZOOM_ISSUER }} \
+              -e GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
               $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
