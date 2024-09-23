@@ -12,5 +12,4 @@ RUN ./mvnw package -DskipTests -Dcheckstyle.skip=true
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build target/*.jar app.jar
-COPY .env /app/.env
 ENTRYPOINT ["java", "-jar", "app.jar"]

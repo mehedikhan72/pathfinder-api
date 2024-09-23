@@ -5,16 +5,20 @@ import io.github.sashirestela.openai.SimpleOpenAI;
 import io.github.sashirestela.openai.domain.chat.ChatMessage;
 import io.github.sashirestela.openai.domain.chat.ChatRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class OpenAIService {
 
-    private final Dotenv dotenv = Dotenv.configure().load();
+    // private final Dotenv dotenv = Dotenv.configure().load();
+
+    @Value("${GROQ_API_KEY}")
+    private String apiKey;
 
     private final SimpleOpenAI openAI = SimpleOpenAI.builder()
-            .apiKey(dotenv.get("GROQ_API_KEY"))
+            .apiKey(apiKey)
             .baseUrl("https://api.groq.com/openai")
             .build();
 

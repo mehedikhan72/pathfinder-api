@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,12 +24,22 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class ZoomAuthenticationHelper {
 
-    private final Dotenv dotenv = Dotenv.configure().load();
-    private final String zoomClientId = dotenv.get("ZOOM_CLIENT_ID");
+//    private final Dotenv dotenv = Dotenv.configure().load();
+//    private final String zoomClientId = dotenv.get("ZOOM_CLIENT_ID");
+//
+//    private final String zoomClientSecret = dotenv.get("ZOOM_CLIENT_SECRET");
+//
+//    private final String zoomIssuerUrl = dotenv.get("ZOOM_ISSUER");
 
-    private final String zoomClientSecret = dotenv.get("ZOOM_CLIENT_SECRET");
+    @Value("${ZOOM_CLIENT_ID}")
+    private final String zoomClientId;
 
-    private final String zoomIssuerUrl = dotenv.get("ZOOM_ISSUER");
+    @Value("${ZOOM_CLIENT_SECRET}")
+    private final String zoomClientSecret;
+
+    @Value("${ZOOM_ISSUER}")
+    private final String zoomIssuerUrl;
+
     private final Integer tokenExpirationInMinutes = 20;
     private final Integer oneSecondInMilliseconds = 1000;
 

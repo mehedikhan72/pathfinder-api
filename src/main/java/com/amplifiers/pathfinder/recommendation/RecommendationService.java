@@ -7,6 +7,7 @@ import com.recombee.api_client.bindings.RecommendationResponse;
 import com.recombee.api_client.util.Region;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -15,9 +16,15 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class RecommendationService {
 
-    private final Dotenv dotenv = Dotenv.configure().load();
-    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
-    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
+//    private final Dotenv dotenv = Dotenv.configure().load();
+//    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
+//    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
+
+    @Value("${RECOMBEE_PRIVATE_TOKEN}")
+    private String privateToken;
+
+    @Value("${RECOMBEE_DATABASE_ID}")
+    private String databaseId;
 
 //    @Value("${recombee.database-id}")
 //    private String databaseId;
