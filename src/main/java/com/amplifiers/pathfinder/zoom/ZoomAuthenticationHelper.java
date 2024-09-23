@@ -41,6 +41,7 @@ public class ZoomAuthenticationHelper {
 //    @Value("${zoom.issuer}")
 //    private final String zoomIssuerUrl;
 
+    @Autowired
     private final Environment env;
 
     private final String zoomClientId = env.getProperty("ZOOM_CLIENT_ID");
