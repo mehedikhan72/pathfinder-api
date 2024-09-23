@@ -5,6 +5,7 @@ import com.recombee.api_client.RecombeeClient;
 import com.recombee.api_client.api_requests.*;
 import com.recombee.api_client.bindings.RecommendationResponse;
 import com.recombee.api_client.util.Region;
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -15,39 +16,20 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class RecommendationService {
 
-//    private final Dotenv dotenv = Dotenv.configure().load();
-//    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
-//    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
+    private final Dotenv dotenv = Dotenv.configure().load();
+    private final String privateToken = dotenv.get("RECOMBEE_PRIVATE_TOKEN");
+    private final String databaseId = dotenv.get("RECOMBEE_DATABASE_ID");
 
-    private final Environment env;
 
-    private final String privateToken;
-    private final String databaseId;
-
-    private final RecombeeClient client;
-
-    public RecommendationService() {
-        this.env = null;
-        this.privateToken = null;
-        this.databaseId = null;
-        this.client = null;
-    }
-
-    // Constructor with environment property extraction
-    public RecommendationService(Environment env) {
-        this.env = env;
-        this.privateToken = env.getProperty("recombee.private-token");
-        this.databaseId = env.getProperty("recombee.database-id");
-
-        // Initialize RecombeeClient
-        this.client = new RecombeeClient(databaseId, privateToken)
-                .setRegion(Region.EU_WEST);
-    }
-
-    // fuck it. let's just do it like that.
+//    fuck it. let's just do it like that.
 
 //    private final String privateToken = "1234";
 //    private final String databaseId = "1234";
+
+    private final RecombeeClient client = new RecombeeClient(
+            databaseId,
+            privateToken
+    ).setRegion(Region.EU_WEST);
 
     public void sendGigValues(Gig gig) {
         System.out.println("private token - " + privateToken);

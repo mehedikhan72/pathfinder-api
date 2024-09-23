@@ -47,10 +47,13 @@ spring:
     username: postgres
     password: postgres
 
-recombee:
-  private-token: ui0bb5rWDix4IUaQQAr6PzWqeddguXPXIclHuyLMYarPH2n85aturUXh76C0NRvk
-  database-id: pathfinder-dev
-
+#recombee:
+#  private-token: ui0bb5rWDix4IUaQQAr6PzWqeddguXPXIclHuyLMYarPH2n85aturUXh76C0NRvk
+#  database-id: pathfinder-dev
+#
+#mailgun:
+#  api-key: 2c9117ed3960408e855767a23c6e3563-2b755df8-02d6f02b
+#  domain: mg.pathphindr.com
 zoom:
   oauth2:
     api-url: https://api.zoom.us
