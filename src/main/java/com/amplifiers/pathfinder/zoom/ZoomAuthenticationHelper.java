@@ -34,7 +34,6 @@ public class ZoomAuthenticationHelper {
     private final Integer tokenExpirationInMinutes = 20;
     private final Integer oneSecondInMilliseconds = 1000;
 
-    @Autowired
     private final RestTemplate restTemplate;
 
     private final UserRepository userRepository;
