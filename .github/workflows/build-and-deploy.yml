@@ -86,4 +86,10 @@ jobs:
               -e DB_NAME=${{ secrets.DB_NAME }} \
               -e DB_PORT=${{ secrets.DB_PORT }} \
               -e SPRING_PROFILES_ACTIVE=prod \
+              -e RECOMBEE_PRIVATE_TOKEN=${{ secrets.RECOMBEE_PRIVATE_TOKEN }} \
+              -e RECOMBEE_DATABASE_ID=${{ secrets.RECOMBEE_DATABASE_ID }} \
+              -e MAILGUN_API_KEY=${{ secrets.MAILGUN_API_KEY }} \
+              -e MAILGUN_DOMAIN=${{ secrets.MAILGUN_DOMAIN }} \
+              -e ZOOM_CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }} \
+              -e ZOOM_CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }} \
               $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
