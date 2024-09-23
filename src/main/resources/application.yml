@@ -48,8 +48,8 @@ spring:
     password: postgres
 
 recombee:
-  private-token: ${RECOMBEE_PRIVATE_TOKEN}
-  database-id: ${RECOMBEE_DATABASE_ID}
+  private-token: ui0bb5rWDix4IUaQQAr6PzWqeddguXPXIclHuyLMYarPH2n85aturUXh76C0NRvk
+  database-id: pathfinder-dev
 
 zoom:
   oauth2:

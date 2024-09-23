@@ -2,15 +2,8 @@ package com.amplifiers.pathfinder.zoom;
 
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
-import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.validation.constraints.NotNull;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -41,20 +39,34 @@ public class ZoomAuthenticationHelper {
 //    @Value("${zoom.issuer}")
 //    private final String zoomIssuerUrl;
 
-    @Autowired
-    private final Environment env;
-
-    private final String zoomClientId = env.getProperty("ZOOM_CLIENT_ID");
-    private final String zoomClientSecret = env.getProperty("ZOOM_CLIENT_SECRET");
-    private final String zoomIssuerUrl = env.getProperty("ZOOM_ISSUER");
+    private final RestTemplate restTemplate;
+    private final UserRepository userRepository;
 
     private final Integer tokenExpirationInMinutes = 20;
     private final Integer oneSecondInMilliseconds = 1000;
 
-    @Autowired
-    private final RestTemplate restTemplate;
+    private final String zoomClientId;
+    private final String zoomClientSecret;
+    private final String zoomIssuerUrl;
 
-    private final UserRepository userRepository;
+    public ZoomAuthenticationHelper() {
+        this.zoomClientId = null;
+        this.zoomClientSecret = null;
+        this.zoomIssuerUrl = null;
+
+        this.restTemplate = null;
+        this.userRepository = null;
+    }
+
+    public ZoomAuthenticationHelper(Environment env, RestTemplate restTemplate, UserRepository userRepository) {
+        this.restTemplate = restTemplate;
+        this.userRepository = userRepository;
+
+        // Initialize these values in the constructor, after env has been injected
+        this.zoomClientId = env.getProperty("ZOOM_CLIENT_ID");
+        this.zoomClientSecret = env.getProperty("ZOOM_CLIENT_SECRET");
+        this.zoomIssuerUrl = env.getProperty("ZOOM_ISSUER");
+    }
 
     public String getAuthenticationToken(User user) throws Exception {
         ZoomAuthResponse res;

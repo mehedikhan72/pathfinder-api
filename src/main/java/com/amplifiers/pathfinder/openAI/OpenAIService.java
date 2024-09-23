@@ -1,11 +1,10 @@
 package com.amplifiers.pathfinder.openAI;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import io.github.sashirestela.openai.SimpleOpenAI;
 import io.github.sashirestela.openai.domain.chat.ChatMessage;
 import io.github.sashirestela.openai.domain.chat.ChatRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,16 +14,28 @@ public class OpenAIService {
 //    private final Dotenv dotenv = Dotenv.configure().load();
 //    private final String apiKey = dotenv.get("GROQ_API_KEY");
 
-    @Value("${openai.groq-api-key}")
-    private String apiKey;
+    private final Environment env;
 
-    private final SimpleOpenAI openAI = SimpleOpenAI.builder()
-            .apiKey(apiKey)
-            .baseUrl("https://api.groq.com/openai")
-            .build();
+    private final String apiKey;
+    private SimpleOpenAI openAI;
 
     private final Integer suggestionMaxTokens = 500;
     private final Integer chatMaxTokens = 300;
+
+    public OpenAIService() {
+        this.env = null;
+        this.apiKey = null;
+    }
+
+    // Constructor to initialize apiKey and SimpleOpenAI using Environment
+    public OpenAIService(Environment env) {
+        this.env = env;
+        this.apiKey = env.getProperty("openai.groq-api-key");
+        this.openAI = SimpleOpenAI.builder()
+                .apiKey(apiKey)
+                .baseUrl("https://api.groq.com/openai")
+                .build();
+    }
 
     public String suggestion(String message) {
         var chatRequest = ChatRequest.builder()

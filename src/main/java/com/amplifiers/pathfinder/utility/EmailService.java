@@ -4,8 +4,7 @@ import com.amplifiers.pathfinder.entity.user.User;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,11 +14,19 @@ public class EmailService {
 //    private final String apiKey = dotenv.get("MAILGUN_API_KEY");
 //    private final String domain = dotenv.get("MAILGUN_DOMAIN");
 
-    @Value("${mailgun.api-key}")
-    private String apiKey;
+    private final String apiKey;
+    private final String domain;
 
-    @Value("${mailgun.domain}")
-    private String domain;
+    public EmailService() {
+        this.apiKey = null;
+        this.domain = null;
+    }
+
+    // Constructor with environment property extraction
+    public EmailService(Environment env) {
+        this.apiKey = env.getProperty("mailgun.api-key");
+        this.domain = env.getProperty("mailgun.domain");
+    }
 
     public void sendEmail(User user, String subject, String message) throws UnirestException {
 
