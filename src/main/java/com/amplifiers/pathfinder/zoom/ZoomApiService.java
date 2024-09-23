@@ -16,10 +16,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class ZoomApiService {
 
-    @Autowired
     private ZoomAuthenticationHelper zoomAuthenticationHelper;
 
-    @Autowired
     private final RestTemplate restTemplate;
 
     @Value("${zoom.oauth2.api-url}")
