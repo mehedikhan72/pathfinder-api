@@ -20,8 +20,7 @@ public class ZoomApiService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${zoom.oauth2.api-url}")
-    private String zoomApiUrl;
+    private final String zoomApiUrl = "https://api.zoom.us";
 
     private static final String BEARER_AUTHORIZATION = "Bearer %s";
 
