@@ -20,7 +20,7 @@ public class ZoomApiService {
     private ZoomAuthenticationHelper zoomAuthenticationHelper;
 
     @Autowired
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     @Value("${zoom.oauth2.api-url}")
     private String zoomApiUrl;

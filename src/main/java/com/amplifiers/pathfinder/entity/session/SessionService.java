@@ -64,8 +64,8 @@ public class SessionService {
         Session savedSession = sessionRepository.save(session);
         // Send notification
         String notificationTxt =
-            session.getEnrollment().getGig().getSeller().getFullName() +
-            " has scheduled a session for you. It's waiting for your confirmation.";
+            session.getEnrollment().getGig().getSeller().getFullName()
+            + " has scheduled a session for you. It's waiting for your confirmation.";
         String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
         notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
 

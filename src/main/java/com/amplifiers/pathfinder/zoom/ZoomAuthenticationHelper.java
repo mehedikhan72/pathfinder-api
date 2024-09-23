@@ -29,9 +29,11 @@ public class ZoomAuthenticationHelper {
     private final String zoomClientSecret = dotenv.get("ZOOM_CLIENT_SECRET");
 
     private final String zoomIssuerUrl = dotenv.get("ZOOM_ISSUER");
+    private final Integer tokenExpirationInMinutes = 20;
+    private final Integer oneSecondInMilliseconds = 1000;
 
     @Autowired
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     private final UserRepository userRepository;
 
@@ -82,7 +84,7 @@ public class ZoomAuthenticationHelper {
             return true;
         }
         //Token has less than 20 minutes to expire
-        return TimeUnit.MILLISECONDS.toMinutes(differenceInMillis) < 20;
+        return TimeUnit.MILLISECONDS.toMinutes(differenceInMillis) < tokenExpirationInMinutes;
     }
 
     private ZoomAuthResponse fetchToken(String authCode) {
@@ -126,7 +128,7 @@ public class ZoomAuthenticationHelper {
         ZoomAuthResponse res = restTemplate.exchange(url, HttpMethod.POST, entity, ZoomAuthResponse.class).getBody();
 
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        res.setExpiresIn(res.getExpiresIn() * 1000 + now.getTimeInMillis());
+        res.setExpiresIn(res.getExpiresIn() * oneSecondInMilliseconds + now.getTimeInMillis());
 
         return res;
     }

@@ -263,7 +263,8 @@ public class AuthenticationService {
         }
 
         if (userEmail != null) {
-            var user = this.repository.findByEmail(userEmail).orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
+            var user = this.repository.findByEmail(userEmail)
+                    .orElseThrow(() -> new ResourceNotFoundException("No user found with this email. Please try again."));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
 
