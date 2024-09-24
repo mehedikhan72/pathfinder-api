@@ -129,7 +129,7 @@ public class GigService {
         Gig gig = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Gig not found"));
 
         User currentUser = userUtility.getCurrentUser();
-        if (!Objects.equals(currentUser.getId(), gig.getId()) && (!gig.isAccepted() || gig.isPaused())) {
+        if (!Objects.equals(currentUser.getId(), gig.getId())) {
             throw new ResourceNotFoundException("Gig Not Found");
         }
 
