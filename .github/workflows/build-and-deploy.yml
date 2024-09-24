@@ -79,7 +79,7 @@ jobs:
             docker run -d \
               --restart always \
               --name $(echo $IMAGE_NAME) \
-              -p 80:8080 \
+              -p 8080:8080 \
               -e DB_HOST=${{ secrets.DB_HOST }} \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
