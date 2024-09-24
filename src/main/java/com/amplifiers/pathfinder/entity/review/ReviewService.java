@@ -10,16 +10,18 @@ import com.amplifiers.pathfinder.exception.ForbiddenException;
 import com.amplifiers.pathfinder.exception.ResourceNotFoundException;
 import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.utility.UserUtility;
+import java.security.Principal;
+import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
+
     private final ReviewRepository repository;
     private final GigRepository gigRepository;
     private final EnrollmentRepository enrollmentRepository;
@@ -50,13 +52,13 @@ public class ReviewService {
         validateReviewRequest(reviewRequest);
 
         Review review = Review.builder()
-                .title(reviewRequest.getTitle())
-                .text(reviewRequest.getText())
-                .rating(reviewRequest.getRating())
-                .createdAt(OffsetDateTime.now())
-                .reviewer(user)
-                .gig(gig)
-                .build();
+            .title(reviewRequest.getTitle())
+            .text(reviewRequest.getText())
+            .rating(reviewRequest.getRating())
+            .createdAt(OffsetDateTime.now())
+            .reviewer(user)
+            .gig(gig)
+            .build();
 
         return repository.save(review);
     }
@@ -120,18 +122,18 @@ public class ReviewService {
 
     public static ReviewCardDTO createReviewCardDTO(Review review, boolean includeGig) {
         UserShortDTO reviewer = UserShortDTO.builder()
-                .id(review.getReviewer().getId())
-                .firstName(review.getReviewer().getFirstName())
-                .lastName(review.getReviewer().getLastName())
-                .build();
+            .id(review.getReviewer().getId())
+            .firstName(review.getReviewer().getFirstName())
+            .lastName(review.getReviewer().getLastName())
+            .build();
 
         var reviewCardDTOBuilder = ReviewCardDTO.builder()
-                .id(review.getId())
-                .title(review.getTitle())
-                .text(review.getText())
-                .rating(review.getRating())
-                .createdAt(review.getCreatedAt())
-                .reviewer(reviewer);
+            .id(review.getId())
+            .title(review.getTitle())
+            .text(review.getText())
+            .rating(review.getRating())
+            .createdAt(review.getCreatedAt())
+            .reviewer(reviewer);
 
         if (includeGig) {
             reviewCardDTOBuilder = reviewCardDTOBuilder.gig(GigService.createGigShortDTO(review.getGig()));
@@ -148,5 +150,13 @@ public class ReviewService {
         Page<Review> reviews = repository.findAllReviewsBySellerId(pageable, sellerId);
 
         return reviews.map(ReviewService::createReviewCardDTO);
+    }
+
+    public Review getMyReviewForGig(Integer gigId, Principal connectedUser) {
+        User user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+        Review review = repository.findByGigIdAndAndReviewer(gigId, user).orElse(null);
+
+        return review;
     }
 }

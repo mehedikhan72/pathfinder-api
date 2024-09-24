@@ -51,7 +51,7 @@ public class EnrollmentController {
         @RequestParam(name = "page", defaultValue = "0") Integer page,
         @PathVariable Integer buyerId
     ) {
-        Pageable pageable = PageRequest.of(page, numEnrollmentsPerPage);
+        Pageable pageable = PageRequest.of(page, numEnrollmentsPerPage * 2);
         return ResponseEntity.ok(service.findAllByBuyerId(pageable, buyerId));
     }
 

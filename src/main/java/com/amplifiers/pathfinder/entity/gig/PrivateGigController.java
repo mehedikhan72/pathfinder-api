@@ -3,44 +3,37 @@ package com.amplifiers.pathfinder.entity.gig;
 import com.amplifiers.pathfinder.entity.review.Review;
 import com.amplifiers.pathfinder.entity.review.ReviewRequest;
 import com.amplifiers.pathfinder.entity.review.ReviewService;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 @RestController
 @RequestMapping("/api/v1/gigs")
 @RequiredArgsConstructor
 public class PrivateGigController {
+
     private final GigService service;
     private final ReviewService reviewService;
     private final Integer badRequestResponseCode = 400;
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> createGig(
-            @RequestBody GigCreateRequest request
-    ) {
+    public ResponseEntity<?> createGig(@RequestBody GigCreateRequest request) {
         return ResponseEntity.ok(service.createGig(request));
     }
 
     @GetMapping("/get/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> findGigById(
-            @PathVariable Integer id
-    ) {
+    public ResponseEntity<?> findGigById(@PathVariable Integer id) {
         return ResponseEntity.ok(service.privateFindById(id));
     }
 
-
     @PatchMapping("/{gigId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> editGig(
-            @PathVariable Integer gigId,
-            @RequestBody GigCreateRequest request
-    ) {
+    public ResponseEntity<?> editGig(@PathVariable Integer gigId, @RequestBody GigCreateRequest request) {
         service.editGig(request, gigId);
         return ResponseEntity.ok("Gig id " + gigId + " successfully edited.");
     }
@@ -67,6 +60,12 @@ public class PrivateGigController {
         }
     }
 
+    @GetMapping("/{gigId}/reviews")
+    @ResponseStatus(HttpStatus.OK)
+    public Review getMyReviewForGig(@PathVariable Integer gigId, Principal connectedUser) {
+        return reviewService.getMyReviewForGig(gigId, connectedUser);
+    }
+
     @PostMapping("/{gigId}/reviews")
     @ResponseStatus(HttpStatus.CREATED)
     public Review createReview(@PathVariable Integer gigId, @RequestBody ReviewRequest reviewRequest) {
@@ -87,9 +86,7 @@ public class PrivateGigController {
     }
 
     @DeleteMapping("/delete/{gigId}")
-    public String deleteGig(
-            @PathVariable Integer gigId
-    ) {
+    public String deleteGig(@PathVariable Integer gigId) {
         return service.deleteGig(gigId);
     }
 
@@ -127,26 +124,19 @@ public class PrivateGigController {
 
     @GetMapping("/recommendations/similar-gigs/{gigId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> getSimilarGigsForGig(
-            @PathVariable Integer gigId
-    ) {
+    public ResponseEntity<?> getSimilarGigsForGig(@PathVariable Integer gigId) {
         return ResponseEntity.ok(service.getRecommendationsForItem(gigId, "similar_gigs"));
     }
 
-
     @GetMapping("/next-recommendations/{recommId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> getNextRecommendationsForUser(
-            @PathVariable String recommId
-    ) {
+    public ResponseEntity<?> getNextRecommendationsForUser(@PathVariable String recommId) {
         return ResponseEntity.ok(service.getNextRecommendationsForUser(recommId));
     }
 
     @PutMapping("/pause-unpause-gig/{gigId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> pauseUnpauseGig(
-            @PathVariable Integer gigId
-    ) {
+    public ResponseEntity<?> pauseUnpauseGig(@PathVariable Integer gigId) {
         return ResponseEntity.ok(service.pauseUnpauseGig(gigId));
     }
 }

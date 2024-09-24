@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/recommendation")
 @RequiredArgsConstructor
 public class RecommendationController {
+
     private final RecommendationService recommendationService;
 
-    @PostMapping("/add-purchase-view")
+    @PostMapping("/add-purchase-view/{gigId}/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void addPurchaseView(
-            @PathVariable Integer gigId,
-            @PathVariable Integer userId,
-            @RequestParam String recommId
+        @PathVariable Integer gigId,
+        @PathVariable Integer userId,
+        @RequestParam(name = "recommId") String recommId
     ) {
         recommendationService.addPurchaseView(gigId, userId, recommId);
     }
-
 }
