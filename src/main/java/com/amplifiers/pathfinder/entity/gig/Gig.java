@@ -35,6 +35,7 @@ public class Gig {
     private Integer id;
 
     @NotBlank(message = "Title is required.")
+    @Column(columnDefinition = "TEXT")
     private String title;
 
     @NotBlank(message = "Description is required.")
@@ -48,6 +49,7 @@ public class Gig {
     private Float price;
 
     @NotBlank(message = "Offer text is required.")
+    @Column(columnDefinition = "TEXT")
     private String offerText;
 
     @Formula(
