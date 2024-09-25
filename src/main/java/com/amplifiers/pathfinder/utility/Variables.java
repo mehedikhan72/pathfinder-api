@@ -4,7 +4,7 @@ public class Variables {
 
     public static class ClientSettings {
 
-        public static final String CLIENT_BASE_URL = "https://www.pathphindr.com";
+        public static final String CLIENT_BASE_URL = "https://pathphindr.com";
     }
 
     public static class ApiSettings {

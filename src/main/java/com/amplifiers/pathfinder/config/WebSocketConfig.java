@@ -44,7 +44,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
             .addEndpoint("/ws")
-            .setAllowedOrigins("http://localhost:5173", CLIENT_BASE_URL, "https://pathphindr.netlify.app", "https://pathphindr.com")
+            .setAllowedOrigins("http://localhost:5173", CLIENT_BASE_URL, "https://pathphindr.netlify.app", "https://www.pathphindr.com")
             .withSockJS();
         registry.addEndpoint("/ws");
     }

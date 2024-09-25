@@ -18,7 +18,7 @@ public class SessionController {
     private final SessionService service;
     private final UserService userService;
 
-    private final Integer response405 = 405;
+    private final Integer response450 = 450;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create/{enrollmentId}")
@@ -42,18 +42,18 @@ public class SessionController {
     }
 
     @PostMapping("/start-zoom/{sessionId}")
-    public ResponseEntity<?> startZoomSession(@PathVariable Integer sessionId, Principal connectedUser, HttpServletRequest request) {
+    public ResponseEntity<?> startZoomSession(@PathVariable Integer sessionId, Principal connectedUser) {
         if (!userService.isZoomAuthorized(connectedUser)) {
-            String redirectUri = request.getScheme() + "://" + request.getServerName() + ":5173" + "/zoom-auth";
+            String redirectUri = CLIENT_BASE_URL + "/zoom-auth";
 
             System.out.println(redirectUri);
 
             Dotenv dotenv = Dotenv.load();
-            return ResponseEntity.status(response405).body(
-                    "https://zoom.us/oauth/authorize?response_type=code&client_id="
-                            + dotenv.get("ZOOM_CLIENT_ID")
-                            + "&redirectUri="
-                            + redirectUri
+            return ResponseEntity.status(response450).body(
+                "https://zoom.us/oauth/authorize?response_type=code&client_id=" +
+                dotenv.get("ZOOM_CLIENT_ID") +
+                "&redirectUri=" +
+                redirectUri
             );
         }
 
