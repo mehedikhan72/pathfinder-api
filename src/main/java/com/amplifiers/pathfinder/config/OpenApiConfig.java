@@ -13,12 +13,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
         info = @Info(
                 contact = @Contact(
-                        name = "pathFinder API",
+                        name = "pathPhindr API",
                         email = "mehedi.72.khan@gmail.com",
                         url = ""
                 ),
-                description = "PathFinder API documentation",
-                title = "PathFinder API",
+                description = "pathPhindr API documentation",
+                title = "pathPhindr API",
                 version = "1.0",
                 license = @License(
                         name = "Licence name",
