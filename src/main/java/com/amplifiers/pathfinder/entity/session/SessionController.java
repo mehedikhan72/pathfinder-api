@@ -52,7 +52,7 @@ public class SessionController {
             return ResponseEntity.status(response450).body(
                 "https://zoom.us/oauth/authorize?response_type=code&client_id=" +
                 dotenv.get("ZOOM_CLIENT_ID") +
-                "&redirectUri=" +
+                "&redirect_uri=" +
                 redirectUri
             );
         }
