@@ -92,7 +92,7 @@ public class PrivateGigController {
 
     // RECOMBEE
 
-    @GetMapping("/recommendations")
+    @GetMapping("/recommendations/user")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getRecommendationsForUser() {
         return ResponseEntity.ok(service.getRecommendationsForUser(null));

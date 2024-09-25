@@ -1,5 +1,7 @@
 package com.amplifiers.pathfinder.zoom;
 
+import static com.amplifiers.pathfinder.utility.Variables.ClientSettings.CLIENT_BASE_URL;
+
 import com.amplifiers.pathfinder.entity.user.User;
 import com.amplifiers.pathfinder.entity.user.UserRepository;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -100,7 +102,7 @@ public class ZoomAuthenticationHelper {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("code", authCode);
         map.add("grant_type", "authorization_code");
-        map.add("redirect_uri", "http://localhost:5173/zoom-auth");
+        map.add("redirect_uri", CLIENT_BASE_URL + "/zoom-auth");
 
         return getZoomAuthResponse(headers, map);
     }

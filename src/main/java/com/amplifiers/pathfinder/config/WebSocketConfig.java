@@ -1,5 +1,7 @@
 package com.amplifiers.pathfinder.config;
 
+import static com.amplifiers.pathfinder.utility.Variables.ClientSettings.CLIENT_BASE_URL;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:5173").withSockJS();
+        registry
+            .addEndpoint("/ws")
+            .setAllowedOrigins("http://localhost:5173", CLIENT_BASE_URL, "https://pathphindr.netlify.app")
+            .withSockJS();
         registry.addEndpoint("/ws");
     }
 
@@ -53,50 +58,49 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         return messageConverter;
     }
 
-//    @Override
-//    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
-//        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
-//        resolver.setDefaultMimeType(APPLICATION_JSON);
-//        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-//        converter.setObjectMapper(new ObjectMapper());
-//        converter.setContentTypeResolver(resolver);
-//        messageConverters.add(converter);
-//
-//        return false;
-//    }
+    //    @Override
+    //    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
+    //        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
+    //        resolver.setDefaultMimeType(APPLICATION_JSON);
+    //        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+    //        converter.setObjectMapper(new ObjectMapper());
+    //        converter.setContentTypeResolver(resolver);
+    //        messageConverters.add(converter);
+    //
+    //        return false;
+    //    }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor =
-                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                System.out.println("hello there");
-                assert accessor != null;
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+        registration.interceptors(
+            new ChannelInterceptor() {
+                @Override
+                public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                    StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                    System.out.println("hello there");
+                    assert accessor != null;
+                    if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                        String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
+                        assert authorizationHeader != null;
+                        String token = authorizationHeader.substring(tokenBeginsAtIndex);
 
-                    String authorizationHeader = accessor.getFirstNativeHeader("Authorization");
-                    assert authorizationHeader != null;
-                    String token = authorizationHeader.substring(tokenBeginsAtIndex);
-
-                    System.out.println("token " + token);
-                    String username = jwtService.extractUsername(token);
-                    System.out.println("username " + username);
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                        System.out.println("token " + token);
+                        String username = jwtService.extractUsername(token);
+                        System.out.println("username " + username);
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-                    accessor.setUser(usernamePasswordAuthenticationToken);
+                        accessor.setUser(usernamePasswordAuthenticationToken);
+                    }
+
+                    return message;
                 }
-
-                return message;
             }
-
-        });
+        );
     }
 }
