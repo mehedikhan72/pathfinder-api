@@ -1,14 +1,14 @@
 package com.amplifiers.pathfinder.entity.session;
 
+import static com.amplifiers.pathfinder.utility.Variables.ClientSettings.CLIENT_BASE_URL;
+
 import com.amplifiers.pathfinder.entity.user.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
-import jakarta.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/sessions")
