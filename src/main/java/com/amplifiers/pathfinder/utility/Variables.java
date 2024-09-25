@@ -9,7 +9,7 @@ public class Variables {
 
     public static class ApiSettings {
 
-        public static final String API_BASE_URL = "http://localhost:8080/";
+        public static final String API_BASE_URL = "https://api.pathphindr.com";
     }
 
     public static class PaginationSettings {
