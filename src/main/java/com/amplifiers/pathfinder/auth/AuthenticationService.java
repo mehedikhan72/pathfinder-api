@@ -102,7 +102,7 @@ public class AuthenticationService {
         }
         String verificationToken = user.getEmailVerificationToken();
 
-        String clientLink = ClientSettings.CLIENT_BASE_URL + "verify-email?token=" + verificationToken;
+        String clientLink = ClientSettings.CLIENT_BASE_URL + "/verify-email?token=" + verificationToken;
 
         try {
             emailService.sendEmail(user,
