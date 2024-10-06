@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -50,7 +48,6 @@ public class ZoomApiService {
             //sout is used for demo purposes you could use @Slf4j
             e.printStackTrace();
             System.out.printf("Unable to get all meetings due to %s. Response code: %d%n", e.getMessage(), response.getStatusCode());
-            e.printStackTrace();
         }
         return null;
     }

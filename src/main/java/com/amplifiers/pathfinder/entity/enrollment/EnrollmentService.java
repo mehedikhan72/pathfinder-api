@@ -12,7 +12,6 @@ import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.payment.PaymentService;
 import com.amplifiers.pathfinder.utility.EmailService;
 import com.amplifiers.pathfinder.utility.UserUtility;
-import jakarta.validation.constraints.Future;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;
