@@ -78,7 +78,7 @@ public class EnrollmentService {
 
         var enrollment = Enrollment.builder()
             .gig(gig)
-            .price(request.getPrice())
+            .price(Float.valueOf(request.getPrice()))
             .numSessions(request.getNumSessions())
             .sessionDurationInMinutes(request.getSessionDurationInMinutes())
             .buyer(buyer)
