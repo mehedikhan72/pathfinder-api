@@ -9,6 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 @Embeddable
 public class FAQ {
+
+    @Column(columnDefinition = "text")
     private String question;
+
+    @Column(columnDefinition = "text")
     private String answer;
 }
