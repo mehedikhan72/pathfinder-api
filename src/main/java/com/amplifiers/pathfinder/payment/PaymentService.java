@@ -15,14 +15,13 @@ import com.amplifiers.pathfinder.sslcommerz.TransactionResponseValidator;
 import com.amplifiers.pathfinder.utility.EmailService;
 import com.amplifiers.pathfinder.utility.Variables;
 import com.amplifiers.pathfinder.utility.Variables.ApiSettings;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -139,8 +138,8 @@ public class PaymentService {
             gigRepository.save(gig);
 
             // Sending notification
-            String notificationTxt = enrollment.getBuyer().getFullName()
-                    + " has accepted your enrollment offer.";
+            String notificationTemplate = "%s - %s - Accepted your enrollment offer.";
+            String notificationTxt = String.format(notificationTemplate, enrollment.getBuyer().getFullName(), gig.getTitle());
             String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
             notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
 

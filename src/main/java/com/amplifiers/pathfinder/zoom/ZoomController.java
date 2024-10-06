@@ -23,7 +23,6 @@ public class ZoomController {
     @PostMapping("/auth-code")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> setUserAuthCode(@RequestBody String code, Principal connectedUser) {
-        System.out.println(code);
         userService.setAuthorizationCode(code, connectedUser);
 
         return ResponseEntity.ok(code);

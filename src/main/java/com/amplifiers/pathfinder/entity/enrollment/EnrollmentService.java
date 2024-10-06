@@ -12,18 +12,19 @@ import com.amplifiers.pathfinder.exception.ValidationException;
 import com.amplifiers.pathfinder.payment.PaymentService;
 import com.amplifiers.pathfinder.utility.EmailService;
 import com.amplifiers.pathfinder.utility.UserUtility;
+import jakarta.validation.constraints.Future;
+import java.time.OffsetDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class EnrollmentService {
+
     private final EnrollmentRepository enrollmentRepository;
     private final GigRepository gigRepository;
     private final UserRepository userRepository;
@@ -37,8 +38,7 @@ public class EnrollmentService {
     // TODO: seller won't be able to initiate any new offers to the same buyer.
 
     public Enrollment createEnrollment(EnrollmentCreateRequest request, Integer gigId) {
-        Gig gig = gigRepository.findById(gigId)
-                .orElseThrow(() -> new ResourceNotFoundException("Gig not found."));
+        Gig gig = gigRepository.findById(gigId).orElseThrow(() -> new ResourceNotFoundException("Gig not found."));
 
         var sellerId = gig.getSeller().getId();
         User user = userUtility.getCurrentUser();
@@ -54,11 +54,12 @@ public class EnrollmentService {
         // since only one incomplete enrollment can exist at a time.
         Optional<Enrollment> existingEnrollment = findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, request.getBuyerId());
         if (existingEnrollment.isPresent()) {
-            throw new ValidationException("An incomplete enrollment already exists between you and this buyer. Please complete this one first.");
+            throw new ValidationException(
+                "An incomplete enrollment already exists between you and this buyer. Please complete this one first."
+            );
         }
 
-        User buyer = userRepository.findById(request.getBuyerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Buyer not found."));
+        User buyer = userRepository.findById(request.getBuyerId()).orElseThrow(() -> new ResourceNotFoundException("Buyer not found."));
 
         if (request.getNumSessions() <= 0) {
             throw new ValidationException("Number of sessions must be positive.");
@@ -72,28 +73,34 @@ public class EnrollmentService {
             throw new ValidationException("You didn't provide a price. Are you some kind of saint?");
         }
 
+        if (request.getDeadline().isBefore(OffsetDateTime.now())) {
+            throw new ValidationException("Deadline must be in the future.");
+        }
+
         var enrollment = Enrollment.builder()
-                .gig(gig)
-                .price(request.getPrice())
-                .numSessions(request.getNumSessions())
-                .sessionDurationInMinutes(request.getSessionDurationInMinutes())
-                .buyer(buyer)
-                .deadline(request.getDeadline())
-                .numSessionsCompleted(0)
-                .buyerConfirmed(false)
-                .paid(false)
-                .createdAt(OffsetDateTime.now())
-                .build();
+            .gig(gig)
+            .price(request.getPrice())
+            .numSessions(request.getNumSessions())
+            .sessionDurationInMinutes(request.getSessionDurationInMinutes())
+            .buyer(buyer)
+            .deadline(request.getDeadline())
+            .numSessionsCompleted(0)
+            .buyerConfirmed(false)
+            .paid(false)
+            .createdAt(OffsetDateTime.now())
+            .build();
 
         Enrollment savedEnrollment = enrollmentRepository.save(enrollment);
 
         gig.setScore(gig.getScore() + scoreIncreaseOnEnrollmentCreation);
         gigRepository.save(gig);
 
+        User seller = savedEnrollment.getGig().getSeller();
+
         // Sending notification to receiver
-        String notificationTxt = savedEnrollment.getGig().getSeller().getFullName()
-                + " has offered you a new enrollment.";
-        String linkSuffix = "interaction/user/" + savedEnrollment.getGig().getSeller().getId();
+        String notificationTemplate = "%s - %s - Offered you a new enrollment.";
+        String notificationTxt = String.format(notificationTemplate, seller.getFullName(), gig.getTitle());
+        String linkSuffix = "interaction/user/" + seller.getId();
         notificationService.sendNotification(notificationTxt, savedEnrollment.getBuyer(), NotificationType.ENROLLMENT, linkSuffix);
 
         // sending email to buyer
@@ -163,10 +170,11 @@ public class EnrollmentService {
         }
 
         // Sending notification
-        String notificationTxt = enrollment.getBuyer().getFullName()
-                + " has declined your enrollment offer.";
+        String notificationTemplate = "%s - %s - Declined your enrollment offer.";
+        String notificationTxt = String.format(notificationTemplate, enrollment.getBuyer().getFullName(), enrollment.getGig().getTitle());
         String linkSuffix = "interaction/user/" + enrollment.getBuyer().getId();
         notificationService.sendNotification(notificationTxt, enrollment.getGig().getSeller(), NotificationType.ENROLLMENT, linkSuffix);
+
         enrollmentRepository.delete(enrollment);
     }
 
@@ -177,9 +185,9 @@ public class EnrollmentService {
         return enrollmentRepository.findIncompleteEnrollmentBySellerIdAndBuyerId(sellerId, buyerId);
     }
 
-//    public Optional<Enrollment> findRunningEnrollmentBetweenTwoUsers(Integer userId1, Integer userId2) {
-//        return enrollmentRepository.findRunningEnrollmentBetweenTwoUsers(userId1, userId2);
-//    }
+    //    public Optional<Enrollment> findRunningEnrollmentBetweenTwoUsers(Integer userId1, Integer userId2) {
+    //        return enrollmentRepository.findRunningEnrollmentBetweenTwoUsers(userId1, userId2);
+    //    }
 
     public Page<Enrollment> findAllByGigId(Pageable pageable, Integer id) {
         return enrollmentRepository.findAllByGigId(pageable, id);
@@ -201,9 +209,13 @@ public class EnrollmentService {
         User user = userUtility.getCurrentUser();
 
         // make sure the user is either the buyer or the seller as this is intended for the enrollment details view.
-        return enrollmentRepository.findById(id)
-                .filter(enrollment -> Objects.equals(user.getId(), enrollment.getBuyer().getId())
-                        || Objects.equals(user.getId(), enrollment.getGig().getSeller().getId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
+        return enrollmentRepository
+            .findById(id)
+            .filter(
+                enrollment ->
+                    Objects.equals(user.getId(), enrollment.getBuyer().getId()) ||
+                    Objects.equals(user.getId(), enrollment.getGig().getSeller().getId())
+            )
+            .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
     }
 }

@@ -4,8 +4,8 @@ import com.amplifiers.pathfinder.entity.gig.Gig;
 import com.amplifiers.pathfinder.entity.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -24,17 +22,18 @@ import java.time.OffsetDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "enrollment")
 public class Enrollment {
+
     @Id
     @GeneratedValue
     private Integer id;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gigId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Gig gig;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -46,8 +45,7 @@ public class Enrollment {
     private OffsetDateTime startedAt;
 
     @NotNull(message = "Deadline is required.")
-    @Future(message = "Deadline must be in the future.")
-    private OffsetDateTime  deadline;
+    private OffsetDateTime deadline;
 
     private OffsetDateTime completedAt;
 
@@ -64,6 +62,5 @@ public class Enrollment {
 
     private boolean buyerConfirmed; // when buyer accepts the offer
     private boolean paid;
-
     // TODO: add an enrollment offer description field.
 }

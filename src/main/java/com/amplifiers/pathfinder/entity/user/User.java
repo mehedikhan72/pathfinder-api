@@ -82,7 +82,7 @@ public class User implements UserDetails {
     @ColumnDefault("null")
     private String emailVerificationToken;
 
-    @Column(columnDefinition = "timestamp default null")
+    @ColumnDefault("null")
     private OffsetDateTime lastVerificationEmailSentAt;
 
     @JsonIgnore

@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class ZoomApiService {
 
-    private ZoomAuthenticationHelper zoomAuthenticationHelper;
+    private final ZoomAuthenticationHelper zoomAuthenticationHelper;
 
     private final RestTemplate restTemplate;
 
@@ -48,6 +48,7 @@ public class ZoomApiService {
             return map;
         } catch (Exception e) {
             //sout is used for demo purposes you could use @Slf4j
+            e.printStackTrace();
             System.out.printf("Unable to get all meetings due to %s. Response code: %d%n", e.getMessage(), response.getStatusCode());
             e.printStackTrace();
         }

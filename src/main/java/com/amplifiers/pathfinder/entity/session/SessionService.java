@@ -33,11 +33,11 @@ public class SessionService {
             .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found."));
 
         // user validation: only the seller can create a session.
-        var sellerId = enrollment.getGig().getSeller().getId();
 
         User user = userUtility.getCurrentUser();
+        User seller = enrollment.getGig().getSeller();
 
-        if (!Objects.equals(user.getId(), sellerId)) {
+        if (!Objects.equals(user.getId(), seller.getId())) {
             throw new UnauthorizedException("Only the seller can create a session.");
         }
 
@@ -63,10 +63,9 @@ public class SessionService {
 
         Session savedSession = sessionRepository.save(session);
         // Send notification
-        String notificationTxt =
-            session.getEnrollment().getGig().getSeller().getFullName()
-            + " has scheduled a session for you. It's waiting for your confirmation.";
-        String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
+        String notificationTemplate = "%s - %s - Scheduled a session for you. Waiting for your confirmation.";
+        String notificationTxt = String.format(notificationTemplate, seller.getFullName(), enrollment.getGig().getTitle());
+        String linkSuffix = "interaction/user/" + seller.getId();
         notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
 
         return savedSession;
@@ -78,6 +77,7 @@ public class SessionService {
         // only the buyer can confirm a session
         User user = userUtility.getCurrentUser();
         User buyer = session.getEnrollment().getBuyer();
+        User seller = session.getEnrollment().getGig().getSeller();
 
         if (!Objects.equals(user.getId(), buyer.getId())) {
             throw new UnauthorizedException("Only the buyer can confirm a session.");
@@ -85,15 +85,11 @@ public class SessionService {
 
         session.setBuyerConfirmed(true);
 
-        // Send notification
-        String notificationTxt = session.getEnrollment().getBuyer().getFullName() + " has confirmed the session.";
-        String linkSuffix = "interaction/user/" + session.getEnrollment().getBuyer().getId();
-        notificationService.sendNotification(
-            notificationTxt,
-            session.getEnrollment().getGig().getSeller(),
-            NotificationType.SESSION,
-            linkSuffix
-        );
+        // Send notification to seller
+        String notificationTemplate = "%s - %s - Session Confirmed";
+        String notificationTxt = String.format(notificationTemplate, buyer.getFullName(), session.getEnrollment().getGig().getTitle());
+        String linkSuffix = "interaction/user/" + buyer.getId();
+        notificationService.sendNotification(notificationTxt, seller, NotificationType.SESSION, linkSuffix);
 
         return sessionRepository.save(session);
     }
@@ -104,6 +100,7 @@ public class SessionService {
         // only the buyer can decline a session
         User user = userUtility.getCurrentUser();
         User buyer = session.getEnrollment().getBuyer();
+        User seller = session.getEnrollment().getGig().getSeller();
 
         if (!Objects.equals(user.getId(), buyer.getId())) {
             throw new UnauthorizedException("Only the buyer can decline a session.");
@@ -111,15 +108,11 @@ public class SessionService {
 
         sessionRepository.delete(session);
 
-        // Send notification
-        String notificationTxt = session.getEnrollment().getBuyer().getFullName() + " has declined the session.";
-        String linkSuffix = "interaction/user/" + session.getEnrollment().getBuyer().getId();
-        notificationService.sendNotification(
-            notificationTxt,
-            session.getEnrollment().getGig().getSeller(),
-            NotificationType.SESSION,
-            linkSuffix
-        );
+        // Send notification to seller
+        String notificationTemplate = "%s - %s - Session Declined";
+        String notificationTxt = String.format(notificationTemplate, buyer.getFullName(), session.getEnrollment().getGig().getTitle());
+        String linkSuffix = "interaction/user/" + buyer.getId();
+        notificationService.sendNotification(notificationTxt, seller, NotificationType.SESSION, linkSuffix);
         return "deleted";
     }
 
@@ -169,15 +162,46 @@ public class SessionService {
         Enrollment enrollment = session.getEnrollment();
         enrollment.setNumSessionsCompleted(enrollment.getNumSessionsCompleted() + 1);
 
+        User buyer = enrollment.getBuyer();
+
+        // Send Session notification
+        // Buyer
+        String notificationTemplate = "%s - %s - Session %d marked completed";
+        String notificationTxt = String.format(
+            notificationTemplate,
+            seller.getFullName(),
+            enrollment.getGig().getTitle(),
+            enrollment.getNumSessionsCompleted()
+        );
+        String linkSuffix = "interaction/user/" + seller.getId();
+        notificationService.sendNotification(notificationTxt, buyer, NotificationType.SESSION, linkSuffix);
+
+        // Seller
+        notificationTxt = String.format(
+            notificationTemplate,
+            buyer.getFullName(),
+            enrollment.getGig().getTitle(),
+            enrollment.getNumSessionsCompleted()
+        );
+        linkSuffix = "interaction/user/" + buyer.getId();
+        notificationService.sendNotification(notificationTxt, seller, NotificationType.SESSION, linkSuffix);
+
         if (enrollment.getNumSessions() <= enrollment.getNumSessionsCompleted()) {
             enrollment.setCompletedAt(java.time.OffsetDateTime.now());
+
+            // Send Enrollment Notification
+            // Buyer
+            notificationTemplate = "%s - %s - Enrollment completed";
+            notificationTxt = String.format(notificationTemplate, seller.getFullName(), enrollment.getGig().getTitle());
+            linkSuffix = "enrollment/details/" + enrollment.getId();
+            notificationService.sendNotification(notificationTxt, buyer, NotificationType.ENROLLMENT, linkSuffix);
+
+            // Seller
+            notificationTxt = String.format(notificationTemplate, buyer.getFullName(), enrollment.getGig().getTitle());
+            notificationService.sendNotification(notificationTxt, seller, NotificationType.ENROLLMENT, linkSuffix);
         }
         enrollmentRepository.save(enrollment);
 
-        // Send notification
-        String notificationTxt = session.getEnrollment().getGig().getSeller().getFullName() + " has marked one session completed.";
-        String linkSuffix = "interaction/user/" + session.getEnrollment().getGig().getSeller().getId();
-        notificationService.sendNotification(notificationTxt, session.getEnrollment().getBuyer(), NotificationType.SESSION, linkSuffix);
         return sessionRepository.save(session);
     }
 

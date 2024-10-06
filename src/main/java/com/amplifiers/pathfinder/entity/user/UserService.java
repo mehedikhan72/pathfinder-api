@@ -7,6 +7,8 @@ import com.amplifiers.pathfinder.entity.gig.GigManageDTO;
 import com.amplifiers.pathfinder.entity.gig.GigService;
 import com.amplifiers.pathfinder.entity.image.Image;
 import com.amplifiers.pathfinder.entity.image.ImageService;
+import com.amplifiers.pathfinder.entity.notification.NotificationService;
+import com.amplifiers.pathfinder.entity.notification.NotificationType;
 import com.amplifiers.pathfinder.entity.review.ReviewCardDTO;
 import com.amplifiers.pathfinder.entity.review.ReviewRepository;
 import com.amplifiers.pathfinder.entity.review.ReviewService;
@@ -41,6 +43,7 @@ public class UserService {
     private final TagService tagService;
     private final EnrollmentRepository enrollmentRepository;
     private final ImageService imageService;
+    private final NotificationService notificationService;
 
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
         var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
@@ -206,6 +209,8 @@ public class UserService {
         var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
 
         user.setZoomAuthorizationCode(code);
+
+        notificationService.sendNotification("Your Zoom account has been connected.", user, NotificationType.OTHERS, null);
         repository.save(user);
     }
 
