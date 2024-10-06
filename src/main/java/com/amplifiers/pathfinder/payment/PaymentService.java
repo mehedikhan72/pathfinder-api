@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
     private final TransactionRepository transactionRepository;
     private final TransactionResponseValidator transactionResponseValidator;
     private final NotificationService notificationService;
@@ -37,29 +38,28 @@ public class PaymentService {
 
     // returns the URL to which the user will be redirected to make the payment
     public String handleOnlinePayment(Enrollment enrollment) throws Exception {
-
         String tranxId = UUID.randomUUID().toString();
         Transaction transaction = Transaction.builder()
-                .tranxId(tranxId)
-                .enrollment(enrollment)
-                .amount(enrollment.getPrice())
-                .paidAt(OffsetDateTime.now())
-                .paymentConfirmed(false)
-                .build();
+            .tranxId(tranxId)
+            .enrollment(enrollment)
+            .amount(enrollment.getPrice())
+            .paidAt(OffsetDateTime.now())
+            .paymentConfirmed(false)
+            .build();
 
         transactionRepository.save(transaction);
 
         Map<String, String> postData = constructPostData(
-                enrollment.getPrice(),
-                tranxId,
-                enrollment.getBuyer().getFullName(),
-                enrollment.getBuyer().getEmail(),
-                enrollment.getGig().getTitle()
+            enrollment.getPrice(),
+            tranxId,
+            enrollment.getBuyer().getFullName(),
+            enrollment.getBuyer().getEmail(),
+            enrollment.getGig().getTitle()
         );
         SSLCommerz sslCommerz = new SSLCommerz(
-                Variables.SslCommerzSettings.SSLCOMMERZ_STORE_ID,
-                Variables.SslCommerzSettings.SSLCOMMERZ_STORE_PASSWORD,
-                Variables.SslCommerzSettings.STORE_TEST_MODE
+            Variables.SslCommerzSettings.SSLCOMMERZ_STORE_ID,
+            Variables.SslCommerzSettings.SSLCOMMERZ_STORE_PASSWORD,
+            Variables.SslCommerzSettings.STORE_TEST_MODE
         );
         String url = sslCommerz.initiateTransaction(postData, false);
         System.out.println("url - " + url);
@@ -73,7 +73,7 @@ public class PaymentService {
         String failUrl = baseUrl + "api/v1/public/enrollment/payment-fail";
         String cancelUrl = baseUrl + "api/v1/public/enrollment/payment-cancel";
 
-        Map<String, String> postData = new HashMap<String, String>();
+        Map<String, String> postData = new HashMap<>();
         postData.put("total_amount", String.valueOf(total));
         postData.put("tran_id", tranxId); // use unique tran_id for each API call
         postData.put("success_url", successUrl);
@@ -90,13 +90,13 @@ public class PaymentService {
         postData.put("product_name", "Test Product");
         postData.put("product_category", "General");
         postData.put("product_profile", "General");
-//        postData.put("ship_name", "ABC XY");
-//        postData.put("ship_add1", "Address Line One");
-//        postData.put("ship_add2", "Address Line Two");
-//        postData.put("ship_city", "City Name");
-//        postData.put("ship_state", "State Name");
-//        postData.put("ship_postcode", "Post Code");
-//        postData.put("ship_country", "Country");
+        //        postData.put("ship_name", "ABC XY");
+        //        postData.put("ship_add1", "Address Line One");
+        //        postData.put("ship_add2", "Address Line Two");
+        //        postData.put("ship_city", "City Name");
+        //        postData.put("ship_state", "State Name");
+        //        postData.put("ship_postcode", "Post Code");
+        //        postData.put("ship_country", "Country");
         return postData;
     }
 
@@ -145,25 +145,41 @@ public class PaymentService {
 
             // updating seller n buyer thru email.
             try {
-                emailService.sendEmail(enrollment.getBuyer(),
-                        "Enrollment Confirmed",
-                        "You have successfully confirmed the enrollment for the gig " + enrollment.getGig().getTitle() + ".\n"
-                                + "Amount paid - " + enrollment.getPrice() + ".\n"
-                                + "Transaction id - " + tranxId + ".\n\n"
-                                + "Best,\n"
-                                + "Team pathPhindr\n");
+                emailService.sendEmail(
+                    enrollment.getBuyer(),
+                    "Enrollment Confirmed",
+                    "You have successfully confirmed the enrollment for the gig " +
+                    enrollment.getGig().getTitle() +
+                    ".\n" +
+                    "Amount paid - " +
+                    enrollment.getPrice() +
+                    ".\n" +
+                    "Transaction id - " +
+                    tranxId +
+                    ".\n\n" +
+                    "Best,\n" +
+                    "Team pathPhindr\n"
+                );
             } catch (Exception e) {
                 throw new ValidationException("Email could not be sent. Please try again.");
             }
 
             try {
-                emailService.sendEmail(enrollment.getGig().getSeller(),
-                        "New Confirmed Enrollment",
-                        "You have a new enrollment confirmed for the gig " + enrollment.getGig().getTitle() + ".\n"
-                                + "Amount received - " + enrollment.getPrice() + ".\n"
-                                + "Transaction id - " + tranxId + ".\n\n"
-                                + "Best,\n"
-                                + "Team pathPhindr\n");
+                emailService.sendEmail(
+                    enrollment.getGig().getSeller(),
+                    "New Confirmed Enrollment",
+                    "You have a new enrollment confirmed for the gig " +
+                    enrollment.getGig().getTitle() +
+                    ".\n" +
+                    "Amount received - " +
+                    enrollment.getPrice() +
+                    ".\n" +
+                    "Transaction id - " +
+                    tranxId +
+                    ".\n\n" +
+                    "Best,\n" +
+                    "Team pathPhindr\n"
+                );
             } catch (Exception e) {
                 throw new ValidationException("Email could not be sent. Please try again.");
             }

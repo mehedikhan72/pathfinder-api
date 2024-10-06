@@ -50,7 +50,7 @@ public class Enrollment {
     private OffsetDateTime completedAt;
 
     @NotNull(message = "Price is required.")
-    private float price;
+    private Float price;
 
     @NotNull(message = "Number of sessions is required.")
     private Integer numSessions;
