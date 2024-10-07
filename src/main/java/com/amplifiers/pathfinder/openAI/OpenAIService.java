@@ -23,25 +23,25 @@ public class OpenAIService {
     private final Integer chatMaxTokens = 300;
 
     public String suggestion(String message) {
-        var chatRequest = ChatRequest.builder()
-                .model("llama3-8b-8192")
-                .message(
-                        ChatMessage.SystemMessage.of(
-                                "You will give a very short description, roadmap and a few resources on how to learn the given topic."
-                                        + "Generate a response within a maximum 500 tokens."
-                        )
-                )
-                .message(ChatMessage.UserMessage.of(message))
-                .temperature(0.0)
-                .maxTokens(suggestionMaxTokens)
-                .build();
+        //        var chatRequest = ChatRequest.builder()
+        //            .model("llama3-8b-8192")
+        //            .message(
+        //                ChatMessage.SystemMessage.of(
+        //                    "You will give a very short description, roadmap and a few resources on how to learn the given topic." +
+        //                    "Generate a response within a maximum 500 tokens."
+        //                )
+        //            )
+        //            .message(ChatMessage.UserMessage.of(message))
+        //            .temperature(0.0)
+        //            .maxTokens(suggestionMaxTokens)
+        //            .build();
+        //
+        //        var futureChat = openAI.chatCompletions().create(chatRequest);
+        //        var chatResponse = futureChat.join();
 
-        var futureChat = openAI.chatCompletions().create(chatRequest);
-        var chatResponse = futureChat.join();
-
-//        System.out.println(chatResponse.firstContent());
-
-        return chatResponse.firstContent();
+        //        System.out.println(chatResponse.firstContent());
+        //        return chatResponse.firstContent();
+        return apiKey;
     }
 
     public String chat(String message) {
