@@ -1,3 +1,5 @@
+####*the resources for the cloud deployment is destroyed atm*
+
 # pathPhindr
 Your gateway to knowledge! Designed to connect curious minds with seasoned pros, pathFinder transforms career aspirations into achievable goals. Explore, connect, and thrive with mentors who illuminate your path to success.
 
